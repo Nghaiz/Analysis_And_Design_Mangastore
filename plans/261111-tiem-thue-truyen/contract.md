@@ -102,7 +102,7 @@ Thêm biến mới: orchestrator sửa `.env.example` và bảng này trong cùn
 ## 9. Git
 
 - Repo: `git@github.com:Nghaiz/Analysis_And_Design_Mangastore.git` (public), remote `origin`, SSH. Commit gốc trên `main` ngày 11/11/2026: `.gitignore`, `.gitattributes`, `plans/`, brief, `images/`, PDF báo cáo. Sau commit gốc không commit thẳng lên `main`.
-- Mỗi phase một nhánh `phase/0N-<slug>` tạo từ `origin/main` mới nhất (`git fetch origin` trước); mỗi lane sửa code một worktree `D:/Coding/mangastore-wt/<0N>-<lane>` trên nhánh `phase/0N-<slug>/<lane>`, chỉ commit tại máy, không push.
+- Mỗi phase một nhánh `phase/0N-<slug>` tạo từ `origin/main` mới nhất (`git fetch origin` trước); mỗi lane sửa code một worktree `D:/Coding/mangastore-wt/<0N>-<lane>` trên nhánh `lane/0N-<slug>/<lane>` (git không cho nhánh `phase/0N-<slug>` và `phase/0N-<slug>/<lane>` cùng tồn tại), chỉ commit tại máy, không push.
 - Cuối phase, orchestrator merge các lane vào nhánh phase rồi chạy Accept. PASS thì push nhánh phase (`git push -u origin phase/0N-<slug>`), mở PR vào `main` (`gh pr create --base main`), merge bằng merge commit (`gh pr merge <số PR> --merge --delete-branch`), rồi `git switch main && git pull --ff-only`. Phase 8 chờ thêm CI trên PR xanh (Deferred #25).
 - Quyền push, mở PR và merge trên repo này do chủ dự án cho ngày 11/11/2026 (Deferred #3). Không push lên đâu khác, không force-push, subagent không push.
 - Commit dạng pathspec (`git commit -m "..." -- <đường dẫn>`), không `git add .`; file mới thì `git add <đường dẫn cụ thể>` trước.
