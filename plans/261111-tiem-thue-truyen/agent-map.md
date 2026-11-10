@@ -2,9 +2,9 @@
 
 Nguồn sự thật cho việc giao lane của mọi phiên cook. Đọc lại đầu phiên và sau mỗi lần compact (cùng `CLAUDE.md` và file phase đang làm). Giao hay nhận việc xong là cập nhật file này ngay, trước khi làm việc khác.
 
-Phase đang chạy: (chưa bắt đầu)
-Cập nhật lần cuối: (yyyy-mm-dd hh:mm)
-Nhánh phase: (ví dụ `phase/01-khung`)
+Phase đang chạy: 1 (khung dự án và hạ tầng)
+Cập nhật lần cuối: 2026-11-11 (phiên cook phase 1–2)
+Nhánh phase: `phase/01-khung`
 
 ## Luật (tóm tắt, bản đủ ở `plan.md` và `contract.md` §1)
 
@@ -31,7 +31,7 @@ Nhánh phase: (ví dụ `phase/01-khung`)
 
 | Phase | Lane | Việc | Agent | Owns | Phụ thuộc | Trạng thái | Báo cáo |
 |---|---|---|---|---|---|---|---|
-| 1 | 1.0 orchestrator | nhánh phase, `.editorconfig`, file dùng chung, hợp đồng, Accept (git và remote đã có) | phiên chính | xem `phase-01` bước 1.0 | cài JDK 25 bằng winget (bước chuẩn bị) | chờ | |
+| 1 | 1.0 orchestrator | nhánh phase, `.editorconfig`, file dùng chung, hợp đồng, Accept (git và remote đã có) | phiên chính | xem `phase-01` bước 1.0 | cài JDK 25 bằng winget (bước chuẩn bị) | xong | contract.md §10 |
 | 1 | 1A `java-khung` | Maven Wrapper, util, tag assets, health, Dockerfile app | `t1k-web-core-developer` | xem `phase-01` | 1.0 | chờ | |
 | 1 | 1B `frontend-khung` | Vite, TS, ESLint, loader khung | `t1k-web-core-developer` | `frontend/**` trừ package | 1.0 | chờ | |
 | 1 | 1C `ha-tang` | nginx brotli, mysql, redis, make-env | `t1k-web-core-developer` | `docker/nginx,mysql,redis/**`, `scripts/dev/**` | 1.0 | chờ | |
