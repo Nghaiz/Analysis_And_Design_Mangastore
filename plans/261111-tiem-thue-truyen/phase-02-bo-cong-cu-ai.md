@@ -16,11 +16,11 @@ Nguồn bắt buộc cho mọi lane: brief `prompt-web-tiem-thue-truyen.md` (§3
 
 ## Các bước
 
-- [ ] **2.0 Lane 2A `hop-dong`, tuần tự (trước mọi lần chia lane):** viết `docs/contracts.md`, `AGENTS.md`, `CLAUDE.md`. Orchestrator đọc lại, commit trước khi mở 2B–2D.
-- [ ] **2.1 Orchestrator:** viết `scripts/check/section10-sync.mjs` và test của nó, `scripts/check/contracts-doc.test.mjs`, `scripts/check/skills-frontmatter.test.mjs`, `scripts/accept/phase-02.mjs`; commit.
-- [ ] **2.2 Lane 2B `docs`**, **2.3 Lane 2C `rules`**, **2.4 Lane 2D `skills`** chạy song song (3 chỗ).
-- [ ] **2.5 Orchestrator, tuần tự:** merge; chạy thử `tiem-contract-guard` trên một diff mẫu cố ý sai (thêm hàm `getBookById` vào `BookDAO` và thêm cột `quantity` vào `tblSelectedBook`) và xác nhận agent báo đúng hai vi phạm; ghi `plans/reports/phase-02-tiem-contract-guard-dryrun-<ts>.md`.
-- [ ] **2.6 Orchestrator:** chạy Accept, đánh dấu, push nhánh phase, mở PR vào `main` và merge bằng merge commit (`contract.md` §9).
+- [x] **2.0 Lane 2A `hop-dong`, tuần tự (trước mọi lần chia lane):** viết `docs/contracts.md`, `AGENTS.md`, `CLAUDE.md`. Orchestrator đọc lại, commit trước khi mở 2B–2D.
+- [x] **2.1 Orchestrator:** viết `scripts/check/section10-sync.mjs` và test của nó, `scripts/check/contracts-doc.test.mjs`, `scripts/check/skills-frontmatter.test.mjs`, `scripts/accept/phase-02.mjs`; commit.
+- [x] **2.2 Lane 2B `docs`**, **2.3 Lane 2C `rules`**, **2.4 Lane 2D `skills`** chạy song song (3 chỗ).
+- [x] **2.5 Orchestrator, tuần tự:** merge; chạy thử `tiem-contract-guard` trên một diff mẫu cố ý sai (thêm hàm `getBookById` vào `BookDAO` và thêm cột `quantity` vào `tblSelectedBook`) và xác nhận agent báo đúng hai vi phạm; ghi `plans/reports/phase-02-tiem-contract-guard-dryrun-<ts>.md`.
+- [x] **2.6 Orchestrator:** chạy Accept, đánh dấu, push nhánh phase, mở PR vào `main` và merge bằng merge commit (`contract.md` §9).
 
 ## Nội dung bắt buộc
 
@@ -69,6 +69,24 @@ Mọi spawn: `model: "opus"`, `effort` = giá trị `CLAUDE_EFFORT`, chạy nề
 5. `CLAUDE.md` có dòng `@AGENTS.md`; `AGENTS.md` có mọi lệnh ở mục "lệnh chạy" và các lệnh đó chạy được ở trạng thái hiện tại (lệnh của phase sau ghi rõ "có từ phase N").
 6. Lần chạy thử `tiem-contract-guard` báo đủ hai vi phạm cố ý.
 7. Accept phase 1 vẫn xanh (chống thoái lui: `plan-contract.test.mjs`, compose healthy).
+
+## Kết quả (11/11/2026)
+
+| Tiêu chí | Kết quả | Bằng chứng |
+|---|---|---|
+| 1 | `section10-sync.mjs` exit 0; làm đỏ có chủ đích: sửa một kí tự trong khối của rule → exit 1 kèm byte lệch (test tự động, cùng với một kí tự trong khối brief §3 của `AGENTS.md`) | `scripts/check/section10-sync.test.mjs` |
+| 2 | 28 trang, 28 thông báo, 13 bảng, 9 dòng DAO và 15 hàm, 12 thuộc tính session, props 4 island; danh sách đọc từ brief, brainstorm, `contract.md`, không chép trong test; làm đỏ đã thử bằng cách xoá một câu | `scripts/check/contracts-doc.test.mjs` |
+| 3 | 8 skill, 1 agent, 5 rule hợp lệ; `git ls-files .claude` chỉ có file `tiem-*` | `scripts/check/skills-frontmatter.test.mjs` |
+| 4 | Mọi khối Mermaid trong `docs/**` render bằng `@mermaid-js/mermaid-cli@12.2.0` | Accept bước 4 |
+| 5 | `CLAUDE.md` mở đầu bằng `@AGENTS.md`; 38 lệnh ở bảng "Lệnh chạy", mọi đường dẫn và script npm của lệnh đã có từ phase 1–2 tồn tại | Accept bước 5 |
+| 6 | `tiem-contract-guard` báo đúng 2 vi phạm: `BookDAO.java:32` (G1 + G5) và `V1__schema.sql:6` (G3 + G5) | `plans/reports/phase-02-tiem-contract-guard-dryrun-261111-0423.md` |
+| 7 | Accept phase 1 chạy lại trong Accept phase 2, compose healthy | Accept bước 7 |
+
+Thêm ngoài kế hoạch: `section10-sync.mjs` so cả khối nguyên văn brief §3 trong `AGENTS.md`; `schema-doc-sync.test.mjs` giữ bảng cột của `docs/schema.md` khớp từng kí tự với `docs/contracts.md` §2; `tblCart.clientId` ghi UNIQUE ngay trong ô khoá.
+
+Lệch kế hoạch: 2A chạy sớm trên nền `phase/01-khung` (chỉ tài liệu) rồi merge vào nhánh phase 2; 13 điểm "Chưa chốt" C1–C13 do orchestrator chốt theo uỷ quyền chủ dự án cho phiên này (`docs/contracts.md` §14); Deferred #29 ở `plan.md`.
+
+Để lại cho phase sau (đã ghi trong tài liệu, không phải nợ của phase 2): tham số Argon2id (phase 3, ADR-0007); token giao diện ở `docs/design-tokens.md` là đề xuất, phase 5 đo tương phản rồi chốt; lệnh test của pipeline chốt ở phase 4; mật khẩu tài khoản mẫu `<username>@123` (`docs/dev-accounts.md`) chỉ cho localhost.
 
 ## Lệnh kiểm
 

@@ -13,7 +13,11 @@ const NPX = IS_WIN ? 'npx.cmd' : 'npx';
 const NPM = IS_WIN ? 'npm.cmd' : 'npm';
 const MERMAID_CLI = '@mermaid-js/mermaid-cli@12.2.0';
 const read = (p) => readFileSync(join(ROOT, p), 'utf8');
-const nodeTest = (file) => mustRun(runner, process.execPath, ['--test', file], { fix: `sửa theo test hỏng (${file})` });
+const nodeTest = (file) => {
+  const r = mustRun(runner, process.execPath, ['--test', file], { fix: `sửa theo test hỏng (${file})` });
+  const pass = /ℹ pass (\d+)/.exec(r.out)?.[1];
+  return pass ? `${pass} test pass` : undefined;
+};
 
 function walk(dir) {
   return readdirSync(dir).flatMap((n) => {

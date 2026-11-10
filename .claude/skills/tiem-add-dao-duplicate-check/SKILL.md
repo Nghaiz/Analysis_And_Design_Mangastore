@@ -16,37 +16,35 @@ Hàm `addX` trả `false` khi vướng ràng buộc UNIQUE, để trang chọn c
 ## Các bước
 
 1. **Hàm phải có trong §5.3.** Không thêm hàm public, DAO mới hay tham số mới. Thiếu hàm → dừng, ghi đề xuất cho orchestrator. Helper `private` trong chính DAO chủ thì được.
-2. **Đúng lớp:** tám DAO (`UserDAO`, `ClientDAO`, `StaffDAO`, `BookDAO`, `CartDAO`, `RentalBillDAO`, `DamageDAO`, `CollateralDAO`) trong `vn.tiemtruyen.dao`, kế thừa `DAO` (giữ `con`, `implements AutoCloseable`). Lớp trung gian (`SelectedBook`, `RentedBook`, `RentedDamage`, `RentalCollateral`) không có DAO: ghi qua `CartDAO.updateCart(cart)` hoặc `RentalBillDAO.updateRentalBill(rentalBill)`.
+2. **Đúng lớp:** tám DAO (`UserDAO`, `ClientDAO`, `StaffDAO`, `BookDAO`, `CartDAO`, `RentalBillDAO`, `DamageDAO`, `CollateralDAO`) trong `vn.tiemtruyen.dao`, kế thừa `DAO` (`implements AutoCloseable`; kết nối là `private final Connection con`, lớp con đọc qua `protected final Connection con()` vì Checkstyle đặt `VisibilityModifier protectedAllowed=false`). Mỗi DAO con có đúng cặp constructor `public XxxDAO() throws SQLException { super(); }` (trang, mượn từ pool) và `protected XxxDAO(Connection con) { super(con); }` (test cùng package). Lớp trung gian (`SelectedBook`, `RentedBook`, `RentedDamage`, `RentalCollateral`) không có DAO: ghi qua `CartDAO.updateCart(cart)` hoặc `RentalBillDAO.updateRentalBill(rentalBill)`.
 3. **Kiểm trùng bằng ràng buộc của DB, không bằng SELECT trước.** SELECT rồi INSERT có khe tranh chấp; UNIQUE trong `V1__schema.sql` là nguồn thật. Bắt lỗi trùng đúng mã MySQL 1062 (`ER_DUP_ENTRY`), trả `false`; lỗi khác ném tiếp.
-4. **Khuôn transaction cho hàm ghi** (§5.2):
+4. **Khuôn transaction cho hàm ghi** (§5.2): bọc toàn bộ thân trong helper `protected final boolean inWriteTransaction(Callable<Boolean> work)` của `DAO` (tắt autocommit, `READ_COMMITTED`; `true` → commit, `false` → rollback; ngoại lệ → rollback rồi ném lại; trả autocommit và mức cô lập cũ). Không tự viết `setAutoCommit` / `commit` / `rollback` trong DAO con:
 
 ```java
 public boolean addDamage(Damage damage) throws SQLException {
-    boolean oldAutoCommit = con.getAutoCommit();
-    con.setAutoCommit(false);
-    con.setTransactionIsolation(Connection.TRANSACTION_READ_COMMITTED);
-    try (PreparedStatement ps = con.prepareStatement(
-            "INSERT INTO tblDamage (name, description) VALUES (?, ?)", Statement.RETURN_GENERATED_KEYS)) {
-        ps.setString(1, damage.getName());
-        ps.setString(2, damage.getDescription());
-        ps.executeUpdate();
-        int newId;
-        try (ResultSet keys = ps.getGeneratedKeys()) {
-            keys.next();
-            newId = keys.getInt(1);
+    int[] newId = new int[1];
+    boolean saved = inWriteTransaction(() -> {
+        try (PreparedStatement ps = con().prepareStatement(
+                "INSERT INTO tblDamage (name, description) VALUES (?, ?)", Statement.RETURN_GENERATED_KEYS)) {
+            ps.setString(1, damage.getName());
+            ps.setString(2, damage.getDescription());
+            ps.executeUpdate();
+            try (ResultSet keys = ps.getGeneratedKeys()) {
+                keys.next();
+                newId[0] = keys.getInt(1);
+            }
+            return true;
+        } catch (SQLException e) {
+            if (e.getErrorCode() == MYSQL_DUPLICATE_ENTRY) {   // hằng có tên, = 1062
+                return false;                                  // helper rollback
+            }
+            throw e;                                           // lỗi không lường trước: helper rollback rồi ném
         }
-        con.commit();
-        damage.setId(newId);          // chỉ gán id sau khi commit
-        return true;
-    } catch (SQLException e) {
-        con.rollback();
-        if (e.getErrorCode() == MYSQL_DUPLICATE_ENTRY) {   // hằng có tên, = 1062
-            return false;
-        }
-        throw e;                       // lỗi không lường trước: không nuốt
-    } finally {
-        con.setAutoCommit(oldAutoCommit);
+    });
+    if (saved) {
+        damage.setId(newId[0]);   // chỉ gán id sau commit
     }
+    return saved;
 }
 ```
 
@@ -61,9 +59,9 @@ public boolean addDamage(Damage damage) throws SQLException {
 ## Gotchas
 
 - Connector/J ném `SQLIntegrityConstraintViolationException` (SQLState `23000`) cho **cả** trùng UNIQUE (1062) lẫn vi phạm khoá ngoại (1452) và NOT NULL (1048). Chỉ 1062 là "trùng"; hai mã kia là bug, phải ném.
-- Trả `false` mà quên rollback thì transaction treo giữ khoá tới khi kết nối về pool. Luôn rollback trước khi trả `false` (§5.2).
+- Tự gọi `con().setAutoCommit(false)` / `commit()` / `rollback()` trong DAO con thay vì `inWriteTransaction` thì dễ quên rollback khi trả `false`: transaction treo giữ khoá tới khi kết nối về pool. `inWriteTransaction` không lồng được (gọi khi autocommit đang tắt thì ném `IllegalStateException`), nên hàm ghi nhiều bảng (`addClient`, `updateRentalBill`) làm mọi bước trong **một** lần gọi helper; helper `private` dùng chung thì nhận `Connection` hoặc chạy bên trong thân đó, không tự gọi helper lần nữa.
 - Gán `id` trước commit rồi bị rollback → đối tượng mang id ma, trang tưởng đã lưu. Gán sau commit.
-- `ClientDAO`, `StaffDAO` kế thừa `UserDAO`: `super.checkLogin(user)` dùng chung `con`, không mở kết nối thứ hai. `checkLogin` tìm theo `username` rồi `Passwords.verify`; không so mật khẩu trong SQL.
+- `ClientDAO`, `StaffDAO` kế thừa `UserDAO`: `super.checkLogin(user)` dùng chung `con()`, không mở kết nối thứ hai. `checkLogin` tìm theo `username` rồi `Passwords.verify`; không so mật khẩu trong SQL.
 - Cấm mọi hàm đọc một đối tượng theo id, kể cả `private` dùng làm "tiện": D9 đọc lại bằng `searchRentalBill("PM" + id)` hoặc `getRentalBillList(client)` ở **trang**, không ở DAO.
 - Không tin `book.listBookCopy` trong session để giữ quyển; K1 luôn đọc lại trong transaction.
 - Tiền là `float` như ch.9 (C13); không đổi sang `BigDecimal`. Kiểu mảng `T[]` là `List<T>`.
