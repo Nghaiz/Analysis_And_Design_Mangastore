@@ -19,22 +19,24 @@ Nhánh phase: `phase/01-khung`
 
 | Lane | Agent | Bắt đầu | Worktree / nhánh | Báo cáo |
 |---|---|---|---|---|
-| | | | | |
+| 1A `java-khung` | `t1k-web-core-developer` (opus, high) | 2026-11-11 | `D:/Coding/mangastore-wt/01-java-khung` / `lane/01-khung/java-khung` | `plans/reports/phase-01-java-khung-*.md` |
+| 1B `frontend-khung` | `t1k-web-core-developer` (opus, high) | 2026-11-11 | `D:/Coding/mangastore-wt/01-frontend-khung` / `lane/01-khung/frontend-khung` | `plans/reports/phase-01-frontend-khung-*.md` |
+| 1C `ha-tang` | `t1k-web-core-developer` (opus, high) | 2026-11-11 | `D:/Coding/mangastore-wt/01-ha-tang` / `lane/01-khung/ha-tang` | `plans/reports/phase-01-ha-tang-*.md` |
 
 ## Hàng đợi
 
 | Thứ tự | Lane | Chờ gì |
 |---|---|---|
-| | | |
+| 1 | 1D `xac-minh` | 1A, 1B, 1C đã merge, `.env`, compose healthy |
 
 ## Bảng lane
 
 | Phase | Lane | Việc | Agent | Owns | Phụ thuộc | Trạng thái | Báo cáo |
 |---|---|---|---|---|---|---|---|
 | 1 | 1.0 orchestrator | nhánh phase, `.editorconfig`, file dùng chung, hợp đồng, Accept (git và remote đã có) | phiên chính | xem `phase-01` bước 1.0 | cài JDK 25 bằng winget (bước chuẩn bị) | xong | contract.md §10 |
-| 1 | 1A `java-khung` | Maven Wrapper, util, tag assets, health, Dockerfile app | `t1k-web-core-developer` | xem `phase-01` | 1.0 | chờ | |
-| 1 | 1B `frontend-khung` | Vite, TS, ESLint, loader khung | `t1k-web-core-developer` | `frontend/**` trừ package | 1.0 | chờ | |
-| 1 | 1C `ha-tang` | nginx brotli, mysql, redis, make-env | `t1k-web-core-developer` | `docker/nginx,mysql,redis/**`, `scripts/dev/**` | 1.0 | chờ | |
+| 1 | 1A `java-khung` | Maven Wrapper, util, tag assets, health, Dockerfile app | `t1k-web-core-developer` | xem `phase-01` | 1.0 | đang chạy | |
+| 1 | 1B `frontend-khung` | Vite, TS, ESLint, loader khung | `t1k-web-core-developer` | `frontend/**` trừ package | 1.0 | đang chạy | |
+| 1 | 1C `ha-tang` | nginx brotli, mysql, redis, make-env | `t1k-web-core-developer` | `docker/nginx,mysql,redis/**`, `scripts/dev/**` | 1.0 | đang chạy | |
 | 1 | 1D `xac-minh` | Playwright MCP trang tạm | `t1k-web-testing-tester` | `plans/reports/` | 1A, 1B, 1C, `.env` | chờ | |
 | 2 | 2A `hop-dong` | `docs/contracts.md`, `AGENTS.md`, `CLAUDE.md` | `t1k-docs-manager` | ba file đó | phase 1 | chờ | |
 | 2 | 2B `docs` | docs còn lại, ADR, Mermaid | `t1k-docs-manager` | `docs/**` trừ contracts | 2A, 2.1 | chờ | |
