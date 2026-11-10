@@ -245,7 +245,7 @@ Tham số và kiểu trả về theo ký hiệu UML của ch.9 (`T[]` = `List<T>
 | BookDAO extends DAO | `addBook(book: Book): boolean` | Ngoài báo cáo (D6). Lưu đầu truyện cùng `listBookCopy` |
 | BookDAO extends DAO | `updateBook(book: Book): boolean` | Ngoài báo cáo (D6). Hàm cập nhật duy nhất của Book; quyển đi qua Book chủ (C12) |
 | CartDAO extends DAO | `getCart(client: Client): Cart` | Giỏ cùng các dòng **chưa thuộc phiếu mượn nào, trừ phiếu đã huỷ**, mỗi dòng kèm quyển và đầu truyện; danh sách rỗng nếu giỏ trống (tr.69) |
-| CartDAO extends DAO | `updateCart(cart: Cart): boolean` | Trong một giao dịch: thêm dòng mới (`id = 0`), xoá dòng bị bỏ; không đụng dòng đã thuộc phiếu mượn (tr.70). Không khoá quyển |
+| CartDAO extends DAO | `updateCart(cart: Cart): boolean` | Trong một giao dịch: thêm dòng mới (`id = 0`), xoá dòng bị bỏ; không đụng dòng đã thuộc phiếu chưa huỷ (tr.70). Không khoá quyển. Trả `false` (rollback) duy nhất khi một dòng mới trỏ vào quyển đã có trong giỏ (bất biến mục 6.2). Xoá dòng từng thuộc phiếu **đã huỷ** thì gỡ `tblRentedBook.selectedBookId` của phiếu huỷ đó về NULL trước (khoá ngoại); quyển thực giao của phiếu huỷ giữ nguyên |
 | RentalBillDAO extends DAO | `addRentalBill(rentalBill: RentalBill): boolean` | Trong một giao dịch, khoá K1: kiểm quyển vẫn sẵn sàng, quyển đã bị phiếu khác giữ thì đổi sang quyển khác cùng đầu truyện, lưu phiếu "Chờ nhận" cùng các dòng; `false` nếu không còn đủ quyển (tr.70) |
 | RentalBillDAO extends DAO | `getRentalBillList(client: Client): RentalBill[]` | Phiếu của khách kèm quyển (cùng lỗi) và khoản cọc (tr.70) |
 | RentalBillDAO extends DAO | `searchRentalBill(keyword: String): RentalBill[]` | Phiếu có mã phiếu, tên khách hoặc số CCCD khớp từ khoá, kèm thông tin khách và quyển (tr.85; cách khớp: C9) |
@@ -266,8 +266,8 @@ So khớp từ khoá dùng `LIKE '%…%'` có tham số (`PreparedStatement`, kh
 Áp cho mọi đường tạo `tblRentedBook`: `addRentalBill` và nhánh "thêm quyển mới" của `updateRentalBill`. Trong cùng transaction (READ COMMITTED, autocommit tắt):
 
 1. Khoá các đầu truyện liên quan theo id tăng dần: `SELECT id FROM tblBook WHERE id IN (…) ORDER BY id FOR UPDATE`.
-2. Với từng dòng, đọc lại quyển còn trống: `NOT EXISTS` dòng `tblRentedBook` của phiếu chưa huỷ trỏ vào quyển đó, trừ chính phiếu này.
-3. Quyển đã bận thì đổi sang quyển trống khác cùng đầu truyện và chưa có trong phiếu (ch.9 tr.66); không đủ thì rollback và trả `false`.
+2. Với từng dòng, theo thứ tự danh sách, đọc lại quyển còn trống: `NOT EXISTS` dòng `tblRentedBook` của phiếu chưa huỷ trỏ vào quyển đó. Dòng còn lại và dòng vừa ghi của chính phiếu này cũng tính là bận, nên một quyển không vào phiếu hai lần.
+3. Quyển đã bận thì đổi sang quyển trống id nhỏ nhất cùng đầu truyện (mục 6.2, ch.9 tr.66); không đủ thì rollback và trả `false`. Chọn theo từng dòng nên dòng nào nhận quyển nào có thể khác cách chọn hai lượt; tập quyển thực giao như nhau (cùng đầu truyện, cùng giá).
 4. Ghi phiếu và dòng, commit. Quyển thực giao (sau khi đổi) được ghi lại vào `RentedBook.bookCopy` của đối tượng truyền vào để trang hiển thị đúng mã vạch.
 
 Huỷ phiếu và bỏ quyển không cần khoá (chỉ giải phóng). `updateCart` không giữ quyển nên không khoá. Không tin `book.listBookCopy` trong session.
