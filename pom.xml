@@ -30,8 +30,12 @@
     <hikaricp.version>7.1.0</hikaricp.version>
     <mysql-connector.version>26.10.0</mysql-connector.version>
     <slf4j.version>2.0.20</slf4j.version>
+    <flyway.version>13.12.1</flyway.version>
+    <password4j.version>1.8.4</password4j.version>
+    <jackson.version>3.3.0</jackson.version>
     <!-- Test -->
     <junit.version>6.1.3</junit.version>
+    <testcontainers.version>2.0.5</testcontainers.version>
     <!-- Plugin -->
     <maven-compiler-plugin.version>3.16.0</maven-compiler-plugin.version>
     <maven-resources-plugin.version>3.5.0</maven-resources-plugin.version>
@@ -104,9 +108,38 @@
       <version>${slf4j.version}</version>
     </dependency>
 
+    <!-- Phase 3: migration (MigrationListener), băm mật khẩu (Passwords), JSON cho island (JsonUtil) -->
+    <dependency>
+      <groupId>org.flywaydb</groupId>
+      <artifactId>flyway-core</artifactId>
+      <version>${flyway.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.flywaydb</groupId>
+      <artifactId>flyway-mysql</artifactId>
+      <version>${flyway.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>com.password4j</groupId>
+      <artifactId>password4j</artifactId>
+      <version>${password4j.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>tools.jackson.core</groupId>
+      <artifactId>jackson-databind</artifactId>
+      <version>${jackson.version}</version>
+    </dependency>
+
     <dependency>
       <groupId>org.junit.jupiter</groupId>
       <artifactId>junit-jupiter</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <!-- Test DAO trên MySQL thật mysql:8.4.13 (Testcontainers 2 đổi tên artifact) -->
+    <dependency>
+      <groupId>org.testcontainers</groupId>
+      <artifactId>testcontainers-mysql</artifactId>
+      <version>${testcontainers.version}</version>
       <scope>test</scope>
     </dependency>
   </dependencies>

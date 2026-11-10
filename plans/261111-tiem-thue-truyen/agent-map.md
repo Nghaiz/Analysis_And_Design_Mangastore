@@ -38,8 +38,8 @@ Nhánh phase: `phase/01-khung`
 | 2 | 2B `docs` | docs còn lại, ADR, Mermaid | `t1k-docs-manager` | `docs/**` trừ contracts | 2A, 2.1 | chờ | |
 | 2 | 2C `rules` | 5 rule | `t1k-rules-manager` | 5 file `.claude/rules/` | 2A, 2.1 | chờ | |
 | 2 | 2D `skills` | 8 skill, agent tiem-contract-guard | `t1k-skills-manager` | 8 thư mục skill, `tiem-contract-guard.md` | 2A, 2.1 | chờ | |
-| 3 | 3.0 orchestrator | V1, V2, V10 e2e, pom | phiên chính | `db/**`, `pom.xml` | phase 2 | chờ | |
-| 3 | 3A `model-util` | model, DAO cha, Messages, Passwords, Codes, JsonUtil, MigrationListener | `t1k-web-core-developer` | xem `phase-03` | 3.0 | chờ | |
+| 3 | 3.0 orchestrator | V1, V2, V10 e2e, pom | phiên ab | `db/**`, `pom.xml` | phase 2 (contracts.md 063f864) | xong (V2 chờ chuỗi băm từ 3A) | |
+| 3 | 3A `model-util` | model, DAO cha, Messages, Passwords, Codes, JsonUtil, MigrationListener | `t1k-web-core-developer` | xem `phase-03` | 3.0 | đang chạy (phiên ab) | `plans/reports/phase-03-model-util-*.md` |
 | 3 | 3B `dao-user-book` | User, Client, Staff, Book, Damage, Collateral DAO | `t1k-web-core-developer` | xem `phase-03` | 3A | chờ | |
 | 3 | 3C `dao-cart-bill` | Cart, RentalBill DAO, K1, D9, test tranh chấp | `t1k-web-core-developer` | xem `phase-03` | 3A | chờ | |
 | 3 | 3D `kiem-kien-truc` | SchemaConformanceTest, ArchitectureTest | `t1k-web-core-developer` | `src/test/.../schema,arch/**` | 3A | chờ | |
