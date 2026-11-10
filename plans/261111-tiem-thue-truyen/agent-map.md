@@ -20,8 +20,7 @@ Nhánh phase: `phase/01-khung`
 | Lane | Agent | Bắt đầu | Worktree / nhánh | Báo cáo |
 |---|---|---|---|---|
 | 1A `java-khung` | `t1k-web-core-developer` (opus, high) | 2026-11-11 | `D:/Coding/mangastore-wt/01-java-khung` / `lane/01-khung/java-khung` | `plans/reports/phase-01-java-khung-*.md` |
-| 1B `frontend-khung` | `t1k-web-core-developer` (opus, high) | 2026-11-11 | `D:/Coding/mangastore-wt/01-frontend-khung` / `lane/01-khung/frontend-khung` | `plans/reports/phase-01-frontend-khung-*.md` |
-| 1C `ha-tang` | `t1k-web-core-developer` (opus, high) | 2026-11-11 | `D:/Coding/mangastore-wt/01-ha-tang` / `lane/01-khung/ha-tang` | `plans/reports/phase-01-ha-tang-*.md` |
+| 2A `hop-dong` (sớm, nền phase/01-khung) | `t1k-docs-manager` (opus, high) | 2026-11-11 | `D:/Coding/mangastore-wt/02-hop-dong` / `lane/02-bo-cong-cu-ai/hop-dong` | `plans/reports/phase-02-hop-dong-*.md` |
 
 ## Hàng đợi
 
@@ -35,10 +34,10 @@ Nhánh phase: `phase/01-khung`
 |---|---|---|---|---|---|---|---|
 | 1 | 1.0 orchestrator | nhánh phase, `.editorconfig`, file dùng chung, hợp đồng, Accept (git và remote đã có) | phiên chính | xem `phase-01` bước 1.0 | cài JDK 25 bằng winget (bước chuẩn bị) | xong | contract.md §10 |
 | 1 | 1A `java-khung` | Maven Wrapper, util, tag assets, health, Dockerfile app | `t1k-web-core-developer` | xem `phase-01` | 1.0 | đang chạy | |
-| 1 | 1B `frontend-khung` | Vite, TS, ESLint, loader khung | `t1k-web-core-developer` | `frontend/**` trừ package | 1.0 | đang chạy | |
-| 1 | 1C `ha-tang` | nginx brotli, mysql, redis, make-env | `t1k-web-core-developer` | `docker/nginx,mysql,redis/**`, `scripts/dev/**` | 1.0 | đang chạy | |
+| 1 | 1B `frontend-khung` | Vite, TS, ESLint, loader khung | `t1k-web-core-developer` | `frontend/**` trừ package | 1.0 | xong | `plans/reports/phase-01-frontend-khung-261111-0342.md` |
+| 1 | 1C `ha-tang` | nginx brotli, mysql, redis, make-env | `t1k-web-core-developer` | `docker/nginx,mysql,redis/**`, `scripts/dev/**` | 1.0 | xong | `plans/reports/phase-01-ha-tang-261111-0342.md` |
 | 1 | 1D `xac-minh` | Playwright MCP trang tạm | `t1k-web-testing-tester` | `plans/reports/` | 1A, 1B, 1C, `.env` | chờ | |
-| 2 | 2A `hop-dong` | `docs/contracts.md`, `AGENTS.md`, `CLAUDE.md` | `t1k-docs-manager` | ba file đó | phase 1 | chờ | |
+| 2 | 2A `hop-dong` | `docs/contracts.md`, `AGENTS.md`, `CLAUDE.md` | `t1k-docs-manager` | ba file đó | phase 1 | đang chạy | |
 | 2 | 2B `docs` | docs còn lại, ADR, Mermaid | `t1k-docs-manager` | `docs/**` trừ contracts | 2A, 2.1 | chờ | |
 | 2 | 2C `rules` | 5 rule | `t1k-rules-manager` | 5 file `.claude/rules/` | 2A, 2.1 | chờ | |
 | 2 | 2D `skills` | 8 skill, agent tiem-contract-guard | `t1k-skills-manager` | 8 thư mục skill, `tiem-contract-guard.md` | 2A, 2.1 | chờ | |
@@ -86,4 +85,8 @@ Nhánh phase: `phase/01-khung`
 
 | Thời điểm | Sự kiện |
 |---|---|
-| | |
+| 2026-11-11 | JDK 25.0.5 (Temurin) cài bằng winget; JDK 24 giữ nguyên |
+| 2026-11-11 | 1.0 xong, commit hợp đồng; nhánh lane đổi thành `lane/0N-<slug>/<lane>` (git cấm `phase/01-khung/<lane>` khi đã có `phase/01-khung`) |
+| 2026-11-11 | Spawn 1A, 1B, 1C song song |
+| 2026-11-11 | 1B xong, merge; 1C xong, merge; áp đề xuất compose của 1C (MySQL conf 0644, Redis qua entrypoint); `.env` tạo bằng make-env |
+| 2026-11-11 | 2A spawn sớm trên nền phase/01-khung (chỉ tài liệu), merge vào phase/02 sau khi phase 1 vào main |
