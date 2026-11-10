@@ -206,7 +206,7 @@ Ràng buộc không nằm trong cột Khoá (ghi ở ghi chú dưới bảng c�
 | Cột | Kiểu | Null | Khoá |
 |---|---|---|---|
 | id | int | NOT NULL | PK |
-| clientId | int | NOT NULL | FK→tblClient.userId |
+| clientId | int | NOT NULL | FK→tblClient.userId, UNIQUE |
 
 ### tblSelectedBook
 

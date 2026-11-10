@@ -111,9 +111,9 @@ Giá trị `position` dùng trong code: `Nhân viên bán hàng` (ch.2 2.3), `Qu
 | Cột | Kiểu | Null | Khoá |
 |---|---|---|---|
 | id | int | NOT NULL | PK |
-| clientId | int | NOT NULL | FK→tblClient.userId |
+| clientId | int | NOT NULL | FK→tblClient.userId, UNIQUE |
 
-`clientId` còn có ràng buộc UNIQUE (quan hệ 1-1 của ch.8 bước 3).
+`clientId` UNIQUE: quan hệ 1-1 của ch.8 bước 3.
 
 ### tblSelectedBook
 
