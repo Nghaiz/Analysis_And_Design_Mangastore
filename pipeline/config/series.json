@@ -16,7 +16,7 @@
     ],
     "tikiQuery": "thám tử lừng danh conan tập",
     "wikidataId": "Q3853685",
-    "maxVolumes": 30
+    "maxVolumes": 20
   },
   {
     "key": "doraemon-truyen-ngan",
@@ -35,7 +35,7 @@
     ],
     "tikiQuery": "doraemon truyện ngắn tập",
     "wikidataId": "Q235311",
-    "maxVolumes": 30
+    "maxVolumes": 40
   },
   {
     "key": "than-dong-dat-viet",
@@ -85,7 +85,7 @@
     ],
     "tikiQuery": "dragon quest dấu ấn roto tập",
     "wikidataId": null,
-    "maxVolumes": 20
+    "maxVolumes": 25
   },
   {
     "key": "shin-cau-be-but-chi",
@@ -103,7 +103,7 @@
     ],
     "tikiQuery": "shin cậu bé bút chì tập",
     "wikidataId": null,
-    "maxVolumes": 20
+    "maxVolumes": 30
   },
   {
     "key": "chu-gia-nuoi-meo-u",
@@ -135,7 +135,7 @@
     "kimdongSlugPrefixes": [],
     "tikiQuery": "nhóc maruko tập",
     "wikidataId": null,
-    "maxVolumes": 12
+    "maxVolumes": 10
   },
   {
     "key": "truong-hoc-biet-tuot",
@@ -169,7 +169,7 @@
     "kimdongSlugPrefixes": [],
     "tikiQuery": "7 viên ngọc rồng tập",
     "wikidataId": "Q15051307",
-    "maxVolumes": 25
+    "maxVolumes": 15
   },
   {
     "key": "shin-hoat-hinh-mau",
@@ -187,7 +187,7 @@
     ],
     "tikiQuery": "shin cậu bé bút chì hoạt hình màu tập",
     "wikidataId": null,
-    "maxVolumes": 15
+    "maxVolumes": 20
   },
   {
     "key": "one-piece",
@@ -205,7 +205,7 @@
     ],
     "tikiQuery": "one piece tập",
     "wikidataId": "Q673",
-    "maxVolumes": 20
+    "maxVolumes": 12
   },
   {
     "key": "naruto",
@@ -220,7 +220,7 @@
     "kimdongSlugPrefixes": [],
     "tikiQuery": "naruto tập",
     "wikidataId": null,
-    "maxVolumes": 15
+    "maxVolumes": 10
   },
   {
     "key": "asari",
@@ -239,7 +239,7 @@
     ],
     "tikiQuery": "asari cô bé tinh nghịch tập",
     "wikidataId": null,
-    "maxVolumes": 15
+    "maxVolumes": 25
   },
   {
     "key": "bluelock",
@@ -258,7 +258,7 @@
     ],
     "tikiQuery": "blue lock tập",
     "wikidataId": null,
-    "maxVolumes": 10
+    "maxVolumes": 15
   },
   {
     "key": "slam-dunk",
@@ -277,7 +277,7 @@
     ],
     "tikiQuery": "slam dunk deluxe edition tập",
     "wikidataId": null,
-    "maxVolumes": 10
+    "maxVolumes": 15
   },
   {
     "key": "thanh-guom-diet-quy",
@@ -295,7 +295,7 @@
     ],
     "tikiQuery": "thanh gươm diệt quỷ tập",
     "wikidataId": null,
-    "maxVolumes": 12
+    "maxVolumes": 6
   },
   {
     "key": "chu-thuat-hoi-chien",
@@ -313,7 +313,7 @@
     ],
     "tikiQuery": "chú thuật hồi chiến tập",
     "wikidataId": null,
-    "maxVolumes": 10
+    "maxVolumes": 8
   },
   {
     "key": "spy-x-family",
@@ -348,7 +348,7 @@
     ],
     "tikiQuery": "nhất quỷ nhì ma thứ ba takagi tập",
     "wikidataId": null,
-    "maxVolumes": 10
+    "maxVolumes": 5
   },
   {
     "key": "yona",
@@ -485,6 +485,6 @@
     "kimdongSlugPrefixes": [],
     "tikiQuery": "haikyu tập",
     "wikidataId": null,
-    "maxVolumes": 8
+    "maxVolumes": 6
   }
 ]
