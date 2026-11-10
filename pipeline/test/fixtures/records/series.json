@@ -1,0 +1,14 @@
+[
+  { "key": "conan", "name": "Thám tử lừng danh Conan", "aliases": ["conan", "tham tu lung danh conan"],
+    "publisher": "Kim Đồng", "preferredSource": "kimdong", "category": "Trinh thám", "longStory": false,
+    "kimdongSlugPrefixes": ["tham-tu-lung-danh-conan-tap-"], "tikiQuery": "thám tử lừng danh conan tập",
+    "wikidataId": "Q3853685", "maxVolumes": 30 },
+  { "key": "doraemon", "name": "Doraemon", "aliases": ["doraemon"],
+    "publisher": "Kim Đồng", "preferredSource": "kimdong", "category": "Thiếu nhi", "longStory": false,
+    "kimdongSlugPrefixes": ["doraemon-tap-"], "tikiQuery": "doraemon tập",
+    "wikidataId": null, "maxVolumes": 30 },
+  { "key": "than-dong-dat-viet", "name": "Thần đồng đất Việt", "aliases": ["than dong dat viet"],
+    "publisher": "Phan Thị", "preferredSource": "tiki", "category": "Lịch sử", "longStory": true,
+    "kimdongSlugPrefixes": [], "tikiQuery": "thần đồng đất việt tập",
+    "wikidataId": null, "maxVolumes": 30 }
+]
