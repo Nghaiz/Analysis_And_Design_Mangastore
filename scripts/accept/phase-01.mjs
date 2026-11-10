@@ -96,6 +96,8 @@ await step('4 nginx: /health.jsp ok, /static br, security headers', async () => 
   if (asset.headers['content-encoding'] !== 'br') {
     throw new Error(`/static/${jsFile} content-encoding=${asset.headers['content-encoding']} → bật brotli trong nginx.conf`);
   }
+  const icon = await httpGet(`${BASE}/favicon.ico`);
+  if (icon.status !== 200) throw new Error(`/favicon.ico trả ${icon.status} → location = /favicon.ico trong docker/nginx/conf.d/app.conf`);
   const home = await httpGet(`${BASE}/HomeView.jsp`);
   for (const [name, res] of [['/health.jsp', health], ['/static', asset], ['/HomeView.jsp', home]]) {
     const miss = SECURITY_HEADERS.filter((h) => !res.headers[h]);
