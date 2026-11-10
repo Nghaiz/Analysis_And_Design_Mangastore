@@ -1,0 +1,25 @@
+# BuildKit đọc file này vì nó nằm cạnh docker/app/Dockerfile (contract.md §10). Context build là gốc repo.
+.git
+.gitignore
+.gitattributes
+.claude
+**/node_modules
+target
+**/target
+data
+images
+**/*.pdf
+plans
+src/main/webapp/static
+.env
+.env.*
+**/*.log
+.idea
+.vscode
+e2e
+docs
+scripts
+.github
+docker/nginx
+docker/mysql
+docker/redis

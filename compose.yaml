@@ -45,6 +45,9 @@ services:
 
   db:
     image: mysql:8.4.13
+    # Docker Desktop trên Windows mount file với quyền 0777 nên MySQL bỏ qua file cấu hình (world-writable).
+    # Chép vào /etc/mysql/conf.d với mode 0644 rồi chạy entrypoint gốc (lane 1C đã thử, báo cáo phase-01-ha-tang).
+    entrypoint: ["sh", "-c", "install -m 0644 /docker-conf.d/*.cnf /etc/mysql/conf.d/ && exec docker-entrypoint.sh mysqld"]
     environment:
       <<: *tz
       MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:?thiếu MYSQL_ROOT_PASSWORD trong .env}
@@ -55,7 +58,7 @@ services:
       - "127.0.0.1:3307:3306"
     volumes:
       - db_data:/var/lib/mysql
-      - ./docker/mysql/conf.d:/etc/mysql/conf.d:ro
+      - ./docker/mysql/conf.d:/docker-conf.d:ro
     healthcheck:
       test: ["CMD-SHELL", "mysqladmin ping -h 127.0.0.1 -uroot -p\"$$MYSQL_ROOT_PASSWORD\" --silent"]
       interval: 10s
@@ -69,7 +72,8 @@ services:
     environment:
       <<: *tz
       REDIS_PASSWORD: ${REDIS_PASSWORD:?thiếu REDIS_PASSWORD trong .env}
-    command: ["sh", "-c", "exec redis-server /usr/local/etc/redis/redis.conf --requirepass \"$$REDIS_PASSWORD\""]
+    # Đi qua docker-entrypoint.sh để ảnh hạ quyền xuống user redis (không chạy bằng root).
+    command: ["sh", "-c", "exec docker-entrypoint.sh redis-server /usr/local/etc/redis/redis.conf --requirepass \"$$REDIS_PASSWORD\""]
     volumes:
       - redis_data:/data
       - ./docker/redis/redis.conf:/usr/local/etc/redis/redis.conf:ro

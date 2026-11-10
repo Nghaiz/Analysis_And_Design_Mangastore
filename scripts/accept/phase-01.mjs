@@ -96,6 +96,8 @@ await step('4 nginx: /health.jsp ok, /static br, security headers', async () => 
   if (asset.headers['content-encoding'] !== 'br') {
     throw new Error(`/static/${jsFile} content-encoding=${asset.headers['content-encoding']} → bật brotli trong nginx.conf`);
   }
+  const icon = await httpGet(`${BASE}/favicon.ico`);
+  if (icon.status !== 200) throw new Error(`/favicon.ico trả ${icon.status} → location = /favicon.ico trong docker/nginx/conf.d/app.conf`);
   const home = await httpGet(`${BASE}/HomeView.jsp`);
   for (const [name, res] of [['/health.jsp', health], ['/static', asset], ['/HomeView.jsp', home]]) {
     const miss = SECURITY_HEADERS.filter((h) => !res.headers[h]);
@@ -140,7 +142,14 @@ await step('6 phiên bản: Java 25, Tomcat 11.0.27, MySQL 8.4.13, Redis 8.10.3'
     const r = compose(['exec', '-T', svc, ...cmd]);
     if (r.code !== 0 || !re.test(r.out)) throw new Error(`${svc} không phải ${label}: ${r.out.trim().slice(0, 120)} → kiểm thẻ ảnh`);
   }
-  return 'đủ 4';
+  // Cấu hình MySQL thật sự được nạp (Windows mount 0777 làm MySQL bỏ qua file .cnf)
+  const vars = compose(['exec', '-T', 'db', 'sh', '-c',
+    'MYSQL_PWD="$MYSQL_ROOT_PASSWORD" mysql -uroot -N -e "SELECT @@time_zone, @@character_set_server, @@collation_server, @@character_set_client"']);
+  const got = vars.out.trim().split(/\s+/).slice(-4).join(' ');
+  if (got !== '+07:00 utf8mb4 utf8mb4_0900_ai_ci utf8mb4') {
+    throw new Error(`MySQL nạp sai cấu hình (${got}) → kiểm docker/mysql/conf.d và entrypoint của db trong compose.yaml`);
+  }
+  return 'đủ 4, MySQL +07:00 utf8mb4';
 });
 
 // 7. Ignore: bí mật, dữ liệu và bộ kit; chỉ file tiem-* của .claude vào repo

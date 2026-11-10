@@ -35,8 +35,16 @@ export function createRunner(name) {
   let missingTool = false;
 
   const log = (text) => appendFileSync(logPath, text.endsWith('\n') ? text : `${text}\n`);
+  // --only 4,5 : chỉ chạy các bước có số đứng đầu tiêu đề trong danh sách (để làm đỏ có chủ đích, gỡ lỗi nhanh)
+  const onlyArg = process.argv.indexOf('--only');
+  const only = onlyArg > 0 ? new Set(process.argv[onlyArg + 1]?.split(',').map((s) => s.trim())) : null;
 
   async function step(title, fn) {
+    if (only && !only.has(title.split(' ')[0])) {
+      console.log(`[accept] SKIP ${title} (--only)`);
+      log(`\n## ${title}\nSKIP (--only)`);
+      return;
+    }
     log(`\n## ${title}`);
     try {
       const note = await fn();
@@ -54,6 +62,10 @@ export function createRunner(name) {
 
   function finish() {
     const failed = results.filter((r) => !r.ok).length;
+    if (results.length === 0) {
+      console.log('[accept] FAIL không bước nào chạy → kiểm tham số --only');
+      process.exit(1);
+    }
     const summary = `[accept] ${failed === 0 ? 'ALL PASS' : `${failed}/${results.length} FAIL`} (log: ${logPath.slice(ROOT.length + 1)})`;
     console.log(summary);
     log(summary);
@@ -63,11 +75,17 @@ export function createRunner(name) {
   return { step, finish, log, logPath };
 }
 
+/** Ghép lệnh .cmd thành một chuỗi cho cmd.exe (Node DEP0190 cấm truyền mảng args cùng shell: true). */
+export function shellLine(cmd, args) {
+  const q = (s) => (/^[\w@%+=:,./\\-]+$/.test(s) ? s : `"${s.replaceAll('"', '\\"')}"`);
+  return [cmd, ...args].map(q).join(' ');
+}
+
 /** Chạy lệnh đồng bộ, ghi stdout/stderr vào log; trả { code, out }. */
 export function run(runner, cmd, args, opts = {}) {
   const shell = opts.shell ?? (IS_WIN && /\.(cmd|bat)$/i.test(cmd));
   runner.log(`$ ${cmd} ${args.join(' ')}`);
-  const r = spawnSync(cmd, args, {
+  const r = spawnSync(shell ? shellLine(cmd, args) : cmd, shell ? [] : args, {
     cwd: opts.cwd ?? ROOT,
     env: { ...process.env, ...(opts.env ?? {}) },
     encoding: 'utf8',
