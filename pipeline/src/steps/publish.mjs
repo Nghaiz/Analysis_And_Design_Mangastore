@@ -1,5 +1,5 @@
-// Lệnh publish (CONTRACT §7): chép data/export/*.sql và data/images/full/** vào volume Docker.
-// Không xoá volume, không khởi động lại app. --dry-run chỉ in lệnh, không chạy docker.
+// Lệnh publish (CONTRACT §7): chép data/export/*.sql và data/images/full/** vào volume Docker; volume ảnh
+// được đồng bộ (bỏ file nguồn không còn). Không xoá volume, không khởi động lại app. --dry-run chỉ in lệnh.
 import { spawnSync } from 'node:child_process';
 import { join } from 'node:path';
 import { exists, paths } from '../lib/io.mjs';
@@ -22,9 +22,14 @@ export function publishPlan(ctx) {
   });
   return [
     job(`${project}_catalog_data`, exportDir, "find /src -maxdepth 1 -name '*.sql' -exec cp {} /dst/ \\; && ls -l /dst"),
-    job(`${project}_covers_data`, imagesDir, 'cp -a /src/. /dst/ && ls /dst | wc -l'),
+    job(`${project}_covers_data`, imagesDir, COVERS_SYNC),
   ];
 }
+
+// Volume ảnh khớp đúng data/images/full: chép đè, rồi xoá file và thư mục mà nguồn không còn
+// (Book bớt ảnh phụ, Book bị bỏ). Không xoá volume. Chỉ publish ghi vào covers_data.
+export const COVERS_SYNC =
+  'cp -a /src/. /dst/ && cd /dst && find . -mindepth 1 -depth -exec sh -c \'[ -e "/src/$1" ] || rm -rf "$1"\' _ {} \\; && ls /dst | wc -l';
 
 const quote = (arg) => (/[\s'"\\;&|*]/.test(arg) ? `"${arg.replace(/"/g, '\\"')}"` : arg);
 
