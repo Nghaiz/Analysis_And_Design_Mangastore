@@ -47,11 +47,11 @@ function surefire() {
   return { suites, failures };
 }
 
-// 1. mvnw -B verify: Flyway V1, V2 (+ V10 e2e) trên mysql:8.4.13, DAO, tranh chấp, kiến trúc, schema, Messages
-await step('1 mvnw -B verify (Testcontainers mysql:8.4.13)', () => {
+// 1. mvnw -B clean verify (clean: ArchitectureTest đọc target/classes, bỏ .class cũ): Flyway V1, V2 (+ V10 e2e) trên mysql:8.4.13, DAO, tranh chấp, kiến trúc, schema, Messages
+await step('1 mvnw -B clean verify (Testcontainers mysql:8.4.13)', () => {
   const javaHome = findJava25();
   requireDocker(runner);
-  const r = run(runner, MVNW, ['-B', '-ntp', 'verify'], { env: { JAVA_HOME: javaHome } });
+  const r = run(runner, MVNW, ['-B', '-ntp', 'clean', 'verify'], { env: { JAVA_HOME: javaHome } });
   const { suites, failures } = surefire();
   if (r.code !== 0) {
     if (failures.length) {
