@@ -120,3 +120,5 @@ Exit 1 khi `blocking` không rỗng. `book-count` (ngoài 300–500) chỉ xét 
 - `sourceUrl` là trang sản phẩm người xem được (Kim Đồng `https://nxbkimdong.com.vn/<alias>[?variant=<id>]`, Tiki `https://tiki.vn/<url_path>`), không phải URL API; `fetchedAt` của Book lấy từ `record.fetchedAt`, `http.fetchedAt` chỉ dùng cho URL ảnh.
 - `publisher` Kim Đồng là `"Kim Đồng"`; Tiki giữ chữ của nguồn, clean chuẩn hoá ("Nhà Xuất Bản Kim Đồng" → "Kim Đồng").
 - Tiki chặn IP sau khoảng 27 request liên tiếp: crawl đầy đủ chạy theo đợt `--series`, cache giữ phần đã tải.
+- `series.json` có thêm khoá tuỳ chọn `author`: tên tác giả chuẩn của bộ; clean dùng khi nguồn để trống hoặc ghi chung chung ("Nhiều tác giả"). Chỉ điền khi chắc chắn.
+- Sau chạy thử 10 đầu (11/11/2026): clean phải giải mã thực thể HTML, bỏ nhiễu trong tên ("Sách - ", "(YYYY)", "(Tái Bản YYYY)", "(Tặng ...)", "(N tập)"), chuẩn hoá NXB theo tiền tố ("Nhà Xuất Bản", "NXB", "Cty", "Công ty"), và nguồn Kim Đồng tách đúng nhiều tác giả.
