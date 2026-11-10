@@ -96,6 +96,57 @@ describe('images', () => {
     expect([meta.width, meta.height]).toEqual([320, 480]);
   });
 
+  describe('chọn bìa có màu', () => {
+    const solid = (background) => sharp({ create: { width: 400, height: 600, channels: 3, background } }).png().toBuffer();
+    const COVER_URL = 'https://bizweb.dktcdn.net/conan-1-cover.jpg';
+    const BACK_URL = 'https://bizweb.dktcdn.net/conan-1-back.jpg';
+
+    async function runWith(cover, back) {
+      const ctx = await makeCtx();
+      await runSteps(ctx, 'clean');
+      const buffers = { [COVER_URL]: cover, [BACK_URL]: back };
+      ctx.http.getBuffer = async (url) => buffers[url];
+      const result = await images(ctx);
+      const [book] = await readJsonl(join(ctx.dataDir, 'stage', ctx.run, 'images.jsonl'));
+      return { ctx, result, book };
+    }
+    const sha = (buffer) => createHash('sha256').update(buffer).digest('hex');
+
+    it('bìa xám + ảnh màu → ảnh màu làm bìa, bìa cũ thành ảnh phụ; sha256 theo ảnh sau khi đổi', async () => {
+      const grey = await solid({ r: 90, g: 92, b: 90 });
+      const red = await solid({ r: 200, g: 30, b: 30 });
+      const { ctx, result, book } = await runWith(grey, red);
+      expect(book.images.map((i) => [i.kind, i.n, i.sourceUrl, i.sha256])).toEqual([
+        ['cover', 0, BACK_URL, sha(red)],
+        ['extra', 1, COVER_URL, sha(grey)],
+      ]);
+      expect(result.summary.coverSwapped).toBe(1);
+      const { channels } = await sharp(join(imageDir(ctx, 1), 'cover-160.webp')).stats();
+      expect(channels[0].mean).toBeGreaterThan(channels[1].mean + 100);
+      const results = await runSteps(ctx, 'export');
+      expect(results.export.exitCode).toBe(0);
+      const manifest = await readJsonl(join(ctx.dataDir, 'export', ctx.run, 'manifest.jsonl'));
+      const imageRows = manifest.filter((r) => r.bookId === 1 && r.kind === 'image');
+      expect(imageRows.map((r) => [r.sourceUrl, r.sha256])).toEqual([
+        [BACK_URL, sha(red)],
+        [COVER_URL, sha(grey)],
+      ]);
+    });
+
+    it('bìa có màu → giữ nguyên thứ tự', async () => {
+      const blue = await solid({ r: 30, g: 60, b: 200 });
+      const red = await solid({ r: 200, g: 30, b: 30 });
+      const { book, result } = await runWith(blue, red);
+      expect(book.images.map((i) => [i.kind, i.sourceUrl])).toEqual([['cover', COVER_URL], ['extra', BACK_URL]]);
+      expect(result.summary.coverSwapped).toBe(0);
+    });
+
+    it('mọi ảnh đều xám → giữ nguyên thứ tự', async () => {
+      const { book } = await runWith(await solid({ r: 90, g: 90, b: 90 }), await solid({ r: 240, g: 240, b: 238 }));
+      expect(book.images.map((i) => [i.kind, i.sourceUrl])).toEqual([['cover', COVER_URL], ['extra', BACK_URL]]);
+    });
+  });
+
   it('OfflineError không bị nuốt', async () => {
     const ctx = await makeCtx();
     await runSteps(ctx, 'clean');
