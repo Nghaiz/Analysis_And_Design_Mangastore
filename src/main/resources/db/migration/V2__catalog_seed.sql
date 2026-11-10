@@ -23,11 +23,11 @@ INSERT INTO tblCollateral (name, description) VALUES
 -- Nhân viên (id 1, 2) và khách mẫu (id 3–5). Khách của ch.2 (Trần Minh Anh, minhanh) KHÔNG có ở đây:
 -- kịch bản đăng kí của E2E tự tạo tài khoản đó.
 INSERT INTO tblUser (id, username, password, fullName) VALUES
-    (1, 'hant', '@@HASH:hant@@', 'Nguyễn Thu Hà'),
-    (2, 'quanli', '@@HASH:quanli@@', 'Phạm Quốc Huy'),
-    (3, 'khach01', '@@HASH:khach01@@', 'Lê Hoàng Nam'),
-    (4, 'khach02', '@@HASH:khach02@@', 'Đỗ Thị Lan'),
-    (5, 'khach03', '@@HASH:khach03@@', 'Vũ Đức Long');
+    (1, 'hant', '$argon2id$v=19$m=19456,t=2,p=1$Z7/ga5InHhW9wZ1E0Nwo2g$6OHItTnti86VDbCM3ZI9PqzZZPkQfllb9oYdM2EpeQc', 'Nguyễn Thu Hà'),
+    (2, 'quanli', '$argon2id$v=19$m=19456,t=2,p=1$WsKuqJ2Jb0qcqNNwbZR39w$7NtBlGWwDTKTeCpfFOMQjJF6QonuXxP8gVoJhxIilcM', 'Phạm Quốc Huy'),
+    (3, 'khach01', '$argon2id$v=19$m=19456,t=2,p=1$gdrTiFlWIsrtIXCgO3arpQ$m7eD1URB+sOant0IbjBlnN8GdYVR+ROvGN1jPqVv6Y8', 'Lê Hoàng Nam'),
+    (4, 'khach02', '$argon2id$v=19$m=19456,t=2,p=1$x2BL8YwmgrEsyfrA1BkqQQ$TaMxzVYriJjvujQDEniQiKdpL8bMy/TQafZLXVdswYA', 'Đỗ Thị Lan'),
+    (5, 'khach03', '$argon2id$v=19$m=19456,t=2,p=1$qiUpoXh7tG+GFctny1Qp3w$NIo7Dc1E6R/oJz967vGc2hqXcSZFiNMjYrypLo7lKi4', 'Vũ Đức Long');
 
 INSERT INTO tblStaff (userId, position) VALUES
     (1, 'Nhân viên bán hàng'),
