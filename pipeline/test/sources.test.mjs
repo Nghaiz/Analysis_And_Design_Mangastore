@@ -5,7 +5,7 @@ import Ajv2020 from 'ajv/dist/2020.js';
 import { describe, expect, it } from 'vitest';
 import { kimdongCandidates, kimdongRecord, listSitemapProducts, planKimdong, splitPeople } from '../src/sources/kimdong.mjs';
 import { isComboName, isUsedGoods, matchVolume } from '../src/sources/text.mjs';
-import { pickTikiProduct, rankCandidates, searchTiki, tikiCandidates, tikiRecord } from '../src/sources/tiki.mjs';
+import { pickTikiProduct, rankCandidates, searchTiki, tikiCandidates, tikiImageUrls, tikiOriginalUrl, tikiRecord } from '../src/sources/tiki.mjs';
 import { wikidataRecord } from '../src/sources/wikidata.mjs';
 import { fixtureBody, fixtureClient } from './fixtures/http/fake-net.mjs';
 
@@ -170,6 +170,41 @@ describe('Tiki', () => {
     });
     expect(record.categoryHints).toContain('Truyện Tranh, Manga, Comic');
     expect(record.imageUrls[0]).toMatch(/^https:\/\/salt\.tikicdn\.com\//);
+  });
+});
+
+describe('Tiki: ảnh bìa theo thumbnail_url', () => {
+  const TDDV = { ...CONAN, key: 'than-dong-dat-viet', aliases: ['thần đồng đất việt'], publisher: 'Phan Thị' };
+  const real = JSON.parse(fixtureBody('tiki/product-51348719.json'));
+  const originals = real.images.map((i) => i.base_url);
+
+  it('bỏ tiền tố cache/kích thước của salt.tikicdn.com', () => {
+    expect(tikiOriginalUrl('https://salt.tikicdn.com/cache/280x280/ts/product/9c/ff/11/a.jpg'))
+      .toBe('https://salt.tikicdn.com/ts/product/9c/ff/11/a.jpg');
+    expect(tikiOriginalUrl('https://salt.tikicdn.com/cache/w1200/ts/product/a.jpg')).toBe('https://salt.tikicdn.com/ts/product/a.jpg');
+  });
+
+  it('ảnh khớp thumbnail lên đầu, ảnh phụ giữ thứ tự còn lại', () => {
+    const thumb = originals[2].replace('/ts/', '/cache/280x280/ts/');
+    expect(tikiImageUrls({ ...real, thumbnail_url: thumb }))
+      .toEqual([originals[2], originals[0], originals[1], ...originals.slice(3)]);
+  });
+
+  it('thumbnail không có trong images[]: ảnh gốc của thumbnail làm bìa', () => {
+    const urls = tikiImageUrls({ ...real, thumbnail_url: 'https://salt.tikicdn.com/cache/280x280/ts/product/zz/x.jpg' });
+    expect(urls[0]).toBe('https://salt.tikicdn.com/ts/product/zz/x.jpg');
+    expect(urls.slice(1)).toEqual(originals);
+  });
+
+  it('Thần Đồng Đất Việt 113 (fixture thật): ảnh chính Tiki chính là trang ruột, JSON không sửa được', async () => {
+    // KnownGap: thumbnail_url = images[0] = trang 12; bìa trước thật là images[2] (đã xem ảnh trong cache
+    // ngày 2026-11-11). Nếu Tiki đổi ảnh chính thì test này đỏ: khi đó xoá ghim, không ghim lại.
+    const { http } = fixtureClient();
+    const detail = await http.getJson('https://tiki.vn/api/v2/products/51348719');
+    const record = tikiRecord(http, TDDV, detail);
+    expectValid(record);
+    expect(record.imageUrls[0]).toBe(originals[0]);
+    expect(record.imageUrls).toHaveLength(originals.length);
   });
 });
 

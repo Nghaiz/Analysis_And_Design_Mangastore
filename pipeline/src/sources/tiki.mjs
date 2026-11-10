@@ -107,6 +107,26 @@ export async function pickTikiProduct(http, series, candidates, log = () => {}) 
   return fallback;
 }
 
+/** Đường dẫn ảnh gốc của salt.tikicdn.com: bỏ đoạn cache/kích thước ("/cache/280x280/", "/cache/w1200/"). */
+const TIKI_CACHE_SEGMENT = new RegExp(String.raw`/cache/[^/]+/`);
+
+export function tikiOriginalUrl(url) {
+  const https = toHttps(url);
+  return https ? https.replace(TIKI_CACHE_SEGMENT, '/') : null;
+}
+
+/**
+ * Ảnh của sản phẩm, bìa trước: ảnh khớp `thumbnail_url` (ảnh chính Tiki hiển thị) lên đầu, còn lại giữ thứ tự;
+ * không khớp ảnh nào thì ảnh gốc của thumbnail làm bìa. Lưu ý: ảnh chính do người bán chọn, có sản phẩm
+ * đặt trang ruột làm ảnh chính (Thần Đồng Đất Việt 113); JSON không phân biệt được, phải xét điểm ảnh.
+ */
+export function tikiImageUrls(detail) {
+  const gallery = [...new Set((detail.images ?? []).map((img) => tikiOriginalUrl(img.base_url)).filter(Boolean))];
+  const main = tikiOriginalUrl(detail.thumbnail_url);
+  if (!main) return gallery;
+  return [main, ...gallery.filter((u) => u !== main)];
+}
+
 /** Bản ghi thô (raw-record.schema.json) từ chi tiết sản phẩm Tiki. */
 export function tikiRecord(http, series, detail) {
   const attrs = attributes(detail);
@@ -125,6 +145,6 @@ export function tikiRecord(http, series, detail) {
     isbn: isbn ? String(isbn).trim() : null,
     categoryHints: crumbs,
     descriptionHtml: detail.description ? String(detail.description) : null,
-    imageUrls: (detail.images ?? []).map((img) => toHttps(img.base_url)).filter(Boolean),
+    imageUrls: tikiImageUrls(detail),
   };
 }

@@ -1,0 +1,91 @@
+{
+ "id": 51348719,
+ "name": "Thần Đồng Đất Việt 113 - Nét Chữ Cứu Người",
+ "url_key": "than-dong-dat-viet-113-net-chu-cuu-nguoi-p51348719",
+ "url_path": "than-dong-dat-viet-113-net-chu-cuu-nguoi-p51348719.html?spid=51348720",
+ "thumbnail_url": "https://salt.tikicdn.com/cache/280x280/ts/product/9c/ff/11/7a90a11809dccf11a236d2bef0d184a1.jpg",
+ "description": "<p>Mô tả cắt ngắn cho test.</p>",
+ "images": [
+  {
+   "base_url": "https://salt.tikicdn.com/ts/product/9c/ff/11/7a90a11809dccf11a236d2bef0d184a1.jpg"
+  },
+  {
+   "base_url": "https://salt.tikicdn.com/ts/product/30/95/8e/4c95f77ab495e26ca807c02375bd4f9f.jpg"
+  },
+  {
+   "base_url": "https://salt.tikicdn.com/ts/product/15/ff/07/8f3270cb0f1e4e0e37f4032b468cbaf3.jpg"
+  },
+  {
+   "base_url": "https://salt.tikicdn.com/ts/product/48/d0/fc/330c1104a0efae84af3aa9bf1ef22ec0.jpg"
+  },
+  {
+   "base_url": "https://salt.tikicdn.com/ts/product/66/bd/0e/0b9c5e861a97702cfaa55c28163e0ee8.jpg"
+  },
+  {
+   "base_url": "https://salt.tikicdn.com/ts/product/86/fb/fd/23a2cb9ac1bc9c074fa479dfe3713a46.jpg"
+  },
+  {
+   "base_url": "https://salt.tikicdn.com/ts/product/3a/c0/b7/0ba61d3f0f731923bd4d39f378f70480.jpg"
+  },
+  {
+   "base_url": "https://salt.tikicdn.com/ts/product/09/a5/ba/42d2d057cbd8240605b64abe1ccc0ae7.jpg"
+  },
+  {
+   "base_url": "https://salt.tikicdn.com/ts/product/70/2e/19/641bbb519613c39d71a4c8080d39e76e.jpg"
+  },
+  {
+   "base_url": "https://salt.tikicdn.com/ts/product/f5/3e/9c/0c8c6ec12d60680499935a5fc551673d.jpg"
+  }
+ ],
+ "authors": [
+  {
+   "id": 4545457,
+   "name": "Nhiều tác giả",
+   "slug": "nhieu-tac-gia"
+  }
+ ],
+ "specifications": [
+  {
+   "name": "Thông tin chung",
+   "attributes": [
+    {
+     "code": "publisher_vn",
+     "name": "Công ty phát hành",
+     "value": "Cty Phan Thị"
+    },
+    {
+     "code": "seller_delivery_method",
+     "name": "Phương thức giao hàng Seller Delivery",
+     "value": "Nhà bán giao hàng cho khách hàng"
+    },
+    {
+     "code": "manufacturer",
+     "name": "Nhà xuất bản",
+     "value": "Nhà Xuất Bản Đại Học Sư Phạm"
+    }
+   ]
+  }
+ ],
+ "breadcrumbs": [
+  {
+   "url": "/nha-sach-tiki/c8322",
+   "name": "Nhà Sách Tiki",
+   "category_id": 8322
+  },
+  {
+   "url": "/sach-truyen-tieng-viet/c316",
+   "name": "Sách tiếng Việt",
+   "category_id": 316
+  },
+  {
+   "url": "/truyen-tranh/c1084",
+   "name": "Truyện Tranh, Manga, Comic",
+   "category_id": 1084
+  },
+  {
+   "url": "https://tiki.vn/than-dong-dat-viet-113-net-chu-cuu-nguoi-p51348719.html",
+   "name": "Thần Đồng Đất Việt 113 - Nét Chữ Cứu Người",
+   "category_id": 0
+  }
+ ]
+}

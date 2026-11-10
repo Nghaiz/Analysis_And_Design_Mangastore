@@ -56,5 +56,9 @@
   "https://nxbkimdong.com.vn/products/truong-hoc-biet-tuot-tap-1-len-duong-thoi-nguyen-tu-va-phan-tu.json": {
     "file": "kimdong/truong-hoc-biet-tuot-tap-1-len-duong-thoi-nguyen-tu-va-phan-tu.json",
     "contentType": "application/json; charset=utf-8"
+  },
+  "https://tiki.vn/api/v2/products/51348719": {
+    "file": "tiki/product-51348719.json",
+    "contentType": "application/json; charset=UTF-8"
   }
 }
