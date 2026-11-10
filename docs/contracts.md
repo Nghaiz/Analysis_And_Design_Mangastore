@@ -9,7 +9,7 @@ Phạm vi: nghiệp vụ và tích hợp trang (thực thể, bảng, DAO, khoá
 
 Nguồn, theo thứ tự ưu tiên: brief `prompt-web-tiem-thue-truyen.md` §3 (thầy đã duyệt) → quyết định D1–D11 của `plans/reports/brainstorm-261111-web-tiem-thue-truyen.md` → `plans/261111-tiem-thue-truyen/plan.md` mục "Deferred decisions" → báo cáo PDF ch.2, ch.8, ch.9, ch.10. Chỗ nào nguồn không trả lời thì ghi ở mục 14 "Chưa chốt" kèm lựa chọn tạm; không tự đặt luật nghiệp vụ mới.
 
-Kí hiệu: `(ch.9 tr.62)` là trang in của báo cáo; `(C3)` trỏ tới mục Chưa chốt số 3.
+Kí hiệu: `(ch.9 tr.62)` là trang in của báo cáo; `(C3)` trỏ tới điểm số 3 ở mục 14.
 
 ## 1. Thực thể và quan hệ
 
@@ -790,11 +790,11 @@ Input island được đổi: không có (HomeView không có form). Bấm gáy 
 
 Mọi tổng tính lúc hiển thị, không lưu (ch.8 bước 5). Chữ trên giao diện toàn tiếng Việt.
 
-## 14. Chưa chốt
+## 14. Điểm báo cáo không trả lời (đã chốt 11/11/2026)
 
-Báo cáo và các quyết định không trả lời các điểm dưới đây. Cột "Tạm lấy" là lựa chọn đang dùng trong file này để các phase sau không bị chặn; orchestrator hỏi chủ dự án rồi sửa file này (hoặc giữ nguyên) trước phase ghi rõ.
+Báo cáo và các quyết định D1–D11 không trả lời các điểm dưới đây. **Đã chốt ngày 11/11/2026** bởi orchestrator phiên cook phase 1–2, theo uỷ quyền của chủ dự án trong phiên đó ("tự chọn phương án khuyến nghị"): lấy đúng cột "Tạm lấy". Lí do chung: không thêm thông báo, bảng hay cột ngoài báo cáo; mọi lựa chọn chạy được không cần JS. Ghi ở `plans/261111-tiem-thue-truyen/plan.md`, Deferred #29. Muốn đổi điểm nào thì sửa dòng đó trước phase ở cột "Chốt trước" và báo các phase đang chạy.
 
-| # | Điểm | Tạm lấy | Chốt trước |
+| # | Điểm | Tạm lấy (đã chốt 11/11/2026) | Chốt trước |
 |---|---|---|---|
 | C1 | Tên `name` cho phần tử ch.9 không đặt tên: ô tích và ô nhập trên từng dòng, giá trị của nút trên dòng, nút trong hộp xác nhận huỷ | Nút trên dòng là `<button type="submit" name="<tên ch.9>" value="<id hoặc mã vạch hoặc STT>">`. Ô mới: `chkSelectedBook` (SearchBookView), `chkReceived` (ProcessRentalBillView), `txtDamageNote` (AddConditionView, mỗi dòng một ô theo thứ tự bảng), `txtCollateralValue` và `txtCollateralNote` (AddRentalCollateralView). Hộp huỷ: `btnConfirmCancel` ("Xác nhận", `formaction="doCancelRentalBill.jsp"`), `btnCloseCancel` ("Huỷ"). `lnkChooseBook` ở AddRentedBookView là ô chọn một (radio). Mọi lần gửi về của AddConditionView và AddRentalCollateralView đọc lại các ô trên dòng vào bản sao trước khi xử lí nút (để ghi chú, giá trị đã nhập không mất, đúng ch.2 bước 17–22, 35–40) | phase 6 |
 | C2 | Cơ chế kĩ thuật của trang: thông báo qua forward hay redirect; trang `doXxx` có nhận GET không; hộp xác nhận huỷ mở bằng gửi về trang hay bằng JS; nút "In phiếu" | Forward kèm request attribute `message` (không thêm thuộc tính session); `doXxx.jsp` chỉ nhận POST (GET trả 405); hộp huỷ mở bằng gửi về chính trang (chạy được không cần JS), loader chỉ làm đẹp; "In phiếu" gọi `window.print()` qua loader rồi sang StaffHomeView, không có JS thì nút gửi thẳng sang StaffHomeView | phase 6 |

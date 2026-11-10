@@ -29,7 +29,7 @@ Công nghệ bắt buộc: **JSP + DAO + MySQL**, kiến trúc JSP-DAO như báo
 | Chi tiết từng màn hình | báo cáo PDF ch.9 (trang in 56–86 = trang PDF 58–88; đọc bằng `Read` với `pages`, tối đa 20 trang mỗi lần), ch.2 (kịch bản), ch.10 (luồng); ảnh `images/svg/ui_m*_*.svg` |
 | Kiến trúc, từ điển Việt - Anh, ERD, luồng trang, token giao diện, ADR | `docs/architecture.md`, `docs/glossary.md`, `docs/schema.md`, `docs/page-flow.md`, `docs/design-tokens.md`, `docs/adr/` |
 
-Không suy đoán nghiệp vụ. Chỗ nào nguồn không trả lời thì xem `docs/contracts.md` mục 14 "Chưa chốt"; điểm mới thì dừng và báo orchestrator, không tự đặt luật.
+Không suy đoán nghiệp vụ. Chỗ nào nguồn không trả lời thì xem `docs/contracts.md` mục 14 (điểm báo cáo không trả lời, đã chốt); điểm mới thì dừng và báo orchestrator, không tự đặt luật.
 
 ## 3. Lệnh chạy
 

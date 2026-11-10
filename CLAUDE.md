@@ -13,7 +13,7 @@ Trí nhớ của phiên không phải nguồn sự thật; đĩa mới là. Sau 
 1. `CLAUDE.md` (file này, kéo theo `AGENTS.md`).
 2. `plans/261111-tiem-thue-truyen/agent-map.md`: lane nào đang chạy, xếp hàng, xong.
 3. File phase đang làm `plans/261111-tiem-thue-truyen/phase-0N-*.md`: bước nào đã đánh dấu.
-4. Khi sắp đụng nghiệp vụ: `docs/contracts.md` (kể cả mục 14 "Chưa chốt").
+4. Khi sắp đụng nghiệp vụ: `docs/contracts.md` (kể cả mục 14 (điểm báo cáo không trả lời, đã chốt)).
 
 Context gần đầy: commit phần đang làm (pathspec), `/t1k:handoff save`, rồi mới làm tiếp.
 
