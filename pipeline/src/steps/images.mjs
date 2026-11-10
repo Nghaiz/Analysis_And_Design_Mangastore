@@ -2,7 +2,7 @@
 import { mkdir, readdir, rm, writeFile } from 'node:fs/promises';
 import { dirname, join } from 'node:path';
 import { exists, paths, readJson, readJsonl, readStage, writeStage, writeText } from '../lib/io.mjs';
-import { chooseCover } from '../lib/colour.mjs';
+import { chooseCover, isUsableCover, meanVector, thumbVector } from '../lib/colour.mjs';
 import { outputNames, RENDER_VERSION, renderImage, sha256Hex, WIDTHS } from '../lib/render.mjs';
 
 const OFFLINE_ERROR = 'OfflineError';
@@ -39,17 +39,43 @@ async function download(ctx, url, failures, bookId) {
   }
 }
 
-async function processBook(ctx, book, previous, counters) {
+// Bộ cần ít nhất chừng này bìa đạt luật thì mới có bìa tham chiếu (ít hơn thì trung bình không đáng tin).
+export const MIN_SERIES_REFERENCES = 3;
+
+/**
+ * Bìa tham chiếu của từng bộ: trung bình vector của các bìa ứng viên đã đạt luật (không cần đổi).
+ * Chỉ tải ảnh đầu của mỗi Book (HTTP cache trên đĩa nên lượt 2 không gọi mạng lại).
+ */
+async function seriesReferences(ctx, books) {
+  const bySeries = new Map();
+  for (const book of books) {
+    const first = book.images[0];
+    if (!first) continue;
+    const buffer = await download(ctx, first.sourceUrl, [], book.id);
+    if (!(await isUsableCover(buffer))) continue;
+    const vector = await thumbVector(buffer);
+    if (!vector) continue;
+    if (!bySeries.has(book.seriesKey)) bySeries.set(book.seriesKey, []);
+    bySeries.get(book.seriesKey).push(vector);
+  }
+  const references = new Map();
+  for (const [series, vectors] of bySeries) {
+    if (vectors.length >= MIN_SERIES_REFERENCES) references.set(series, meanVector(vectors));
+  }
+  return references;
+}
+
+async function processBook(ctx, book, previous, counters, reference) {
   const dir = join(paths.imagesDir(ctx), String(book.id));
   const downloaded = [];
   for (const image of book.images) {
     const buffer = await download(ctx, image.sourceUrl, counters.failures, book.id);
     downloaded.push({ image: { ...image, sha256: buffer ? sha256Hex(buffer) : null, widths: [] }, buffer });
   }
-  const fetched = await chooseCover(downloaded);
+  const fetched = await chooseCover(downloaded, reference);
   if (fetched !== downloaded) {
     counters.coverSwapped += 1;
-    ctx.log(`[images] Book ${book.id}: bìa ứng viên không màu, dùng ${fetched[0].image.sourceUrl} làm bìa`);
+    ctx.log(`[images] Book ${book.id}: bìa ứng viên không màu hoặc sai dáng bìa, dùng ${fetched[0].image.sourceUrl} làm bìa`);
   }
   const before = previous.get(book.id);
   if (before && signature(before) === signature(fetched.map((f) => f.image)) && (await allFilesExist(dir, before))) {
@@ -92,7 +118,10 @@ export async function images(ctx) {
   const previous = await previousImages(ctx);
   const counters = { rendered: 0, reused: 0, coverSwapped: 0, failures: [] };
   const out = [];
-  for (const book of books) out.push(await processBook(ctx, book, previous, counters));
+  const references = await seriesReferences(ctx, books);
+  for (const book of books) {
+    out.push(await processBook(ctx, book, previous, counters, references.get(book.seriesKey) ?? null));
+  }
   await removeStaleDirs(ctx, new Set(books.map((book) => String(book.id))));
   await writeStage(ctx, 'images', out);
   await writeText(renderMarker(ctx), `${JSON.stringify({ version: RENDER_VERSION })}\n`);

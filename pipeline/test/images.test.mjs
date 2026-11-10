@@ -6,6 +6,7 @@ import sharp from 'sharp';
 import { readJsonl } from '../src/lib/io.mjs';
 import { images } from '../src/steps/images.mjs';
 import { paddingCropBox } from '../src/lib/trim.mjs';
+import { chooseCover, meanVector, thumbVector } from '../src/lib/colour.mjs';
 import { addRaw, makeCtx, rawTemplate, runSteps } from './fixtures/records/harness.mjs';
 
 const imageDir = (ctx, id) => join(ctx.dataDir, 'images', ctx.run, String(id));
@@ -139,6 +140,39 @@ describe('images', () => {
       const { book, result } = await runWith(blue, red);
       expect(book.images.map((i) => [i.kind, i.sourceUrl])).toEqual([['cover', COVER_URL], ['extra', BACK_URL]]);
       expect(result.summary.coverSwapped).toBe(0);
+    });
+
+    it('bìa màu dáng vuông (ảnh ghép quà tặng) + ảnh màu có viền đệm ra đúng dáng 2:3 → đổi bìa', async () => {
+      const gift = await sharp({ create: { width: 900, height: 900, channels: 3, background: { r: 30, g: 160, b: 60 } } })
+        .composite([{ input: await solid({ r: 200, g: 30, b: 30 }), left: 20, top: 150 }])
+        .png()
+        .toBuffer();
+      const inner = await sharp({ create: { width: 600, height: 900, channels: 3, background: { r: 30, g: 60, b: 200 } } }).png().toBuffer();
+      const padded = await sharp({ create: { width: 900, height: 900, channels: 3, background: '#ffffff' } })
+        .composite([{ input: inner, left: 150, top: 0 }])
+        .png()
+        .toBuffer();
+      const { book, result } = await runWith(gift, padded);
+      expect(book.images.map((i) => [i.kind, i.sourceUrl])).toEqual([['cover', BACK_URL], ['extra', COVER_URL]]);
+      expect(result.summary.coverSwapped).toBe(1);
+    });
+
+    it('bìa màu dáng vuông nhưng không ảnh nào đúng dáng bìa → giữ nguyên thứ tự', async () => {
+      const square = (background) => sharp({ create: { width: 600, height: 600, channels: 3, background } }).png().toBuffer();
+      const { book, result } = await runWith(await square({ r: 30, g: 160, b: 60 }), await square({ r: 200, g: 30, b: 30 }));
+      expect(book.images.map((i) => [i.kind, i.sourceUrl])).toEqual([['cover', COVER_URL], ['extra', BACK_URL]]);
+      expect(result.summary.coverSwapped).toBe(0);
+    });
+
+    it('có bìa tham chiếu của bộ → lấy ảnh màu giống tham chiếu nhất, không phải ảnh màu đầu tiên', async () => {
+      const grey = await solid({ r: 90, g: 92, b: 90 });
+      const back = await solid({ r: 200, g: 30, b: 30 });
+      const front = await solid({ r: 30, g: 60, b: 200 });
+      const entry = (buffer, n) => ({ image: { kind: n === 0 ? 'cover' : 'extra', n, sourceUrl: `u${n}` }, buffer });
+      const fetched = [entry(grey, 0), entry(back, 1), entry(front, 2)];
+      const reference = meanVector([await thumbVector(await solid({ r: 40, g: 70, b: 190 }))]);
+      expect((await chooseCover(fetched, reference)).map((e) => e.image.sourceUrl)).toEqual(['u2', 'u0', 'u1']);
+      expect((await chooseCover(fetched, null)).map((e) => e.image.sourceUrl)).toEqual(['u1', 'u0', 'u2']);
     });
 
     it('mọi ảnh đều xám → giữ nguyên thứ tự', async () => {
