@@ -111,3 +111,12 @@ Exit 1 khi `blocking` không rỗng. `book-count` (ngoài 300–500) chỉ xét 
 ## 8. Manifest (`pipeline/manifest.jsonl`, vào git, do export ghi khi `run = full`)
 
 Đúng `contract.md` §6: mỗi dòng `{"kind":"book"|"image","bookId","source","sourceUrl","fetchedAt","winner","sha256"}`; `kind=book`: một dòng cho mỗi bản ghi nguồn đã gộp vào Book đó (`source`/`sourceUrl`/`fetchedAt` của bản ghi đó), `winner` là nguồn thắng, `sha256` null; `kind=image`: một dòng mỗi ảnh gốc (bìa và ảnh phụ), `sha256` của ảnh gốc, `winner` là nguồn của ảnh. Không có `name`, `description` hay bất kì nội dung nào. Sắp theo `bookId`, rồi `kind` (book trước), rồi `sourceUrl`.
+
+## 9. Đổi sau lane 4A (orchestrator chấp nhận 11/11/2026)
+
+- `census.json`: `"tiki": null` nghĩa là chưa biết vì nguồn chặn; census exit 1 khi có `null`.
+- Wikidata đọc `https://www.wikidata.org/wiki/Special:EntityData/<QID>.json` (1 request mỗi bộ), không dùng SPARQL vì `robots.txt` của query.wikidata.org cấm `/sparql`. Ảnh P18 của bản ghi `level = series` không bao giờ là bìa Book.
+- `ctx.series`: mảng key từ `--series` hoặc `null`. `ctx.http.stats()` trả `{ network, cacheHits }`.
+- `sourceUrl` là trang sản phẩm người xem được (Kim Đồng `https://nxbkimdong.com.vn/<alias>[?variant=<id>]`, Tiki `https://tiki.vn/<url_path>`), không phải URL API; `fetchedAt` của Book lấy từ `record.fetchedAt`, `http.fetchedAt` chỉ dùng cho URL ảnh.
+- `publisher` Kim Đồng là `"Kim Đồng"`; Tiki giữ chữ của nguồn, clean chuẩn hoá ("Nhà Xuất Bản Kim Đồng" → "Kim Đồng").
+- Tiki chặn IP sau khoảng 27 request liên tiếp: crawl đầy đủ chạy theo đợt `--series`, cache giữ phần đã tải.
