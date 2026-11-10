@@ -7,16 +7,18 @@ import { tmpdir } from 'node:os';
 import { join, resolve, dirname } from 'node:path';
 import { spawnSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
-import { BEGIN, END, BRIEF, briefSection10, firstDiff, markedBlock } from './section10-sync.mjs';
+import { BEGIN, END, BRIEF, briefSection, briefSection10, firstDiff, markedBlock, markers } from './section10-sync.mjs';
 
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '..', '..');
 const SCRIPT = join(ROOT, 'scripts/check/section10-sync.mjs');
 const SECTION = briefSection10(readFileSync(join(ROOT, BRIEF), 'utf8'));
+const SECTION3 = briefSection(readFileSync(join(ROOT, BRIEF), 'utf8'), 3);
+const [BEGIN3, END3] = markers(3);
 
-function fixture({ agents = SECTION, rule = SECTION, ruleMarkers = true } = {}) {
+function fixture({ agents = SECTION, agents3 = SECTION3, rule = SECTION, ruleMarkers = true } = {}) {
   const dir = mkdtempSync(join(tmpdir(), 's10-'));
   writeFileSync(join(dir, BRIEF), readFileSync(join(ROOT, BRIEF)));
-  writeFileSync(join(dir, 'AGENTS.md'), `# A\n\n${BEGIN}${agents}${END}\n`);
+  writeFileSync(join(dir, 'AGENTS.md'), `# A\n\n${BEGIN3}${agents3}${END3}\n\n${BEGIN}${agents}${END}\n`);
   mkdirSync(join(dir, '.claude/rules'), { recursive: true });
   writeFileSync(join(dir, '.claude/rules/tiem-cook-orchestration.md'),
     ruleMarkers ? `# R\n\n${BEGIN}${rule}${END}\n\nphần thêm\n` : `# R\n\n${rule}\n`);
@@ -44,6 +46,15 @@ test('sửa một kí tự trong khối của rule → exit 1, in vị trí byte
     assert.equal(r.status, 1);
     assert.match(r.stdout, new RegExp(`tiem-cook-orchestration\\.md: lệch brief §10 ở byte ${Buffer.byteLength(SECTION.slice(0, pos))}`));
     assert.match(r.stdout, /→ chép lại nguyên văn/);
+  } finally { rmSync(dir, { recursive: true, force: true }); }
+});
+
+test('sửa một kí tự trong khối brief §3 của AGENTS.md → exit 1', () => {
+  const dir = fixture({ agents3: SECTION3.replace('Cart', 'Kart') });
+  try {
+    const r = runOn(dir);
+    assert.equal(r.status, 1);
+    assert.match(r.stdout, /AGENTS\.md: lệch brief §3 ở byte \d+/);
   } finally { rmSync(dir, { recursive: true, force: true }); }
 });
 
