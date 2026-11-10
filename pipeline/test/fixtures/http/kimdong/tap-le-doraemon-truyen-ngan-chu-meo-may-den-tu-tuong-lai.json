@@ -1,0 +1,147 @@
+{
+ "id": 60918934,
+ "name": "(Tập lẻ) Doraemon truyện ngắn - Chú mèo máy đến từ tương lai",
+ "alias": "tap-le-doraemon-truyen-ngan-chu-meo-may-den-tu-tuong-lai",
+ "vendor": null,
+ "product_type": "Manga - comic",
+ "price": 19800,
+ "price_max": 22500,
+ "price_min": 19800,
+ "price_varies": true,
+ "compare_at_price_max": 25000,
+ "compare_at_price_min": 22000,
+ "compare_at_price_varies": true,
+ "tags": [
+  "15",
+  "bienthe"
+ ],
+ "summary": null,
+ "content": "<ul>\n<li style=\"text-align: justify;\">Tác giả: <a href=\"/collections/fujiko-f-fujio\">Fujiko F Fujio</a></li>\n<li style=\"text-align: justify;\">Đối tượng: <a href=\"/collections/nhi-dong-6-11\">Nhi đồng (6 – 11)</a></li>\n<li style=\"text-align: justify;\">Khuôn Khổ: 11,3x17,6 cm</li>\n<li style=\"text-align: justify;\">Số trang: 192</li>\n<li style=\"text-align: justify;\">Định dạng: bìa mềm</li>\n<li style=\"text-align: justify;\">Trọng lượng: 140 gram</li>\n<li style=\"text-align: justify;\">Bộ sách: <a href=\"/collections/doraemon-truyen-ngan\">Doraemon truyện ngắn</a><hr />\n<p>Mô tả cắt ngắn cho test.</p></li>\n</ul>",
+ "featured_image": "https://bizweb.dktcdn.net/100/576/749/products/32-b23267bf6f044f57851792fc0331634a-3019fee0-f345-4c99-9a25-ec6de8922ba7.jpg?v=1765028993327",
+ "images": [
+  "https://bizweb.dktcdn.net/100/576/749/products/32-b23267bf6f044f57851792fc0331634a-3019fee0-f345-4c99-9a25-ec6de8922ba7.jpg?v=1765028993327",
+  "https://bizweb.dktcdn.net/100/576/749/products/1-f689ece081cb4d96bd7081e54a80a206-409e4f38-3374-4ca8-b582-20d77b8da90d.jpg?v=1765028993327"
+ ],
+ "options": [
+  {
+   "name": "Title",
+   "position": 1
+  }
+ ],
+ "variants": [
+  {
+   "id": 192019867,
+   "barcode": "6262204340001",
+   "sku": "6262204340001",
+   "unit": "Cuốn",
+   "price": 22500,
+   "compare_at_price": 25000,
+   "price_original": 25000,
+   "compare_at_price_original": 25000,
+   "options": [
+    "Tập 01 (2026)"
+   ],
+   "option1": "Tập 01 (2026)",
+   "option2": null,
+   "option3": null,
+   "title": "Tập 01 (2026)",
+   "inventory_management": "bizweb",
+   "inventory_policy": "deny",
+   "inventory_quantity": 70,
+   "weight": 140,
+   "weight_unit": "g",
+   "featured_image": {
+    "src": "https://bizweb.dktcdn.net/100/576/749/products/1-f689ece081cb4d96bd7081e54a80a206-409e4f38-3374-4ca8-b582-20d77b8da90d.jpg?v=1765028993327"
+   },
+   "available": true,
+   "url": "/tap-le-doraemon-truyen-ngan-chu-meo-may-den-tu-tuong-lai?variant=192019867",
+   "taxable": true
+  },
+  {
+   "id": 204799528,
+   "barcode": "6262204340002",
+   "sku": "6262204340002",
+   "unit": "Cuốn",
+   "price": 22500,
+   "compare_at_price": 25000,
+   "price_original": 25000,
+   "compare_at_price_original": 25000,
+   "options": [
+    "Tập 02 (2026)"
+   ],
+   "option1": "Tập 02 (2026)",
+   "option2": null,
+   "option3": null,
+   "title": "Tập 02 (2026)",
+   "inventory_management": "bizweb",
+   "inventory_policy": "deny",
+   "inventory_quantity": 0,
+   "weight": 140,
+   "weight_unit": "g",
+   "featured_image": {
+    "src": "https://bizweb.dktcdn.net/100/576/749/products/2-f3be6e15b4354c7a8fa024f21fdb39db-a34f0178-ec39-42c4-885a-83753725beab.jpg?v=1765028993327"
+   },
+   "available": false,
+   "url": "/tap-le-doraemon-truyen-ngan-chu-meo-may-den-tu-tuong-lai?variant=204799528",
+   "taxable": true
+  },
+  {
+   "id": 179139126,
+   "barcode": "6252204340015",
+   "sku": "6252204340015",
+   "unit": "Cuốn",
+   "price": 19800,
+   "compare_at_price": 22000,
+   "price_original": 22000,
+   "compare_at_price_original": 22000,
+   "options": [
+    "Tập 15 (2025)"
+   ],
+   "option1": "Tập 15 (2025)",
+   "option2": null,
+   "option3": null,
+   "title": "Tập 15 (2025)",
+   "inventory_management": "bizweb",
+   "inventory_policy": "deny",
+   "inventory_quantity": 1,
+   "weight": 140,
+   "weight_unit": "g",
+   "featured_image": {
+    "src": "https://bizweb.dktcdn.net/100/576/749/products/15-c22f7850b2294e749c228e7d368ad500-b38280f7-39e0-4250-9e5d-7f445fc4179c.jpg?v=1777093303783"
+   },
+   "available": true,
+   "url": "/tap-le-doraemon-truyen-ngan-chu-meo-may-den-tu-tuong-lai?variant=179139126",
+   "taxable": true
+  },
+  {
+   "id": 215305214,
+   "barcode": "6262204340015",
+   "sku": "6262204340015",
+   "unit": null,
+   "price": 22500,
+   "compare_at_price": 25000,
+   "price_original": 25000,
+   "compare_at_price_original": 25000,
+   "options": [
+    "Tập 15 (2026)"
+   ],
+   "option1": "Tập 15 (2026)",
+   "option2": null,
+   "option3": null,
+   "title": "Tập 15 (2026)",
+   "inventory_management": "bizweb",
+   "inventory_policy": "deny",
+   "inventory_quantity": 38,
+   "weight": 140,
+   "weight_unit": "g",
+   "featured_image": {
+    "src": "https://bizweb.dktcdn.net/100/576/749/products/15-c22f7850b2294e749c228e7d368ad500-b38280f7-39e0-4250-9e5d-7f445fc4179c.jpg?v=1777093303783"
+   },
+   "available": true,
+   "url": "/tap-le-doraemon-truyen-ngan-chu-meo-may-den-tu-tuong-lai?variant=215305214",
+   "taxable": true
+  }
+ ],
+ "available": true,
+ "url": "/tap-le-doraemon-truyen-ngan-chu-meo-may-den-tu-tuong-lai"
+}

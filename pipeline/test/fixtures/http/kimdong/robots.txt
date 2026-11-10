@@ -1,0 +1,65 @@
+# we use Sapo as our ecommerce platform
+
+User-agent: *  
+Disallow: /admin
+Disallow: /cart
+Disallow: /search
+Disallow: /checkout
+Disallow: /account
+Disallow: /collections/*sortBy*
+Disallow: /collections/*+*
+Disallow: /collections/*%2B*
+Disallow: /collections/*%2b*
+Disallow: /blogs/*+*
+Disallow: /blogs/*%2B*
+Disallow: /blogs/*%2b*
+Disallow: /*previewThemeId*  
+Sitemap: https://nxbkimdong.com.vn/sitemap.xml  
+
+User-agent: adsbot-google  
+Disallow: /checkout
+Disallow: /cart
+Disallow: /*previewThemeId*  
+
+User-agent: Nutch  
+Disallow: /  
+
+User-agent: AhrefsBot  
+Crawl-Delay: 10
+Disallow: /admin
+Disallow: /cart
+Disallow: /search
+Disallow: /checkout
+Disallow: /account
+Disallow: /collections/*sortBy*
+Disallow: /collections/*+*
+Disallow: /collections/*%2B*
+Disallow: /collections/*%2b*
+Disallow: /blogs/*+*
+Disallow: /blogs/*%2B*
+Disallow: /blogs/*%2b*
+Disallow: /*previewThemeId*  
+Sitemap: https://nxbkimdong.com.vn/sitemap.xml  
+
+User-agent: AhrefsSiteAudit  
+Crawl-Delay: 10
+Disallow: /admin
+Disallow: /cart
+Disallow: /search
+Disallow: /checkout
+Disallow: /account
+Disallow: /collections/*sortBy*
+Disallow: /collections/*+*
+Disallow: /collections/*%2B*
+Disallow: /collections/*%2b*
+Disallow: /blogs/*+*
+Disallow: /blogs/*%2B*
+Disallow: /blogs/*%2b*
+Disallow: /*previewThemeId*  
+Sitemap: https://nxbkimdong.com.vn/sitemap.xml  
+
+User-agent: MJ12bot  
+Crawl-Delay: 10  
+
+User-agent: Pinterest  
+Crawl-Delay: 1  

@@ -1,0 +1,490 @@
+[
+  {
+    "key": "conan",
+    "name": "Thám tử lừng danh Conan",
+    "aliases": [
+      "thám tử lừng danh conan",
+      "conan",
+      "detective conan"
+    ],
+    "publisher": "Kim Đồng",
+    "preferredSource": "kimdong",
+    "category": "Trinh thám",
+    "longStory": false,
+    "kimdongSlugPrefixes": [
+      "tham-tu-lung-danh-conan-tap-"
+    ],
+    "tikiQuery": "thám tử lừng danh conan tập",
+    "wikidataId": "Q3853685",
+    "maxVolumes": 30
+  },
+  {
+    "key": "doraemon-truyen-ngan",
+    "name": "Doraemon truyện ngắn",
+    "aliases": [
+      "doraemon truyện ngắn",
+      "doraemon chú mèo máy đến từ tương lai",
+      "doraemon"
+    ],
+    "publisher": "Kim Đồng",
+    "preferredSource": "kimdong",
+    "category": "Thiếu nhi",
+    "longStory": false,
+    "kimdongSlugPrefixes": [
+      "tap-le-doraemon-truyen-ngan-chu-meo-may-den-tu-tuong-lai"
+    ],
+    "tikiQuery": "doraemon truyện ngắn tập",
+    "wikidataId": "Q235311",
+    "maxVolumes": 30
+  },
+  {
+    "key": "than-dong-dat-viet",
+    "name": "Thần đồng đất Việt",
+    "aliases": [
+      "thần đồng đất việt"
+    ],
+    "publisher": "Phan Thị",
+    "preferredSource": "tiki",
+    "category": "Lịch sử",
+    "longStory": false,
+    "kimdongSlugPrefixes": [],
+    "tikiQuery": "thần đồng đất việt",
+    "wikidataId": "Q10826379",
+    "maxVolumes": 25
+  },
+  {
+    "key": "doraemon-truyen-dai",
+    "name": "Doraemon truyện dài",
+    "aliases": [
+      "doraemon truyện dài"
+    ],
+    "publisher": "Kim Đồng",
+    "preferredSource": "kimdong",
+    "category": "Khoa học viễn tưởng",
+    "longStory": true,
+    "kimdongSlugPrefixes": [
+      "tap-le-doraemon-truyen-dai-24"
+    ],
+    "tikiQuery": "doraemon truyện dài tập",
+    "wikidataId": null,
+    "maxVolumes": 24
+  },
+  {
+    "key": "dragon-quest-dau-an-roto",
+    "name": "Dragon Quest - Dấu ấn Roto - Những người kế thừa",
+    "aliases": [
+      "dragon quest dấu ấn roto những người kế thừa",
+      "dragon quest dấu ấn roto"
+    ],
+    "publisher": "Kim Đồng",
+    "preferredSource": "kimdong",
+    "category": "Kì ảo",
+    "longStory": false,
+    "kimdongSlugPrefixes": [
+      "dragon-quest-dau-an-roto-nhung-nguoi-ke-thua-tap-"
+    ],
+    "tikiQuery": "dragon quest dấu ấn roto tập",
+    "wikidataId": null,
+    "maxVolumes": 20
+  },
+  {
+    "key": "shin-cau-be-but-chi",
+    "name": "Shin - Cậu bé bút chì",
+    "aliases": [
+      "shin cậu bé bút chì",
+      "shin"
+    ],
+    "publisher": "Kim Đồng",
+    "preferredSource": "kimdong",
+    "category": "Hài hước",
+    "longStory": false,
+    "kimdongSlugPrefixes": [
+      "tap-le-shin-cau-be-but-chi"
+    ],
+    "tikiQuery": "shin cậu bé bút chì tập",
+    "wikidataId": null,
+    "maxVolumes": 20
+  },
+  {
+    "key": "chu-gia-nuoi-meo-u",
+    "name": "Chú già nuôi mèo ú",
+    "aliases": [
+      "chú già nuôi mèo ú"
+    ],
+    "publisher": "Kim Đồng",
+    "preferredSource": "kimdong",
+    "category": "Đời thường",
+    "longStory": false,
+    "kimdongSlugPrefixes": [
+      "chu-gia-nuoi-meo-u-tap-"
+    ],
+    "tikiQuery": "chú già nuôi mèo ú tập",
+    "wikidataId": null,
+    "maxVolumes": 12
+  },
+  {
+    "key": "nhoc-maruko",
+    "name": "Nhóc Maruko",
+    "aliases": [
+      "nhóc maruko"
+    ],
+    "publisher": "Kim Đồng",
+    "preferredSource": "kimdong",
+    "category": "Đời thường",
+    "longStory": false,
+    "kimdongSlugPrefixes": [],
+    "tikiQuery": "nhóc maruko tập",
+    "wikidataId": null,
+    "maxVolumes": 12
+  },
+  {
+    "key": "truong-hoc-biet-tuot",
+    "name": "Trường học Biết Tuốt",
+    "aliases": [
+      "trường học biết tuốt"
+    ],
+    "publisher": "Kim Đồng",
+    "preferredSource": "kimdong",
+    "category": "Thiếu nhi",
+    "longStory": false,
+    "kimdongSlugPrefixes": [
+      "truong-hoc-biet-tuot-tap-"
+    ],
+    "tikiQuery": "trường học biết tuốt tập",
+    "wikidataId": null,
+    "maxVolumes": 15
+  },
+  {
+    "key": "dragon-ball",
+    "name": "Dragon Ball - 7 viên ngọc rồng",
+    "aliases": [
+      "dragon ball 7 viên ngọc rồng",
+      "7 viên ngọc rồng",
+      "dragon ball"
+    ],
+    "publisher": "Kim Đồng",
+    "preferredSource": "kimdong",
+    "category": "Hành động",
+    "longStory": false,
+    "kimdongSlugPrefixes": [],
+    "tikiQuery": "7 viên ngọc rồng tập",
+    "wikidataId": "Q15051307",
+    "maxVolumes": 25
+  },
+  {
+    "key": "shin-hoat-hinh-mau",
+    "name": "Shin - Cậu bé bút chì - Hoạt hình màu",
+    "aliases": [
+      "shin cậu bé bút chì hoạt hình màu"
+    ],
+    "publisher": "Kim Đồng",
+    "preferredSource": "kimdong",
+    "category": "Hài hước",
+    "longStory": false,
+    "kimdongSlugPrefixes": [
+      "shin-cau-be-but-chi-hoat-hinh-mau-tap-",
+      "tap-le-shin-cau-be-but-chi-phien-ban-hoat-hinh-mau"
+    ],
+    "tikiQuery": "shin cậu bé bút chì hoạt hình màu tập",
+    "wikidataId": null,
+    "maxVolumes": 15
+  },
+  {
+    "key": "one-piece",
+    "name": "One Piece",
+    "aliases": [
+      "one piece",
+      "đảo hải tặc"
+    ],
+    "publisher": "Kim Đồng",
+    "preferredSource": "tiki",
+    "category": "Phiêu lưu",
+    "longStory": false,
+    "kimdongSlugPrefixes": [
+      "one-piece-tap-"
+    ],
+    "tikiQuery": "one piece tập",
+    "wikidataId": "Q673",
+    "maxVolumes": 20
+  },
+  {
+    "key": "naruto",
+    "name": "Naruto",
+    "aliases": [
+      "naruto"
+    ],
+    "publisher": "Kim Đồng",
+    "preferredSource": "kimdong",
+    "category": "Hành động",
+    "longStory": false,
+    "kimdongSlugPrefixes": [],
+    "tikiQuery": "naruto tập",
+    "wikidataId": null,
+    "maxVolumes": 15
+  },
+  {
+    "key": "asari",
+    "name": "Asari - Cô bé tinh nghịch",
+    "aliases": [
+      "asari cô bé tinh nghịch",
+      "cô bé asari",
+      "asari"
+    ],
+    "publisher": "Kim Đồng",
+    "preferredSource": "kimdong",
+    "category": "Hài hước",
+    "longStory": false,
+    "kimdongSlugPrefixes": [
+      "tap-le-asari-co-be-tinh-nghich"
+    ],
+    "tikiQuery": "asari cô bé tinh nghịch tập",
+    "wikidataId": null,
+    "maxVolumes": 15
+  },
+  {
+    "key": "bluelock",
+    "name": "Bluelock",
+    "aliases": [
+      "bluelock",
+      "blue lock"
+    ],
+    "publisher": "Kim Đồng",
+    "preferredSource": "kimdong",
+    "category": "Thể thao",
+    "longStory": false,
+    "kimdongSlugPrefixes": [
+      "tap-le-bluelock",
+      "bluelock-tap-"
+    ],
+    "tikiQuery": "blue lock tập",
+    "wikidataId": null,
+    "maxVolumes": 10
+  },
+  {
+    "key": "slam-dunk",
+    "name": "Slam Dunk - Deluxe Edition",
+    "aliases": [
+      "slam dunk deluxe edition",
+      "slam dunk"
+    ],
+    "publisher": "Kim Đồng",
+    "preferredSource": "kimdong",
+    "category": "Thể thao",
+    "longStory": false,
+    "kimdongSlugPrefixes": [
+      "tap-le-slam-dunk-deluxe-edition",
+      "slam-dunk-deluxe-edition-tap-"
+    ],
+    "tikiQuery": "slam dunk deluxe edition tập",
+    "wikidataId": null,
+    "maxVolumes": 10
+  },
+  {
+    "key": "thanh-guom-diet-quy",
+    "name": "Thanh gươm diệt quỷ",
+    "aliases": [
+      "thanh gươm diệt quỷ",
+      "kimetsu no yaiba"
+    ],
+    "publisher": "Kim Đồng",
+    "preferredSource": "kimdong",
+    "category": "Hành động",
+    "longStory": false,
+    "kimdongSlugPrefixes": [
+      "thanh-guom-diet-quy-tap-"
+    ],
+    "tikiQuery": "thanh gươm diệt quỷ tập",
+    "wikidataId": null,
+    "maxVolumes": 12
+  },
+  {
+    "key": "chu-thuat-hoi-chien",
+    "name": "Chú thuật hồi chiến",
+    "aliases": [
+      "chú thuật hồi chiến",
+      "jujutsu kaisen"
+    ],
+    "publisher": "Kim Đồng",
+    "preferredSource": "kimdong",
+    "category": "Hành động",
+    "longStory": false,
+    "kimdongSlugPrefixes": [
+      "chu-thuat-hoi-chien-tap-"
+    ],
+    "tikiQuery": "chú thuật hồi chiến tập",
+    "wikidataId": null,
+    "maxVolumes": 10
+  },
+  {
+    "key": "spy-x-family",
+    "name": "Spy x Family",
+    "aliases": [
+      "spy x family",
+      "spy family"
+    ],
+    "publisher": "Kim Đồng",
+    "preferredSource": "kimdong",
+    "category": "Hài hước",
+    "longStory": false,
+    "kimdongSlugPrefixes": [
+      "spy-x-family-tap-"
+    ],
+    "tikiQuery": "spy x family tập",
+    "wikidataId": null,
+    "maxVolumes": 8
+  },
+  {
+    "key": "takagi",
+    "name": "Nhất quỷ nhì ma, thứ ba Takagi",
+    "aliases": [
+      "nhất quỷ nhì ma thứ ba takagi"
+    ],
+    "publisher": "Kim Đồng",
+    "preferredSource": "kimdong",
+    "category": "Đời thường",
+    "longStory": false,
+    "kimdongSlugPrefixes": [
+      "nhat-quy-nhi-ma-thu-ba-takagi-tap-"
+    ],
+    "tikiQuery": "nhất quỷ nhì ma thứ ba takagi tập",
+    "wikidataId": null,
+    "maxVolumes": 10
+  },
+  {
+    "key": "yona",
+    "name": "Yona - Công chúa bình minh",
+    "aliases": [
+      "yona công chúa bình minh"
+    ],
+    "publisher": "Kim Đồng",
+    "preferredSource": "kimdong",
+    "category": "Kì ảo",
+    "longStory": false,
+    "kimdongSlugPrefixes": [
+      "yona-cong-chua-binh-minh-tap-"
+    ],
+    "tikiQuery": "yona công chúa bình minh tập",
+    "wikidataId": null,
+    "maxVolumes": 8
+  },
+  {
+    "key": "bach-tuyet-toc-do",
+    "name": "Bạch tuyết tóc đỏ",
+    "aliases": [
+      "bạch tuyết tóc đỏ"
+    ],
+    "publisher": "Kim Đồng",
+    "preferredSource": "kimdong",
+    "category": "Kì ảo",
+    "longStory": false,
+    "kimdongSlugPrefixes": [
+      "bach-tuyet-toc-do-tap-"
+    ],
+    "tikiQuery": "bạch tuyết tóc đỏ tập",
+    "wikidataId": null,
+    "maxVolumes": 8
+  },
+  {
+    "key": "chi-chion-o-den-meo",
+    "name": "Chị Chion ở đền mèo",
+    "aliases": [
+      "chị chion ở đền mèo"
+    ],
+    "publisher": "Kim Đồng",
+    "preferredSource": "kimdong",
+    "category": "Đời thường",
+    "longStory": false,
+    "kimdongSlugPrefixes": [
+      "chi-chion-o-den-meo-tap-"
+    ],
+    "tikiQuery": "chị chion ở đền mèo tập",
+    "wikidataId": null,
+    "maxVolumes": 8
+  },
+  {
+    "key": "tan-ninja-hattori",
+    "name": "Tân Ninja Hattori",
+    "aliases": [
+      "tân ninja hattori"
+    ],
+    "publisher": "Kim Đồng",
+    "preferredSource": "kimdong",
+    "category": "Hài hước",
+    "longStory": false,
+    "kimdongSlugPrefixes": [
+      "tan-ninja-hattori-tap-"
+    ],
+    "tikiQuery": "tân ninja hattori tập",
+    "wikidataId": null,
+    "maxVolumes": 7
+  },
+  {
+    "key": "perman",
+    "name": "Perman - Cậu bé siêu nhân",
+    "aliases": [
+      "perman cậu bé siêu nhân",
+      "perman"
+    ],
+    "publisher": "Kim Đồng",
+    "preferredSource": "kimdong",
+    "category": "Thiếu nhi",
+    "longStory": false,
+    "kimdongSlugPrefixes": [
+      "perman-cau-be-sieu-nhan-tap-"
+    ],
+    "tikiQuery": "perman tập",
+    "wikidataId": null,
+    "maxVolumes": 7
+  },
+  {
+    "key": "pokemon-dac-biet",
+    "name": "Pokémon đặc biệt",
+    "aliases": [
+      "pokémon đặc biệt"
+    ],
+    "publisher": "Kim Đồng",
+    "preferredSource": "kimdong",
+    "category": "Phiêu lưu",
+    "longStory": false,
+    "kimdongSlugPrefixes": [
+      "pokemon-dac-biet-tap-"
+    ],
+    "tikiQuery": "pokemon đặc biệt tập",
+    "wikidataId": null,
+    "maxVolumes": 8
+  },
+  {
+    "key": "kinh-van-hoa",
+    "name": "Kính vạn hoa",
+    "aliases": [
+      "kính vạn hoa"
+    ],
+    "publisher": "Kim Đồng",
+    "preferredSource": "kimdong",
+    "category": "Đời thường",
+    "longStory": false,
+    "kimdongSlugPrefixes": [
+      "tap-le-kinh-van-hoa",
+      "kinh-van-hoa-tap-"
+    ],
+    "tikiQuery": "kính vạn hoa tập",
+    "wikidataId": null,
+    "maxVolumes": 8
+  },
+  {
+    "key": "haikyu",
+    "name": "Haikyu!! - Chàng khổng lồ tí hon",
+    "aliases": [
+      "haikyu chàng khổng lồ tí hon",
+      "haikyu"
+    ],
+    "publisher": "Kim Đồng",
+    "preferredSource": "kimdong",
+    "category": "Thể thao",
+    "longStory": false,
+    "kimdongSlugPrefixes": [],
+    "tikiQuery": "haikyu tập",
+    "wikidataId": null,
+    "maxVolumes": 8
+  }
+]

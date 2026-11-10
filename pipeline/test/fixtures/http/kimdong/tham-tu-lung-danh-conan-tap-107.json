@@ -1,0 +1,62 @@
+{
+ "id": 69587005,
+ "name": "Thám tử lừng danh Conan - Tập 107",
+ "alias": "tham-tu-lung-danh-conan-tap-107",
+ "vendor": null,
+ "product_type": "Manga - comic",
+ "price": 22500,
+ "price_max": 90000,
+ "price_min": 22500,
+ "price_varies": true,
+ "compare_at_price_max": 100000,
+ "compare_at_price_min": 25000,
+ "compare_at_price_varies": true,
+ "tags": [
+  "15"
+ ],
+ "summary": null,
+ "content": "<ul>\n\t<li style=\"text-align: justify;\">ISBN: <strong>978-604-2-39259-4</strong></li>\n\t<li style=\"text-align: justify;\">T&aacute;c giả:&nbsp;<a href=\"/collections/gosho-aoyama\">Gosho Aoyama</a></li>\n\t<li style=\"text-align: justify;\">Đối tượng:&nbsp;<a href=\"/collections/thieu-nien-11-15\">Thiếu ni&ecirc;n (11 &ndash; 15)</a></li>\n\t<li style=\"text-align: justify;\">Khu&ocirc;n Khổ:&nbsp;11.3x17.6 cm</li>\n\t<li style=\"text-align: justify;\">Số trang: 176</li>\n\t<li style=\"text-align: justify;\">Định dạng: b&igrave;a mềm</li>\n\t<li style=\"text-align: justify;\">Trọng lượng: 230 gram</li>\n\t<li style=\"text-align: justify;\">Bộ s&aacute;ch:&nbsp;<a href=\"/collections/tham-tu-lung-danh-conan-1\">Th&aacute;m tử lừng danh Conan</a><hr />\n<p>Mô tả cắt ngắn cho test.</p></li>\n</ul>",
+ "featured_image": "https://bizweb.dktcdn.net/100/576/749/products/tham-tu-lung-danh-conan-ban-thuong-tap-107-bia.jpg?v=1769762385143",
+ "images": [
+  "https://bizweb.dktcdn.net/100/576/749/products/tham-tu-lung-danh-conan-ban-thuong-tap-107-bia.jpg?v=1769762385143",
+  "https://bizweb.dktcdn.net/100/576/749/products/4fd2bdde-b317-47ac-b40a-77902cf2f2cd.jpg?v=1769762385143"
+ ],
+ "options": [
+  {
+   "name": "Phiên bản",
+   "position": 1
+  }
+ ],
+ "variants": [
+  {
+   "id": 186272017,
+   "barcode": "5252208470107",
+   "sku": "5252208470107",
+   "unit": "Cuốn",
+   "price": 22500,
+   "compare_at_price": 25000,
+   "price_original": 25000,
+   "compare_at_price_original": 25000,
+   "options": [
+    "Bản thường"
+   ],
+   "option1": "Bản thường",
+   "option2": null,
+   "option3": null,
+   "title": "Bản thường",
+   "inventory_management": "bizweb",
+   "inventory_policy": "deny",
+   "inventory_quantity": 1,
+   "weight": 0,
+   "weight_unit": "g",
+   "featured_image": {
+    "src": "https://bizweb.dktcdn.net/100/576/749/products/4fd2bdde-b317-47ac-b40a-77902cf2f2cd.jpg?v=1769762385143"
+   },
+   "available": true,
+   "url": "/tham-tu-lung-danh-conan-tap-107?variant=186272017",
+   "taxable": true
+  }
+ ],
+ "available": true,
+ "url": "/tham-tu-lung-danh-conan-tap-107"
+}
