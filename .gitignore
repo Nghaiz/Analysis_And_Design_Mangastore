@@ -15,6 +15,7 @@ src/main/webapp/static/
 plans/reports/screens/
 e2e/test-results/
 e2e/playwright-report/
+.playwright-mcp/
 *.log
 
 # Bộ TheOneKit trong .claude/ không vào repo (Deferred #4).
