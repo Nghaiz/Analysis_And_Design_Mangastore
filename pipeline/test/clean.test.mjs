@@ -47,7 +47,7 @@ describe('clean', () => {
     expect(book.source).toBe('kimdong');
     expect(book.mergedFrom.map((m) => m.source)).toEqual(['kimdong', 'tiki']);
     expect(book.publishYear).toBe(2020);
-    expect(book.publisher).toBe('Nhà Xuất Bản Kim Đồng');
+    expect(book.publisher).toBe('Kim Đồng');
     expect(book.author).toBe('Gosho Aoyama');
     expect(book.images.map((i) => [i.kind, i.n])).toEqual([['cover', 0], ['extra', 1]]);
   });

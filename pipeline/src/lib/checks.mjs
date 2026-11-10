@@ -33,8 +33,8 @@ export function schemaIssues(book, validate, missing) {
 
 export function duplicateKeys(books) {
   const out = [];
-  const seen = { id: new Map(), key: new Map(), isbn13: new Map() };
-  const keyOf = { id: (b) => b.id, key: (b) => mergeKey(b), isbn13: (b) => b.isbn13 };
+  const seen = { id: new Map(), key: new Map(), isbn13: new Map(), name: new Map() };
+  const keyOf = { id: (b) => b.id, key: (b) => mergeKey(b), isbn13: (b) => b.isbn13, name: (b) => b.name };
   for (const book of books) {
     for (const kind of Object.keys(seen)) {
       const value = keyOf[kind](book);

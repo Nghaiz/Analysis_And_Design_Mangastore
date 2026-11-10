@@ -65,12 +65,6 @@ export function yearFromDate(publishedAt) {
   return match ? validYear(match[1]) : null;
 }
 
-/** Năm trong "(Tái bản YYYY)" của tên. */
-export function yearFromReprint(name) {
-  const match = foldedName(name).match(REPRINT);
-  return match ? validYear(match[1]) : null;
-}
-
 /** Tên còn mang dấu hiệu combo/bộ/set (CONTRACT §5). */
 export function isCombo(name) {
   const text = foldedName(name);

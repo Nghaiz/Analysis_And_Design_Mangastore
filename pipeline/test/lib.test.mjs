@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest';
 import { authorKey, buildAuthorSpelling, formatAuthors } from '../src/lib/authors.mjs';
 import { toIsbn13 } from '../src/lib/isbn.mjs';
 import { htmlToText, truncateAtSentence } from '../src/lib/text.mjs';
-import { detectVariant, isCombo, parseVolume, yearFromDate, yearFromReprint } from '../src/lib/title.mjs';
+import { detectVariant, isCombo, parseVolume, yearFromDate } from '../src/lib/title.mjs';
 
 describe('isbn', () => {
   it('nhận ISBN-13 đúng, đổi ISBN-10 sang 13, bỏ checksum sai', () => {
@@ -38,7 +38,6 @@ describe('title', () => {
     expect(detectVariant('Doraemon Plus - Tập 1')).toBe('plus');
     expect(detectVariant('Conan - Tập 12 (Tái bản 2023)')).toBe('thuong');
     expect(detectVariant('Sách mẫu - Tập 1')).toBe('thuong');
-    expect(yearFromReprint('Conan - Tập 12 (Tái bản 2023)')).toBe(2023);
     expect(yearFromDate('15/03/2020')).toBe(2020);
     expect(yearFromDate('không rõ')).toBeNull();
   });

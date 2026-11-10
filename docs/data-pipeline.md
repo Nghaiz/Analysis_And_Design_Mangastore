@@ -23,14 +23,17 @@ Mọi dữ liệu sinh ra nằm trong `data/` (bị ignore, không vào git). Ch
 
 ### Làm sạch và gộp trùng (`clean`)
 
-- Chữ: chuẩn Unicode NFC, bỏ thẻ HTML, giải mã `&amp;`, `&#273;`, gom khoảng trắng.
+- Chữ: chuẩn Unicode NFC, bỏ thẻ HTML, giải mã mọi thực thể HTML có tên (đủ bảng Latin-1 như `&agrave;`, `&ocirc;`, `&nbsp;`, cộng `&abreve;`, `&dstrok;`...) và số (`&#7887;`, `&#x1EA1;`), kể cả chuỗi bị mã hoá hai lần, trước khi cắt; gom khoảng trắng.
+- Tên đầu truyện: bỏ tiền tố "Sách - ", đuôi "(YYYY)", "(Tái bản ...)", mọi "(Tặng ...)", "(N tập)"; số tập đệm "Tập 01" thành "Tập 1". Năm bỏ khỏi tên chỉ dùng làm `publishYear` khi nguồn không ghi năm. Số tập, biến thể và khoá gộp tính trên tên đã làm sạch; validate chặn hai Book trùng tên.
+- Mô tả bắt đầu bằng chính tên sản phẩm (hay gặp ở Tiki) thì bỏ phần tên lặp đó.
+- NXB chuẩn hoá theo tiền tố: bỏ "Nhà xuất bản", "NXB", "Công ty"/"Cty" và từ chỉ loại doanh nghiệp đi sau ("TNHH", "Cổ phần", "Văn hoá"...); phần còn lại khớp đuôi với `publisher` của một bộ trong `series.json` thì dùng cách viết đó ("Nhà Xuất Bản Kim Đồng" → "Kim Đồng", "Cty Phan Thị" → "Phan Thị").
 - ISBN: đổi ISBN-10 sang ISBN-13, kiểm checksum; sai checksum thì coi như không có ISBN (đếm vào `invalidIsbn`).
 - Số tập đọc từ "Tập N", "Vol. N", "#N", "Quyển N". Biến thể: `dac-biet` ("đặc biệt", "special"), `mau` ("màu", có dấu, để không nhầm với "mẫu"), `plus`; còn lại `thuong`. "Tái bản YYYY" không phải biến thể.
 - Gộp trùng hai lượt: lượt 1 gom các bản ghi cùng ISBN-13; lượt 2 gom các nhóm có cùng khoá `seriesKey|volume|variant` của bản ghi thắng (không có số tập thì dùng tên đã bỏ dấu thay số tập). Khoá của bản ghi thua không nối chuỗi, nên một ISBN ghi nhầm không kéo hai tập khác nhau vào một.
 - Nguồn thắng: Kim Đồng, rồi Tiki, rồi Wikidata; cùng nguồn thì `sourceUrl` nhỏ hơn. Trường nào nguồn thắng để trống thì lấy của bản ghi kế tiếp trong nhóm. Bản ghi Wikidata cấp bộ chỉ bổ trợ: tác giả khi mọi bản ghi tập đều thiếu, và cách viết chuẩn của tên tác giả.
-- Tác giả: tách theo `,`, `;`, `/`, `&`, " - ", " và "; gộp biến thể theo khoá bỏ dấu, chữ thường, sắp các từ (nên "Aoyama Gosho", "GOSHO AOYAMA" và "Gosho Aoyama" là một người); cách viết chuẩn là của Wikidata, không có thì cách viết gặp đầu tiên (cách viết toàn chữ hoa bị thay khi có cách viết thường). Nhiều tác giả nối bằng ", ", bỏ bớt người cuối nếu vượt 100 kí tự.
+- Tác giả: chữ chung chung ("Nhiều tác giả", "Đang cập nhật"...) coi như trống; khi mọi nguồn trống thì dùng khoá `author` của bộ trong `series.json`, rồi tác giả Wikidata, không có nữa thì để trống (validate chặn `missing-field`). Chữ cái đứng một mình giữa tên được thêm dấu chấm ("Fujiko F Fujio" → "Fujiko F. Fujio"). Tách theo `,`, `;`, `/`, `&`, " - ", " và "; gộp biến thể theo khoá bỏ dấu, chữ thường, sắp các từ (nên "Aoyama Gosho", "GOSHO AOYAMA" và "Gosho Aoyama" là một người); cách viết chuẩn là `author` của `series.json` rồi Wikidata, không có thì cách viết gặp đầu tiên (cách viết toàn chữ hoa bị thay khi có cách viết thường). Nhiều tác giả nối bằng ", ", bỏ bớt người cuối nếu vượt 100 kí tự.
 - `publisher`: từ nguồn, không có thì `publisher` của bộ trong `series.json`.
-- `publishYear`: năm trong "Ngày xuất bản"/`publishedAt` của nguồn, không có thì "(Tái bản YYYY)" trong tên; vẫn không có thì để trống (validate cảnh báo `no-year`). Không bao giờ đoán.
+- `publishYear`: năm trong "Ngày xuất bản"/`publishedAt` của nguồn, không có thì năm trong "(Tái bản YYYY)" hoặc "(YYYY)" của tên; vẫn không có thì để trống (validate cảnh báo `no-year`). Không bao giờ đoán.
 - `description`: văn bản thuần, cắt ≤ 255 kí tự tại dấu kết câu cuối cùng còn vừa; câu đầu đã dài hơn 255 thì cắt ở ranh giới từ và thêm "…".
 - `category`: thể loại của bộ trong `series.json` (phải có trong `pipeline/config/categories.json`).
 - `id`: theo thứ tự bộ trong `series.json`, rồi số tập (không số tập xếp cuối), rồi biến thể (`thuong`, `dac-biet`, `mau`, `plus`), bắt đầu từ 1. Thứ tự dòng trong tệp thô không ảnh hưởng.

@@ -1,7 +1,9 @@
 // Dựng một bản ghi Book (clean-record.schema.json) từ một nhóm bản ghi thô đã gộp.
-import { AUTHOR_SEPARATOR, formatAuthors } from './authors.mjs';
+import { AUTHOR_SEPARATOR, formatAuthors, splitAuthors } from './authors.mjs';
+import { stripLeadingTitle } from './name.mjs';
+import { normalizePublisher } from './publisher.mjs';
 import { cleanLine, clip, foldKey, htmlToText, truncateAtSentence } from './text.mjs';
-import { yearFromDate, yearFromReprint } from './title.mjs';
+import { yearFromDate } from './title.mjs';
 
 export const NAME_MAX = 255;
 export const AUTHOR_MAX = 100;
@@ -46,22 +48,27 @@ function pickImages(raws) {
 
 /**
  * @param group entry đã sắp, phần tử đầu là nguồn thắng (lib/merge.mjs)
- * @param context { series, seriesAuthors, spelling, categories }
+ * @param context { series, seriesAuthors, spelling, categories, knownPublishers }
+ *   seriesAuthors: tác giả cấp bộ (series.json `author`, rồi Wikidata), dùng khi mọi nguồn để trống/chung chung
  */
-export function buildBook(group, { series, seriesAuthors, spelling, categories }) {
+export function buildBook(group, { series, seriesAuthors, spelling, categories, knownPublishers }) {
   const head = group[0];
   const winner = head.raw;
   const raws = group.map((entry) => entry.raw);
-  const authorList = firstOf(raws, (raw) => (raw.authors?.length ? raw.authors : null)) ?? seriesAuthors;
-  const description = firstOf(raws, (raw) => htmlToText(raw.descriptionHtml));
-  const publishYear =
-    firstOf(raws, (raw) => yearFromDate(raw.publishedAt)) ?? firstOf(raws, (raw) => yearFromReprint(raw.name));
+  const authorList = firstOf(raws, (raw) => (splitAuthors(raw.authors).length ? raw.authors : null)) ?? seriesAuthors;
+  const titles = group.flatMap((entry) => [cleanLine(entry.raw.name), entry.name]);
+  const description = firstOf(raws, (raw) => stripLeadingTitle(htmlToText(raw.descriptionHtml), titles));
+  const publishYear = firstOf(raws, (raw) => yearFromDate(raw.publishedAt)) ?? firstOf(group, (entry) => entry.nameYear);
+  const publisher =
+    firstOf(raws, (raw) => normalizePublisher(raw.publisher, knownPublishers)) ??
+    normalizePublisher(series.publisher, knownPublishers) ??
+    '';
   const { images, imageSource } = pickImages(raws);
   const book = {
     id: 0,
-    name: clip(cleanLine(winner.name), NAME_MAX),
+    name: clip(head.name, NAME_MAX),
     author: fitAuthors(formatAuthors(authorList, spelling), AUTHOR_MAX),
-    publisher: clip(firstOf(raws, (raw) => cleanLine(raw.publisher)) ?? cleanLine(series.publisher) ?? '', PUBLISHER_MAX),
+    publisher: clip(publisher, PUBLISHER_MAX),
     publishYear,
     category: clip(pickCategory(series, raws, categories), CATEGORY_MAX),
     description: truncateAtSentence(description, DESCRIPTION_MAX),

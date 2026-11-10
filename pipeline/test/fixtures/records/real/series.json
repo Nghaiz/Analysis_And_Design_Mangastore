@@ -1,0 +1,139 @@
+[
+  {
+    "key": "conan",
+    "name": "Thám tử lừng danh Conan",
+    "aliases": [
+      "thám tử lừng danh conan",
+      "conan",
+      "detective conan"
+    ],
+    "publisher": "Kim Đồng",
+    "preferredSource": "kimdong",
+    "category": "Trinh thám",
+    "longStory": false,
+    "kimdongSlugPrefixes": [
+      "tham-tu-lung-danh-conan-tap-"
+    ],
+    "tikiQuery": "thám tử lừng danh conan tập",
+    "wikidataId": "Q3853685",
+    "maxVolumes": 20
+  },
+  {
+    "key": "than-dong-dat-viet",
+    "name": "Thần đồng đất Việt",
+    "aliases": [
+      "thần đồng đất việt"
+    ],
+    "publisher": "Phan Thị",
+    "preferredSource": "tiki",
+    "category": "Lịch sử",
+    "longStory": false,
+    "kimdongSlugPrefixes": [],
+    "tikiQuery": "thần đồng đất việt",
+    "wikidataId": "Q10826379",
+    "maxVolumes": 25,
+    "author": "Lê Linh"
+  },
+  {
+    "key": "doraemon-truyen-dai",
+    "name": "Doraemon truyện dài",
+    "aliases": [
+      "doraemon truyện dài"
+    ],
+    "publisher": "Kim Đồng",
+    "preferredSource": "kimdong",
+    "category": "Khoa học viễn tưởng",
+    "longStory": true,
+    "kimdongSlugPrefixes": [
+      "tap-le-doraemon-truyen-dai-24"
+    ],
+    "tikiQuery": "doraemon truyện dài tập",
+    "wikidataId": null,
+    "maxVolumes": 24
+  },
+  {
+    "key": "dragon-quest-dau-an-roto",
+    "name": "Dragon Quest - Dấu ấn Roto - Những người kế thừa",
+    "aliases": [
+      "dragon quest dấu ấn roto những người kế thừa",
+      "dragon quest dấu ấn roto"
+    ],
+    "publisher": "Kim Đồng",
+    "preferredSource": "kimdong",
+    "category": "Kì ảo",
+    "longStory": false,
+    "kimdongSlugPrefixes": [
+      "dragon-quest-dau-an-roto-nhung-nguoi-ke-thua-tap-"
+    ],
+    "tikiQuery": "dragon quest dấu ấn roto tập",
+    "wikidataId": null,
+    "maxVolumes": 25
+  },
+  {
+    "key": "shin-cau-be-but-chi",
+    "name": "Shin - Cậu bé bút chì",
+    "aliases": [
+      "shin cậu bé bút chì",
+      "shin"
+    ],
+    "publisher": "Kim Đồng",
+    "preferredSource": "kimdong",
+    "category": "Hài hước",
+    "longStory": false,
+    "kimdongSlugPrefixes": [
+      "tap-le-shin-cau-be-but-chi"
+    ],
+    "tikiQuery": "shin cậu bé bút chì tập",
+    "wikidataId": null,
+    "maxVolumes": 30
+  },
+  {
+    "key": "chu-gia-nuoi-meo-u",
+    "name": "Chú già nuôi mèo ú",
+    "aliases": [
+      "chú già nuôi mèo ú"
+    ],
+    "publisher": "Kim Đồng",
+    "preferredSource": "kimdong",
+    "category": "Đời thường",
+    "longStory": false,
+    "kimdongSlugPrefixes": [
+      "chu-gia-nuoi-meo-u-tap-"
+    ],
+    "tikiQuery": "chú già nuôi mèo ú tập",
+    "wikidataId": null,
+    "maxVolumes": 12
+  },
+  {
+    "key": "nhoc-maruko",
+    "name": "Nhóc Maruko",
+    "aliases": [
+      "nhóc maruko"
+    ],
+    "publisher": "Kim Đồng",
+    "preferredSource": "kimdong",
+    "category": "Đời thường",
+    "longStory": false,
+    "kimdongSlugPrefixes": [],
+    "tikiQuery": "nhóc maruko tập",
+    "wikidataId": null,
+    "maxVolumes": 10
+  },
+  {
+    "key": "dragon-ball",
+    "name": "Dragon Ball - 7 viên ngọc rồng",
+    "aliases": [
+      "dragon ball 7 viên ngọc rồng",
+      "7 viên ngọc rồng",
+      "dragon ball"
+    ],
+    "publisher": "Kim Đồng",
+    "preferredSource": "kimdong",
+    "category": "Hành động",
+    "longStory": false,
+    "kimdongSlugPrefixes": [],
+    "tikiQuery": "7 viên ngọc rồng tập",
+    "wikidataId": "Q15051307",
+    "maxVolumes": 15
+  }
+]

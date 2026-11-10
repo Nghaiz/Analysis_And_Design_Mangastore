@@ -1,34 +1,21 @@
 // Xử lí chữ: NFC, bỏ HTML, bỏ dấu, cắt theo câu.
+import { decodeEntities } from './entities.mjs';
 
-const NAMED_ENTITIES = Object.freeze({
-  amp: '&', lt: '<', gt: '>', quot: '"', apos: "'", nbsp: ' ',
-  hellip: '…', ndash: '–', mdash: '—', laquo: '«', raquo: '»',
-  ldquo: '“', rdquo: '”', lsquo: '‘', rsquo: '’',
-});
+export { decodeEntities };
 
 const BLOCK_TAGS = /<\s*\/?\s*(br|p|div|li|ul|ol|h[1-6]|tr|table|blockquote)\b[^>]*>/gi;
 const DROP_BLOCKS = /<\s*(script|style)\b[^>]*>[\s\S]*?<\s*\/\s*\1\s*>/gi;
 const ANY_TAG = /<[^>]*>/g;
 const ELLIPSIS = '…';
 
-export function decodeEntities(text) {
-  return text.replace(/&(#x[0-9a-f]+|#\d+|[a-z]+);/gi, (whole, body) => {
-    if (body[0] === '#') {
-      const code = body[1] === 'x' || body[1] === 'X' ? parseInt(body.slice(2), 16) : parseInt(body.slice(1), 10);
-      return Number.isFinite(code) ? String.fromCodePoint(code) : whole;
-    }
-    return NAMED_ENTITIES[body.toLowerCase()] ?? whole;
-  });
-}
-
 export function collapseSpaces(text) {
   return text.replace(/\s+/g, ' ').trim();
 }
 
-/** NFC + gom khoảng trắng; null/rỗng thành null. */
+/** Giải mã thực thể HTML, NFC, gom khoảng trắng; null/rỗng thành null. */
 export function cleanLine(text) {
   if (text == null) return null;
-  const out = collapseSpaces(String(text).normalize('NFC'));
+  const out = collapseSpaces(decodeEntities(String(text)).normalize('NFC'));
   return out === '' ? null : out;
 }
 
@@ -36,14 +23,14 @@ export function cleanLine(text) {
 export function htmlToText(html) {
   if (html == null) return null;
   const stripped = String(html).replace(DROP_BLOCKS, ' ').replace(BLOCK_TAGS, ' ').replace(ANY_TAG, '');
-  return cleanLine(decodeEntities(stripped));
+  return cleanLine(stripped);
 }
 
 /** Bỏ dấu tiếng Việt, chữ thường, đ → d. Dùng để so khớp, không để hiển thị. */
 export function fold(text) {
   return String(text ?? '')
     .normalize('NFD')
-    .replace(/[̀-ͯ]/g, '')
+    .replace(/[\u0300-\u036f]/g, '')
     .replace(/đ/g, 'd')
     .replace(/Đ/g, 'D')
     .toLowerCase();
