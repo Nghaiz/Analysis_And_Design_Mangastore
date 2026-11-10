@@ -1,0 +1,14 @@
+# Mount: ./docker/mysql/conf.d:/etc/mysql/conf.d:ro (compose.yaml, service db).
+# Múi giờ dạng offset '+07:00' (Asia/Ho_Chi_Minh, không có giờ mùa hè): tên vùng như 'Asia/Ho_Chi_Minh'
+# cần bảng time zone đã nạp, ảnh mysql gốc chưa có.
+# MySQL bỏ qua file cấu hình ghi được bởi mọi người (world-writable); xem báo cáo lane 1C về bind mount Windows.
+[mysqld]
+character-set-server = utf8mb4
+collation-server = utf8mb4_0900_ai_ci
+default-time-zone = '+07:00'
+
+[client]
+default-character-set = utf8mb4
+
+[mysql]
+default-character-set = utf8mb4

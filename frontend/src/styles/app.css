@@ -1,0 +1,5 @@
+/* Entry `src/styles/app.css` (contract.md §5). Theme tokens arrive in phase 5. */
+@import "tailwindcss";
+
+/* Tailwind scans frontend/ on its own; the JSP pages and tag files live outside it. */
+@source "../../../src/main/webapp/**/*.{jsp,tag}";

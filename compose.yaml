@@ -1,0 +1,114 @@
+# Cấu hình duy nhất để chạy tại máy (chỉ localhost, không có prod: Deferred #28).
+# Bảng service/cổng/volume: plans/261111-tiem-thue-truyen/contract.md §3. File dùng chung, chỉ orchestrator sửa.
+# Chạy: docker compose up --build -d --wait   (cần .env: node scripts/dev/make-env.mjs)
+# Không chạy "docker compose down -v" khi chủ dự án chưa đồng ý: xoá volume là thao tác phá huỷ.
+name: tiemtruyen
+
+x-tz: &tz
+  TZ: ${TZ:-Asia/Ho_Chi_Minh}
+
+services:
+  app:
+    build:
+      context: .
+      dockerfile: docker/app/Dockerfile
+    image: tiemtruyen-app:local
+    environment:
+      <<: *tz
+      APP_DB_URL: ${APP_DB_URL:?thiếu APP_DB_URL trong .env}
+      APP_DB_USER: ${APP_DB_USER:?thiếu APP_DB_USER trong .env}
+      APP_DB_PASSWORD: ${APP_DB_PASSWORD:?thiếu APP_DB_PASSWORD trong .env}
+      APP_DB_POOL_SIZE: ${APP_DB_POOL_SIZE:-10}
+      APP_REDIS_ADDRESS: ${APP_REDIS_ADDRESS:-redis://redis:6379}
+      REDIS_PASSWORD: ${REDIS_PASSWORD:?thiếu REDIS_PASSWORD trong .env}
+      APP_VITE_DEV: ${APP_VITE_DEV:-false}
+      APP_VITE_DEV_ORIGIN: ${APP_VITE_DEV_ORIGIN:-http://localhost:5173}
+      APP_COVERS_BASE_URL: ${APP_COVERS_BASE_URL:-/covers}
+      FLYWAY_DATA_LOCATION: ${FLYWAY_DATA_LOCATION:-filesystem:/flyway/data}
+      LOGIN_RATE_MAX_FAILS: ${LOGIN_RATE_MAX_FAILS:-5}
+      LOGIN_RATE_WINDOW_SECONDS: ${LOGIN_RATE_WINDOW_SECONDS:-900}
+    volumes:
+      - covers_data:/srv/covers:ro
+      - catalog_data:/flyway/data:ro
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "curl -fsS http://127.0.0.1:8080/health.jsp | grep -q ok"]
+      interval: 10s
+      timeout: 5s
+      retries: 12
+      start_period: 40s
+    restart: unless-stopped
+
+  db:
+    image: mysql:8.4.13
+    # Docker Desktop trên Windows mount file với quyền 0777 nên MySQL bỏ qua file cấu hình (world-writable).
+    # Chép vào /etc/mysql/conf.d với mode 0644 rồi chạy entrypoint gốc (lane 1C đã thử, báo cáo phase-01-ha-tang).
+    entrypoint: ["sh", "-c", "install -m 0644 /docker-conf.d/*.cnf /etc/mysql/conf.d/ && exec docker-entrypoint.sh mysqld"]
+    environment:
+      <<: *tz
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:?thiếu MYSQL_ROOT_PASSWORD trong .env}
+      MYSQL_DATABASE: ${MYSQL_DATABASE:-tiemtruyen}
+      MYSQL_USER: ${MYSQL_USER:?thiếu MYSQL_USER trong .env}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD:?thiếu MYSQL_PASSWORD trong .env}
+    ports:
+      - "127.0.0.1:3307:3306"
+    volumes:
+      - db_data:/var/lib/mysql
+      - ./docker/mysql/conf.d:/docker-conf.d:ro
+    healthcheck:
+      test: ["CMD-SHELL", "mysqladmin ping -h 127.0.0.1 -uroot -p\"$$MYSQL_ROOT_PASSWORD\" --silent"]
+      interval: 10s
+      timeout: 5s
+      retries: 12
+      start_period: 30s
+    restart: unless-stopped
+
+  redis:
+    image: redis:8.10.3
+    environment:
+      <<: *tz
+      REDIS_PASSWORD: ${REDIS_PASSWORD:?thiếu REDIS_PASSWORD trong .env}
+    # Đi qua docker-entrypoint.sh để ảnh hạ quyền xuống user redis (không chạy bằng root).
+    command: ["sh", "-c", "exec docker-entrypoint.sh redis-server /usr/local/etc/redis/redis.conf --requirepass \"$$REDIS_PASSWORD\""]
+    volumes:
+      - redis_data:/data
+      - ./docker/redis/redis.conf:/usr/local/etc/redis/redis.conf:ro
+    healthcheck:
+      test: ["CMD-SHELL", "redis-cli -a \"$$REDIS_PASSWORD\" --no-auth-warning ping | grep -q PONG"]
+      interval: 10s
+      timeout: 5s
+      retries: 12
+      start_period: 10s
+    restart: unless-stopped
+
+  nginx:
+    build:
+      context: docker/nginx
+      dockerfile: Dockerfile
+    image: tiemtruyen-nginx:local
+    environment:
+      <<: *tz
+    ports:
+      - "127.0.0.1:${NGINX_HTTP_PORT:-8080}:80"
+    volumes:
+      - covers_data:/srv/covers:ro
+    depends_on:
+      app:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "curl -fsS http://127.0.0.1/nginx-health | grep -q ok"]
+      interval: 10s
+      timeout: 5s
+      retries: 12
+      start_period: 10s
+    restart: unless-stopped
+
+volumes:
+  db_data:
+  redis_data:
+  covers_data:
+  catalog_data:
