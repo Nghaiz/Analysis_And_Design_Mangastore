@@ -45,9 +45,9 @@ Nhánh phase: `phase/01-khung`
 | 3 | 3B `dao-user-book` | User, Client, Staff, Book, Damage, Collateral DAO | `t1k-web-core-developer` | xem `phase-03` | 3A | chờ | |
 | 3 | 3C `dao-cart-bill` | Cart, RentalBill DAO, K1, D9, test tranh chấp | `t1k-web-core-developer` | xem `phase-03` | 3A | chờ | |
 | 3 | 3D `kiem-kien-truc` | SchemaConformanceTest, ArchitectureTest | `t1k-web-core-developer` | `src/test/.../schema,arch/**` | 3A | chờ | |
-| 4 | 4.0 orchestrator | package, schema bản ghi, categories, Accept | phiên chính | xem `phase-04` | phase 3 | chờ | |
-| 4 | 4A `nguon` | fetch, robots, cache, nguồn, series, census | `t1k-web-core-developer` | xem `phase-04` | 4.0 | chờ | |
-| 4 | 4B `xu-li` | clean, images, copies, price, validate, export, publish | `t1k-web-core-developer` | xem `phase-04` | 4.0 | chờ | |
+| 4 | 4.0 orchestrator | package, schema bản ghi, categories, Accept, `pipeline/CONTRACT.md` | phiên ab | xem `phase-04` | phase 3 (chỉ export cần) | xong | `pipeline/CONTRACT.md` |
+| 4 | 4A `nguon` | fetch, robots, cache, nguồn, series, census | `t1k-web-core-developer` | xem `phase-04` | 4.0 | đang chạy (phiên ab) | `plans/reports/phase-04-nguon-*.md` |
+| 4 | 4B `xu-li` | clean, images, copies, price, validate, export, publish | `t1k-web-core-developer` | xem `phase-04` | 4.0 | đang chạy (phiên ab) | `plans/reports/phase-04-xu-li-*.md` |
 | 4 | 4C `xac-minh` | Playwright MCP trang ảnh chạy thử | `t1k-web-testing-tester` | `plans/reports/` | 4.3 | chờ | |
 | 4 | 4.5 HARD STOP | chủ dự án duyệt chạy thử 10 đầu truyện | chủ dự án | | 4C | chờ | |
 | 5 | 5.0 orchestrator | gói npm, shadcn add, khoá vite.config | phiên chính | xem `phase-05` | phase 3 | chờ | |

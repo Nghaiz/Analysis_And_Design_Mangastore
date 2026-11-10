@@ -1,0 +1,97 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "tiemtruyen/pipeline/clean-record.schema.json",
+  "title": "Bản ghi Book đã làm sạch (một dòng trong data/stage/<run>/*.jsonl)",
+  "description": "Đủ cột tblBook (docs/schema.md) cộng trường của pipeline. Các bước sau clean chỉ điền thêm trường của mình: images điền images[].sha256 và images[].widths, copies điền copies, price điền rentalPrice. Trường chưa tới bước điền thì là null.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "id", "name", "author", "publisher", "publishYear", "category", "description", "rentalPrice",
+    "seriesKey", "volume", "variant", "isbn13", "pages", "source", "sourceUrl", "fetchedAt",
+    "mergedFrom", "images", "copies"
+  ],
+  "properties": {
+    "id": {
+      "description": "tblBook.id, gán ở clean theo thứ tự cố định (thứ tự bộ trong series.json, rồi volume, rồi variant), bắt đầu từ 1",
+      "type": "integer",
+      "minimum": 1
+    },
+    "name": { "type": "string", "minLength": 1, "maxLength": 255 },
+    "author": { "type": "string", "minLength": 1, "maxLength": 100 },
+    "publisher": { "type": "string", "minLength": 1, "maxLength": 100 },
+    "publishYear": {
+      "description": "Năm lấy từ nguồn ('Ngày xuất bản' của Tiki, tag năm của Kim Đồng, '(Tái bản YYYY)' trong tên); không có thì null, không bịa",
+      "type": ["integer", "null"],
+      "minimum": 1900,
+      "maximum": 2100
+    },
+    "category": {
+      "description": "Một giá trị của pipeline/config/categories.json",
+      "type": "string",
+      "maxLength": 50
+    },
+    "description": {
+      "description": "Văn bản thuần NFC, cắt ≤ 255 kí tự theo ranh giới câu; null nếu nguồn không có mô tả",
+      "type": ["string", "null"],
+      "maxLength": 255
+    },
+    "rentalPrice": {
+      "description": "Giá thuê một ngày (đồng), do bước price điền: 3000 / 5000, cộng 1000 nếu hiếm",
+      "type": ["integer", "null"],
+      "minimum": 1000
+    },
+    "seriesKey": { "type": "string", "pattern": "^[a-z0-9-]+$" },
+    "volume": { "type": ["integer", "null"], "minimum": 0 },
+    "variant": { "enum": ["thuong", "dac-biet", "mau", "plus"] },
+    "isbn13": { "type": ["string", "null"], "pattern": "^97[89]\\d{10}$" },
+    "pages": { "type": ["integer", "null"], "minimum": 1 },
+    "source": { "description": "Nguồn thắng khi gộp", "enum": ["kimdong", "tiki", "wikidata"] },
+    "sourceUrl": { "type": "string", "pattern": "^https://" },
+    "fetchedAt": { "type": "string" },
+    "mergedFrom": {
+      "description": "Mọi bản ghi thô đã gộp vào Book này (kể cả nguồn thắng)",
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["source", "sourceUrl", "fetchedAt"],
+        "properties": {
+          "source": { "enum": ["kimdong", "tiki", "wikidata"] },
+          "sourceUrl": { "type": "string" },
+          "fetchedAt": { "type": "string" }
+        }
+      }
+    },
+    "images": {
+      "description": "Phần tử đầu là bìa (kind=cover), còn lại ảnh phụ (kind=extra, n từ 1). Mảng rỗng = thiếu bìa (cảnh báo, nginx trả ảnh dự phòng)",
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["kind", "n", "sourceUrl", "sha256", "widths"],
+        "properties": {
+          "kind": { "enum": ["cover", "extra"] },
+          "n": { "type": "integer", "minimum": 0 },
+          "sourceUrl": { "type": "string", "pattern": "^https://" },
+          "sha256": {
+            "description": "sha256 hex của ảnh gốc đã tải; null tới khi bước images chạy",
+            "type": ["string", "null"],
+            "pattern": "^[0-9a-f]{64}$"
+          },
+          "widths": {
+            "description": "Các cỡ đã sinh (160, 320, 640); rỗng tới khi bước images chạy",
+            "type": "array",
+            "items": { "enum": [160, 320, 640] }
+          }
+        }
+      }
+    },
+    "copies": {
+      "description": "Số quyển (1–5) do bước copies điền; barcode suy ra: DT{id 3 chữ số}-{n 2 chữ số}, n = 1..copies",
+      "type": ["integer", "null"],
+      "minimum": 1,
+      "maximum": 5
+    }
+  }
+}
