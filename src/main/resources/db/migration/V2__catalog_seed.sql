@@ -24,10 +24,10 @@ INSERT INTO tblCollateral (name, description) VALUES
 -- kịch bản đăng kí của E2E tự tạo tài khoản đó.
 INSERT INTO tblUser (id, username, password, fullName) VALUES
     (1, 'hant', '$argon2id$v=19$m=19456,t=2,p=1$Z7/ga5InHhW9wZ1E0Nwo2g$6OHItTnti86VDbCM3ZI9PqzZZPkQfllb9oYdM2EpeQc', 'Nguyễn Thu Hà'),
-    (2, 'quanli', '$argon2id$v=19$m=19456,t=2,p=1$WsKuqJ2Jb0qcqNNwbZR39w$7NtBlGWwDTKTeCpfFOMQjJF6QonuXxP8gVoJhxIilcM', 'Phạm Quốc Huy'),
-    (3, 'khach01', '$argon2id$v=19$m=19456,t=2,p=1$gdrTiFlWIsrtIXCgO3arpQ$m7eD1URB+sOant0IbjBlnN8GdYVR+ROvGN1jPqVv6Y8', 'Lê Hoàng Nam'),
-    (4, 'khach02', '$argon2id$v=19$m=19456,t=2,p=1$x2BL8YwmgrEsyfrA1BkqQQ$TaMxzVYriJjvujQDEniQiKdpL8bMy/TQafZLXVdswYA', 'Đỗ Thị Lan'),
-    (5, 'khach03', '$argon2id$v=19$m=19456,t=2,p=1$qiUpoXh7tG+GFctny1Qp3w$NIo7Dc1E6R/oJz967vGc2hqXcSZFiNMjYrypLo7lKi4', 'Vũ Đức Long');
+    (2, 'quanli', '$argon2id$v=19$m=19456,t=2,p=1$ItRa5psBN3u9HxZlxBnzog$mTyfXDmvptqiA7epSIqiT1iC4/awKvZVbmnDKNJ5aTA', 'Phạm Quốc Huy'),
+    (3, 'khach01', '$argon2id$v=19$m=19456,t=2,p=1$kOQkAxaLmtRYffdiFRJNHg$C4pvljVSStfHJT5QLwY08Y3HsCB6kww25wCk/aDHqzY', 'Lê Hoàng Nam'),
+    (4, 'khach02', '$argon2id$v=19$m=19456,t=2,p=1$MFq1qzGZ+tgDt4uay3md2Q$2pBPPKoMK7fuJjV7TAc6AB17J4xOIRuz6sJ55oFKqiY', 'Đỗ Thị Lan'),
+    (5, 'khach03', '$argon2id$v=19$m=19456,t=2,p=1$bjUR170Ij7wQD4dlnWKoVg$LLf7RQQ3ZZkP1eR1VYVMx2Hm4Nc4JUd8oxVv5ixGiAc', 'Vũ Đức Long');
 
 INSERT INTO tblStaff (userId, position) VALUES
     (1, 'Nhân viên bán hàng'),
