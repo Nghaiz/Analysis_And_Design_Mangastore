@@ -2,9 +2,9 @@
 
 Nguồn sự thật cho việc giao lane của mọi phiên cook. Đọc lại đầu phiên và sau mỗi lần compact (cùng `CLAUDE.md` và file phase đang làm). Giao hay nhận việc xong là cập nhật file này ngay, trước khi làm việc khác.
 
-Phase đang chạy: 1 (khung dự án và hạ tầng)
+Phase đang chạy: 2 (bộ công cụ AI); phase 1 đã vào `main` (PR #1)
 Cập nhật lần cuối: 2026-11-11 (phiên cook phase 1–2)
-Nhánh phase: `phase/01-khung`
+Nhánh phase: `phase/02-bo-cong-cu-ai`
 
 ## Luật (tóm tắt, bản đủ ở `plan.md` và `contract.md` §1)
 
@@ -34,15 +34,15 @@ Nhánh phase: `phase/01-khung`
 | 1 | 1B `frontend-khung` | Vite, TS, ESLint, loader khung | `t1k-web-core-developer` | `frontend/**` trừ package | 1.0 | xong | `plans/reports/phase-01-frontend-khung-261111-0342.md` |
 | 1 | 1C `ha-tang` | nginx brotli, mysql, redis, make-env | `t1k-web-core-developer` | `docker/nginx,mysql,redis/**`, `scripts/dev/**` | 1.0 | xong | `plans/reports/phase-01-ha-tang-261111-0342.md` |
 | 1 | 1D `xac-minh` | Playwright MCP trang tạm | `t1k-web-testing-tester` | `plans/reports/` | 1A, 1B, 1C, `.env` | xong | `plans/reports/phase-01-xac-minh-261111-0356.md` |
-| 2 | 2A `hop-dong` | `docs/contracts.md`, `AGENTS.md`, `CLAUDE.md` | `t1k-docs-manager` | ba file đó | phase 1 | xong (chờ merge vào phase/02) | `plans/reports/phase-02-hop-dong-261111-0403.md` |
-| 2 | 2B `docs` | docs còn lại, ADR, Mermaid | `t1k-docs-manager` | `docs/**` trừ contracts | 2A, 2.1 | chờ | |
-| 2 | 2C `rules` | 5 rule | `t1k-rules-manager` | 5 file `.claude/rules/` | 2A, 2.1 | chờ | |
-| 2 | 2D `skills` | 8 skill, agent tiem-contract-guard | `t1k-skills-manager` | 8 thư mục skill, `tiem-contract-guard.md` | 2A, 2.1 | chờ | |
+| 2 | 2A `hop-dong` | `docs/contracts.md`, `AGENTS.md`, `CLAUDE.md` | `t1k-docs-manager` | ba file đó | phase 1 | xong | `plans/reports/phase-02-hop-dong-261111-0403.md` |
+| 2 | 2B `docs` | docs còn lại, ADR, Mermaid | `t1k-docs-manager` | `docs/**` trừ contracts | 2A, 2.1 | xong | `plans/reports/phase-02-docs-261111-0426.md` |
+| 2 | 2C `rules` | 5 rule | `t1k-rules-manager` | 5 file `.claude/rules/` | 2A, 2.1 | xong | `plans/reports/phase-02-rules-261111-0415.md` |
+| 2 | 2D `skills` | 8 skill, agent tiem-contract-guard | `t1k-skills-manager` | 8 thư mục skill, `tiem-contract-guard.md` | 2A, 2.1 | xong | `plans/reports/phase-02-skills-261111-0419.md` |
 | 3 | 3.0 orchestrator | V1, V2, V10 e2e, pom | phiên ab | `db/**`, `pom.xml` | phase 2 (contracts.md 063f864) | xong (V2 chờ chuỗi băm từ 3A) | |
 | 3 | 3A `model-util` | model, DAO cha, Messages, Passwords, Codes, JsonUtil, MigrationListener | `t1k-web-core-developer` | xem `phase-03` | 3.0 | xong (6caaa20) | `plans/reports/phase-03-model-util-*.md` |
-| 3 | 3B `dao-user-book` | User, Client, Staff, Book, Damage, Collateral DAO | `t1k-web-core-developer` | xem `phase-03` | 3A | chờ | |
-| 3 | 3C `dao-cart-bill` | Cart, RentalBill DAO, K1, D9, test tranh chấp | `t1k-web-core-developer` | xem `phase-03` | 3A | chờ | |
-| 3 | 3D `kiem-kien-truc` | SchemaConformanceTest, ArchitectureTest | `t1k-web-core-developer` | `src/test/.../schema,arch/**` | 3A | chờ | |
+| 3 | 3B `dao-user-book` | User, Client, Staff, Book, Damage, Collateral DAO | `t1k-web-core-developer` | xem `phase-03` | 3A | đang chạy (phiên ab) | `plans/reports/phase-03-dao-user-book-*.md` |
+| 3 | 3C `dao-cart-bill` | Cart, RentalBill DAO, K1, D9, test tranh chấp | `t1k-web-core-developer` | xem `phase-03` | 3A | đang chạy (phiên ab) | `plans/reports/phase-03-dao-cart-bill-*.md` |
+| 3 | 3D `kiem-kien-truc` | SchemaConformanceTest, ArchitectureTest | `t1k-web-core-developer` | `src/test/.../schema,arch/**` | 3A | đang chạy (phiên ab) | `plans/reports/phase-03-kiem-kien-truc-*.md` |
 | 4 | 4.0 orchestrator | package, schema bản ghi, categories, Accept | phiên chính | xem `phase-04` | phase 3 | chờ | |
 | 4 | 4A `nguon` | fetch, robots, cache, nguồn, series, census | `t1k-web-core-developer` | xem `phase-04` | 4.0 | chờ | |
 | 4 | 4B `xu-li` | clean, images, copies, price, validate, export, publish | `t1k-web-core-developer` | xem `phase-04` | 4.0 | chờ | |
@@ -90,3 +90,9 @@ Nhánh phase: `phase/01-khung`
 | 2026-11-11 | 1A xong, merge; Accept phase 1 ALL PASS lần đầu; làm đỏ bước 5 bằng cách dừng redis |
 | 2026-11-11 | 1D lần 1 FAIL (`/favicon.ico` 404 ở trang text/plain) → nginx trả favicon tự vẽ, Accept thêm kiểm; lần 2, lần 3 sạch |
 | 2026-11-11 | 2A xong (commit f04b1a4), 13 điểm Chưa chốt C1–C13 |
+| 2026-11-11 | Phase 1 merge vào `main` (PR #1, merge commit e504f12); nhánh `phase/02-bo-cong-cu-ai` từ `origin/main`, merge 2A |
+| 2026-11-11 | 2.1: orchestrator chốt C1–C13 theo uỷ quyền của chủ dự án, viết script kiểm và Accept (063f864); spawn 2B, 2C, 2D song song |
+| 2026-11-11 | 2C xong, merge (556973a); section10-sync so thêm khối brief §3 của AGENTS.md (a36f897) |
+| 2026-11-11 | 2D xong, merge (d8104fc); chạy thử tiem-contract-guard báo đúng 2 vi phạm cố ý (c124d06), worktree thử không merge |
+| 2026-11-11 | 2B xong, merge (875c7fb); UNIQUE vào ô khoá `tblCart.clientId`, thêm `schema-doc-sync.test.mjs` (2257b72) |
+| 2026-11-11 | Theo phiên phase 3 (lane 3A): skill `tiem-add-dao-duplicate-check` đổi khuôn sang `con()` + `inWriteTransaction` (Checkstyle cấm trường protected); Accept phase 2 ALL PASS (`plans/reports/accept-phase-02-261111-0430.log`) |
