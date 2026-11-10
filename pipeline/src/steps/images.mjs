@@ -1,14 +1,19 @@
 // Bước images: clean.jsonl → images.jsonl, ảnh vào data/images/<run>/<bookId>/ (contract.md §6).
 import { mkdir, readdir, rm, writeFile } from 'node:fs/promises';
-import { join } from 'node:path';
-import { exists, paths, readJsonl, readStage, writeStage } from '../lib/io.mjs';
-import { outputNames, renderImage, sha256Hex, WIDTHS } from '../lib/render.mjs';
+import { dirname, join } from 'node:path';
+import { exists, paths, readJson, readJsonl, readStage, writeStage, writeText } from '../lib/io.mjs';
+import { outputNames, RENDER_VERSION, renderImage, sha256Hex, WIDTHS } from '../lib/render.mjs';
 
 const OFFLINE_ERROR = 'OfflineError';
 
+const renderMarker = (ctx) => join(dirname(paths.stageFile(ctx, 'images')), 'images-render.json');
+
+/** Ảnh của lần trước, chỉ khi cùng RENDER_VERSION (đổi cách sinh ảnh thì sinh lại hết). */
 async function previousImages(ctx) {
   const file = paths.stageFile(ctx, 'images');
-  if (!(await exists(file))) return new Map();
+  const marker = renderMarker(ctx);
+  if (!(await exists(file)) || !(await exists(marker))) return new Map();
+  if ((await readJson(marker)).version !== RENDER_VERSION) return new Map();
   return new Map((await readJsonl(file)).map((book) => [book.id, book.images]));
 }
 
@@ -84,6 +89,7 @@ export async function images(ctx) {
   for (const book of books) out.push(await processBook(ctx, book, previous, counters));
   await removeStaleDirs(ctx, new Set(books.map((book) => String(book.id))));
   await writeStage(ctx, 'images', out);
+  await writeText(renderMarker(ctx), `${JSON.stringify({ version: RENDER_VERSION })}\n`);
   const summary = {
     run: ctx.run,
     books: out.length,

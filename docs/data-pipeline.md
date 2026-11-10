@@ -42,7 +42,7 @@ Mọi dữ liệu sinh ra nằm trong `data/` (bị ignore, không vào git). Ch
 
 ### Ảnh (`images`)
 
-Ảnh tải qua bộ tải của lane 4A (có cache, throttle, `--offline`). Ảnh được xoay theo EXIF, thu nhỏ giữ tỉ lệ, không phóng to ảnh nhỏ hơn cỡ đích (file `cover-640.webp` của ảnh gốc rộng 400 px vẫn rộng 400 px). WebP chất lượng 80, AVIF chất lượng 50, effort 4. Ảnh tải lỗi: `sha256` null (coi như thiếu ảnh). Ảnh tải được mà không giải mã được: giữ `sha256`, `widths` rỗng, validate báo `image-decode`. Chạy lại: Book có ảnh gốc giống lần trước và đủ file thì dùng lại, không mã hoá lại.
+Ảnh tải qua bộ tải của lane 4A (có cache, throttle, `--offline`). Ảnh được xoay theo EXIF; bìa có viền đệm đơn sắc (ảnh Tiki vuông 900x900 viền trắng) được cắt viền trước khi thu nhỏ, chỉ khi bốn góc cùng màu, phần còn lại ≥ 50% mỗi chiều và tỉ lệ sau cắt gần 2:3 hơn ảnh gốc (`pipeline/src/lib/trim.mjs`); sha256 vẫn là của ảnh gốc. Ảnh được thu nhỏ giữ tỉ lệ, không phóng to ảnh nhỏ hơn cỡ đích (file `cover-640.webp` của ảnh gốc rộng 400 px vẫn rộng 400 px). WebP chất lượng 80, AVIF chất lượng 50, effort 4. Ảnh tải lỗi: `sha256` null (coi như thiếu ảnh). Ảnh tải được mà không giải mã được: giữ `sha256`, `widths` rỗng, validate báo `image-decode`. Chạy lại: Book có ảnh gốc giống lần trước và đủ file thì dùng lại, không mã hoá lại.
 
 ## Quy tắc số quyển và giá
 
