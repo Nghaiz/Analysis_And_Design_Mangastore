@@ -1,5 +1,9 @@
 # Pipeline dữ liệu catalog
 
+<!-- updated 261111 -->
+
+Owner: phase 4 (`plans/261111-tiem-thue-truyen/phase-04-pipeline-crawl-seed.md`), hợp đồng nội bộ `pipeline/CONTRACT.md`. Lí do chọn nguồn: [ADR-0010](adr/0010-nguon-du-lieu-kim-dong-tiki.md); lí do dùng Node: [ADR-0012](adr/0012-pipeline-bang-node.md). Endpoint, `robots.txt`, điều khoản: `plans/reports/researcher-261111-data-sources.md`. Không dùng Fahasa (điều khoản cấm bot), Open Library, Google Books. Wikidata đọc qua `Special:EntityData` (robots của query.wikidata.org cấm `/sparql`).
+
 Pipeline lấy dữ liệu truyện từ Kim Đồng, Tiki và Wikidata, làm sạch, sinh ảnh bìa, số quyển, giá thuê, kiểm tra rồi xuất migration Flyway. Hợp đồng nội bộ: `pipeline/CONTRACT.md`. Hợp đồng với app và nginx: `plans/261111-tiem-thue-truyen/contract.md` §5–§6.
 
 Mọi dữ liệu sinh ra nằm trong `data/` (bị ignore, không vào git). Chỉ `pipeline/manifest.jsonl` vào git, và nó chỉ ghi nguồn, ngày tải, nguồn thắng, mã băm ảnh, không có tên truyện, mô tả hay ảnh.

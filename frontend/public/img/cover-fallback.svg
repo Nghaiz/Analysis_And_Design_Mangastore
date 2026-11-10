@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 480" role="img" aria-label="Chưa có ảnh bìa">
+  <!-- Bìa giấy vẽ sẵn khi thiếu ảnh bìa thật (contract.md §6). Tự vẽ, không dùng hình có bản quyền. -->
+  <rect width="320" height="480" fill="#E4CF9F"/>
+  <rect x="14" y="14" width="292" height="452" fill="#F3E6C8" stroke="#5C4A36" stroke-width="2"/>
+  <rect x="14" y="14" width="22" height="452" fill="#6B4226" opacity="0.85"/>
+  <g stroke="#5C4A36" stroke-width="1.5" opacity="0.35">
+    <line x1="60" y1="300" x2="280" y2="300"/>
+    <line x1="60" y1="330" x2="280" y2="330"/>
+    <line x1="60" y1="360" x2="240" y2="360"/>
+  </g>
+  <rect x="96" y="170" width="150" height="86" fill="none" stroke="#A3221B" stroke-width="4" transform="rotate(-6 171 213)"/>
+  <text x="171" y="206" text-anchor="middle" font-family="monospace" font-size="20" fill="#A3221B" transform="rotate(-6 171 213)">CHƯA CÓ</text>
+  <text x="171" y="236" text-anchor="middle" font-family="monospace" font-size="20" fill="#A3221B" transform="rotate(-6 171 213)">ẢNH BÌA</text>
+</svg>
