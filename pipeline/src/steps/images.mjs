@@ -2,6 +2,7 @@
 import { mkdir, readdir, rm, writeFile } from 'node:fs/promises';
 import { dirname, join } from 'node:path';
 import { exists, paths, readJson, readJsonl, readStage, writeStage, writeText } from '../lib/io.mjs';
+import { chooseCover } from '../lib/colour.mjs';
 import { outputNames, RENDER_VERSION, renderImage, sha256Hex, WIDTHS } from '../lib/render.mjs';
 
 const OFFLINE_ERROR = 'OfflineError';
@@ -40,10 +41,15 @@ async function download(ctx, url, failures, bookId) {
 
 async function processBook(ctx, book, previous, counters) {
   const dir = join(paths.imagesDir(ctx), String(book.id));
-  const fetched = [];
+  const downloaded = [];
   for (const image of book.images) {
     const buffer = await download(ctx, image.sourceUrl, counters.failures, book.id);
-    fetched.push({ image: { ...image, sha256: buffer ? sha256Hex(buffer) : null, widths: [] }, buffer });
+    downloaded.push({ image: { ...image, sha256: buffer ? sha256Hex(buffer) : null, widths: [] }, buffer });
+  }
+  const fetched = await chooseCover(downloaded);
+  if (fetched !== downloaded) {
+    counters.coverSwapped += 1;
+    ctx.log(`[images] Book ${book.id}: bìa ứng viên không màu, dùng ${fetched[0].image.sourceUrl} làm bìa`);
   }
   const before = previous.get(book.id);
   if (before && signature(before) === signature(fetched.map((f) => f.image)) && (await allFilesExist(dir, before))) {
@@ -84,7 +90,7 @@ async function removeStaleDirs(ctx, ids) {
 export async function images(ctx) {
   const books = await readStage(ctx, 'clean');
   const previous = await previousImages(ctx);
-  const counters = { rendered: 0, reused: 0, failures: [] };
+  const counters = { rendered: 0, reused: 0, coverSwapped: 0, failures: [] };
   const out = [];
   for (const book of books) out.push(await processBook(ctx, book, previous, counters));
   await removeStaleDirs(ctx, new Set(books.map((book) => String(book.id))));
@@ -95,6 +101,7 @@ export async function images(ctx) {
     books: out.length,
     rendered: counters.rendered,
     reusedBooks: counters.reused,
+    coverSwapped: counters.coverSwapped,
     withCover: out.filter((b) => b.images[0]?.widths.length > 0).length,
     failures: counters.failures,
   };

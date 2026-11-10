@@ -7,7 +7,7 @@ export const WIDTHS = Object.freeze([160, 320, 640]);
 const WEBP_OPTIONS = Object.freeze({ quality: 80, effort: 4 });
 const AVIF_OPTIONS = Object.freeze({ quality: 50, effort: 4 });
 /** Đổi khi cách sinh ảnh đổi, để bước images không dùng lại file của cách cũ. */
-export const RENDER_VERSION = 2;
+export const RENDER_VERSION = 3;
 
 export function sha256Hex(data) {
   return createHash('sha256').update(data).digest('hex');
