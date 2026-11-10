@@ -63,7 +63,11 @@ export async function clean(ctx) {
   const { kept, dropped } = capVolumes(ordered, series);
 
   const spellingBySeries = new Map();
-  const seriesAuthorsOf = (key) => seriesLevel.filter((raw) => raw.seriesKey === key).flatMap((raw) => raw.authors);
+  const knownPublishers = [...new Set(series.list.map((s) => s.publisher).filter(Boolean))];
+  const seriesAuthorsOf = (key) => [
+    ...(series.byKey.get(key).author ? [series.byKey.get(key).author] : []),
+    ...seriesLevel.filter((raw) => raw.seriesKey === key).flatMap((raw) => raw.authors),
+  ];
   const spellingOf = (key) => {
     if (!spellingBySeries.has(key)) {
       const others = entries.filter((e) => e.raw.seriesKey === key).sort((a, b) => compareRaw(a.raw, b.raw));
@@ -74,7 +78,13 @@ export async function clean(ctx) {
 
   const built = kept.map((group) => {
     const key = group[0].raw.seriesKey;
-    const context = { series: series.byKey.get(key), seriesAuthors: seriesAuthorsOf(key), spelling: spellingOf(key), categories };
+    const context = {
+      series: series.byKey.get(key),
+      seriesAuthors: seriesAuthorsOf(key),
+      spelling: spellingOf(key),
+      categories,
+      knownPublishers,
+    };
     return { ...buildBook(group, context), seriesKey: key };
   });
   const limited = roundRobinLimit(built, series.list.map((s) => s.key), ctx.limit);

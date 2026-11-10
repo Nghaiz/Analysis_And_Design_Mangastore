@@ -5,6 +5,17 @@ import { cleanLine, foldKey } from './text.mjs';
 export const AUTHOR_SEPARATOR = ', ';
 const SPLIT = /\s*(?:[,;/&|]|\s-\s|\svà\s|\sand\s)\s*/i;
 const ROLE_PREFIX = /^(?:tác giả|tranh|lời|minh hoạ|minh họa|author)\s*:\s*/i;
+// Chữ chung chung không phải tên người (so trên khoá bỏ dấu): coi như nguồn để trống.
+const GENERIC_AUTHORS = Object.freeze(
+  new Set(['nhieu tac gia', 'tap the tac gia', 'nhom tac gia', 'dang cap nhat', 'khong ro', 'various', 'various authors']),
+);
+const INITIAL = /^[A-Z]$/;
+
+/** "Fujiko F Fujio" → "Fujiko F. Fujio": chữ cái đứng một mình giữa tên được thêm dấu chấm. */
+function dotInitials(name) {
+  const words = name.split(' ');
+  return words.map((w, i) => (i > 0 && i < words.length - 1 && INITIAL.test(w) ? `${w}.` : w)).join(' ');
+}
 
 /** Khoá gộp biến thể: bỏ dấu, chữ thường, sắp các từ. */
 export function authorKey(name) {
@@ -16,7 +27,7 @@ export function splitAuthors(list) {
   for (const item of list ?? []) {
     for (const part of String(item).split(SPLIT)) {
       const name = cleanLine(part?.replace(ROLE_PREFIX, ''));
-      if (name) out.push(name);
+      if (name && !GENERIC_AUTHORS.has(foldKey(name))) out.push(dotInitials(name));
     }
   }
   return out;

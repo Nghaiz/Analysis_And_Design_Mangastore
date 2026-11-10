@@ -1,6 +1,7 @@
 // Gộp trùng (brainstorm §6): trước theo ISBN-13 đã kiểm checksum, rồi theo seriesKey|volume|variant.
 // Nguồn thắng: Kim Đồng > Tiki > Wikidata; hoà thì sourceUrl nhỏ hơn.
 import { toIsbn13 } from './isbn.mjs';
+import { cleanTitle } from './name.mjs';
 import { foldKey } from './text.mjs';
 import { detectVariant, parseVolume, VARIANTS } from './title.mjs';
 
@@ -18,13 +19,14 @@ export function mergeKey({ seriesKey, volume, variant, name }) {
   return `${seriesKey}|${middle}|${variant}`;
 }
 
-/** Thêm các trường suy ra từ bản ghi thô (không sửa bản ghi gốc). */
+/** Thêm các trường suy ra từ bản ghi thô (không sửa bản ghi gốc); `name` là tên đã làm sạch. */
 export function annotate(raw) {
-  const volume = parseVolume(raw.name);
-  const variant = detectVariant(raw.name);
+  const { name, year: nameYear } = cleanTitle(raw.name);
+  const volume = parseVolume(name);
+  const variant = detectVariant(name);
   const isbn13 = toIsbn13(raw.isbn);
-  const entry = { raw, volume, variant, isbn13, invalidIsbn: raw.isbn != null && isbn13 == null };
-  entry.key = mergeKey({ seriesKey: raw.seriesKey, volume, variant, name: raw.name });
+  const entry = { raw, name, nameYear, volume, variant, isbn13, invalidIsbn: raw.isbn != null && isbn13 == null };
+  entry.key = mergeKey({ seriesKey: raw.seriesKey, volume, variant, name });
   return entry;
 }
 

@@ -37,15 +37,19 @@ export function fakeHttp() {
   };
 }
 
-/** Tạo thư mục gốc tạm và ctx theo CONTRACT §3. */
-export async function makeCtx({ run = 'trial', limit = null, dryRun = false } = {}) {
+/**
+ * Tạo thư mục gốc tạm và ctx theo CONTRACT §3.
+ * `fixture`: 'sample' (bản ghi tự soạn) hoặc 'real' (vài dòng chép từ lần chạy thử thật, mô tả đã cắt ngắn).
+ */
+export async function makeCtx({ run = 'trial', limit = null, dryRun = false, fixture = 'sample' } = {}) {
+  const base = fixture === 'real' ? join(here, 'real') : here;
   const rootDir = await mkdtemp(join(tmpdir(), 'pipeline-4b-'));
   const tmpPipeline = join(rootDir, 'pipeline');
   await cp(join(pipelineDir, 'schema'), join(tmpPipeline, 'schema'), { recursive: true });
   await cp(join(pipelineDir, 'config', 'categories.json'), join(tmpPipeline, 'config', 'categories.json'));
-  await cp(join(here, 'series.json'), join(tmpPipeline, 'config', 'series.json'));
+  await cp(join(base, 'series.json'), join(tmpPipeline, 'config', 'series.json'));
   const dataDir = join(rootDir, 'data');
-  await cp(join(here, 'raw'), join(dataDir, 'raw', run), { recursive: true });
+  await cp(join(base, 'raw'), join(dataDir, 'raw', run), { recursive: true });
   const logs = [];
   return {
     run,

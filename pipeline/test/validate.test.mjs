@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest';
 import { readFile } from 'node:fs/promises';
 import { join } from 'node:path';
 import { addRaw, makeCtx, rawTemplate, runSteps } from './fixtures/records/harness.mjs';
+import { duplicateKeys } from '../src/lib/checks.mjs';
 
 const reportFile = (ctx, name) => join(ctx.dataDir, 'reports', ctx.run, name);
 
@@ -51,5 +52,11 @@ describe('validate', () => {
     expect(codes).toContain('book-count:null');
     expect(codes).toContain('missing-field:5');
     expect(codes.filter((c) => c.startsWith('schema'))).toEqual([]);
+  });
+
+  it('trùng tên giữa hai Book là duplicate-key', () => {
+    const a = { id: 1, name: 'X - Tập 1', seriesKey: 'a', volume: 1, variant: 'thuong', isbn13: null };
+    const b = { ...a, id: 2, seriesKey: 'b' };
+    expect(duplicateKeys([a, b]).map((i) => i.message)).toEqual(['trùng name "X - Tập 1" với Book 1']);
   });
 });
