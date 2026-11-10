@@ -5,7 +5,7 @@
 // Exit: mã thoát của Maven; 2 khi thiếu JDK 25 hoặc Maven Wrapper.
 import { spawnSync } from 'node:child_process';
 import { existsSync } from 'node:fs';
-import { ROOT, MVNW, IS_WIN, findJava25, MissingToolError } from '../accept/_lib.mjs';
+import { ROOT, MVNW, IS_WIN, findJava25, shellLine, MissingToolError } from '../accept/_lib.mjs';
 
 let javaHome;
 try {
@@ -19,7 +19,8 @@ if (!existsSync(MVNW)) {
   console.error('[mvnw] thiếu Maven Wrapper (mvnw, mvnw.cmd) ở gốc repo → kiểm checkout');
   process.exit(2);
 }
-const r = spawnSync(MVNW, process.argv.slice(2), {
+const args = process.argv.slice(2);
+const r = spawnSync(IS_WIN ? shellLine(MVNW, args) : MVNW, IS_WIN ? [] : args, {
   cwd: ROOT,
   stdio: 'inherit',
   shell: IS_WIN,
