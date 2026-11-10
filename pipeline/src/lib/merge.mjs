@@ -19,10 +19,10 @@ export function mergeKey({ seriesKey, volume, variant, name }) {
   return `${seriesKey}|${middle}|${variant}`;
 }
 
-/** Thêm các trường suy ra từ bản ghi thô (không sửa bản ghi gốc); `name` là tên đã làm sạch. */
-export function annotate(raw) {
+/** Thêm các trường suy ra từ bản ghi thô (không sửa bản ghi gốc); `name` là tên đã làm sạch; `series` từ series.json. */
+export function annotate(raw, series = null) {
   const { name, year: nameYear } = cleanTitle(raw.name);
-  const volume = parseVolume(name);
+  const volume = parseVolume(name, series ? [series.name, ...(series.aliases ?? [])] : []);
   const variant = detectVariant(name);
   const isbn13 = toIsbn13(raw.isbn);
   const entry = { raw, name, nameYear, volume, variant, isbn13, invalidIsbn: raw.isbn != null && isbn13 == null };

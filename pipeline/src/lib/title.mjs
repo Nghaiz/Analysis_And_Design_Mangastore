@@ -43,11 +43,24 @@ export function detectVariant(name) {
   return DEFAULT_VARIANT;
 }
 
-export function parseVolume(name) {
+const escapeRegExp = (text) => text.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+const YEAR_LIKE = /^(?:19|20)\d{2}$/;
+
+/**
+ * Số tập từ "Tập N", "Vol. N", "#N", "Quyển N"; không có thì từ dạng "<tên bộ hoặc bí danh> <số>"
+ * đứng đầu tên, trước " - " hoặc cuối tên (CONTRACT §9), trừ số trông như năm (19xx/20xx).
+ * `seriesNames`: tên bộ và bí danh trong series.json; so sau khi bỏ dấu, không phân biệt hoa thường.
+ */
+export function parseVolume(name, seriesNames = []) {
   const text = foldedName(name).replace(REPRINT, ' ');
   for (const pattern of VOLUME_PATTERNS) {
     const match = text.match(pattern);
     if (match) return Number(match[1]);
+  }
+  const candidates = [...new Set(seriesNames.filter(Boolean).map((n) => foldedName(n).trim()))].sort((a, b) => b.length - a.length);
+  for (const candidate of candidates) {
+    const match = text.match(new RegExp(`^ ${escapeRegExp(candidate)}\\s+(\\d+)(?=\\s+[-–—]\\s|\\s*$)`));
+    if (match && !YEAR_LIKE.test(match[1])) return Number(match[1]);
   }
   return null;
 }

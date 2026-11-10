@@ -6,6 +6,7 @@ import { cleanTitle, stripLeadingTitle } from '../src/lib/name.mjs';
 import { normalizePublisher } from '../src/lib/publisher.mjs';
 import { formatAuthors } from '../src/lib/authors.mjs';
 import { htmlToText, truncateAtSentence } from '../src/lib/text.mjs';
+import { parseVolume } from '../src/lib/title.mjs';
 import { clean } from '../src/steps/clean.mjs';
 import { makeCtx } from './fixtures/records/harness.mjs';
 
@@ -68,6 +69,25 @@ describe('3. nhiễu trong tên', () => {
     expect(of('dragon-ball').publishYear).toBe(2023);
     expect(of('shin-cau-be-but-chi').publishYear).toBe(2026);
     expect(of('conan').publishYear).toBeNull();
+  });
+});
+
+describe('6. số tập dạng "<tên bộ> <số>" không có chữ "Tập"', () => {
+  it('"Thần Đồng Đất Việt 113 - Nét Chữ Cứu Người" cho volume 113, tên giữ nguyên', async () => {
+    const { of } = await realBooks();
+    expect(of('than-dong-dat-viet').volume).toBe(113);
+    expect(of('than-dong-dat-viet').name).toBe('Thần Đồng Đất Việt 113 - Nét Chữ Cứu Người');
+  });
+
+  it('khớp tên bộ hoặc bí danh, trước " - " hoặc cuối tên; không lấy số dạng năm hay số giữa tên', () => {
+    const names = ['Thần đồng đất Việt', 'tdđv'];
+    expect(parseVolume('THẦN ĐỒNG ĐẤT VIỆT 7', names)).toBe(7);
+    expect(parseVolume('Tdđv 12 - Trạng Tí', names)).toBe(12);
+    expect(parseVolume('Thần Đồng Đất Việt 2004 - Kỉ niệm', names)).toBeNull();
+    expect(parseVolume('Thần Đồng Đất Việt 113 Nét Chữ', names)).toBeNull();
+    expect(parseVolume('Chuyện Thần Đồng Đất Việt 5', names)).toBeNull();
+    expect(parseVolume('Thần Đồng Đất Việt 113 - Tập 9', names)).toBe(9);
+    expect(parseVolume('Thần Đồng Đất Việt 113')).toBeNull();
   });
 });
 
