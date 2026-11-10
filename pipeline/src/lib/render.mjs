@@ -1,10 +1,13 @@
 // Sinh ảnh theo contract.md §6: bìa cover-{w}.webp + cover-{w}.avif, ảnh phụ extra-{n}-{w}.webp.
 import { createHash } from 'node:crypto';
 import sharp from 'sharp';
+import { paddingCropBox } from './trim.mjs';
 
 export const WIDTHS = Object.freeze([160, 320, 640]);
 const WEBP_OPTIONS = Object.freeze({ quality: 80, effort: 4 });
 const AVIF_OPTIONS = Object.freeze({ quality: 50, effort: 4 });
+/** Đổi khi cách sinh ảnh đổi, để bước images không dùng lại file của cách cũ. */
+export const RENDER_VERSION = 2;
 
 export function sha256Hex(data) {
   return createHash('sha256').update(data).digest('hex');
@@ -16,19 +19,21 @@ export function outputNames(image) {
   return WIDTHS.map((w) => `extra-${image.n}-${w}.webp`);
 }
 
-/** Giữ tỉ lệ, không phóng to ảnh nhỏ hơn cỡ đích, xoay theo EXIF, bỏ metadata. */
-function resized(buffer, width) {
-  return sharp(buffer, { failOn: 'error' }).autoOrient().resize({ width, withoutEnlargement: true });
+/** Xoay theo EXIF, cắt viền đệm (nếu có), giữ tỉ lệ, không phóng to ảnh nhỏ hơn cỡ đích, bỏ metadata. */
+function resized(buffer, width, box) {
+  const base = sharp(buffer, { failOn: 'error' }).autoOrient();
+  return (box ? base.extract(box) : base).resize({ width, withoutEnlargement: true });
 }
 
-/** Trả [{ name, data }] cho một ảnh; ném lỗi nếu không giải mã được. */
+/** Trả [{ name, data }] cho một ảnh; ném lỗi nếu không giải mã được. Chỉ bìa được cắt viền đệm. */
 export async function renderImage(buffer, image) {
   await sharp(buffer, { failOn: 'error' }).metadata();
+  const box = image.kind === 'cover' ? await paddingCropBox(buffer) : null;
   const jobs = WIDTHS.flatMap((width) => {
     const base = image.kind === 'cover' ? `cover-${width}` : `extra-${image.n}-${width}`;
-    const out = [resized(buffer, width).webp(WEBP_OPTIONS).toBuffer().then((data) => ({ name: `${base}.webp`, data }))];
+    const out = [resized(buffer, width, box).webp(WEBP_OPTIONS).toBuffer().then((data) => ({ name: `${base}.webp`, data }))];
     if (image.kind === 'cover') {
-      out.push(resized(buffer, width).avif(AVIF_OPTIONS).toBuffer().then((data) => ({ name: `${base}.avif`, data })));
+      out.push(resized(buffer, width, box).avif(AVIF_OPTIONS).toBuffer().then((data) => ({ name: `${base}.avif`, data })));
     }
     return out;
   });
