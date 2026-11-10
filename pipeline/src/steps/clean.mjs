@@ -58,7 +58,7 @@ export async function clean(ctx) {
 
   const known = records.filter((raw) => series.byKey.has(raw.seriesKey));
   const seriesLevel = known.filter((raw) => raw.level === 'series').sort(compareRaw);
-  const entries = known.filter((raw) => raw.level === 'volume').map(annotate);
+  const entries = known.filter((raw) => raw.level === 'volume').map((raw) => annotate(raw, series.byKey.get(raw.seriesKey)));
   const ordered = mergeEntries(entries).sort((a, b) => compareBooks(series.index)(a[0], b[0]));
   const { kept, dropped } = capVolumes(ordered, series);
 
