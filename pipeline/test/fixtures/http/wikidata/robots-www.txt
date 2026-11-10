@@ -1,0 +1,8 @@
+# Trích các dòng liên quan từ https://www.wikidata.org/robots.txt (2026-11-11), cắt ngắn cho test.
+User-agent: *
+Allow: /w/api.php?action=mobileview&
+Disallow: /w/
+Disallow: /api/
+Disallow: /wiki/Special:
+Disallow: /wiki/Special:EntityData/
+Allow: /wiki/Special:EntityData/*.

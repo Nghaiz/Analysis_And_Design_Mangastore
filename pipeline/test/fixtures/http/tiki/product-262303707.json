@@ -1,0 +1,125 @@
+{
+ "id": 262303707,
+ "name": "Thám Tử Lừng Danh Conan Tập 2",
+ "url_key": "tham-tu-lung-danh-conan-tap-2-tai-ban-2014-p262303707",
+ "url_path": "tham-tu-lung-danh-conan-tap-2-tai-ban-2014-p262303707.html?spid=262303710",
+ "short_url": "https://tiki.vn/product-p262303707.html?spid=262303710",
+ "description": "<p><strong>Thám Tử Lừng Danh Conan Tập 2</strong></p><p>Mô tả cắt ngắn cho test.</p>",
+ "images": [
+  {
+   "base_url": "https://salt.tikicdn.com/ts/product/0f/7d/2a/1f72e8026e9819ec55d7a084cd76e59b.jpg"
+  },
+  {
+   "base_url": "https://salt.tikicdn.com/ts/product/54/69/43/f75c3b3c3f4e97f42c775cc56fa39cb5.png"
+  }
+ ],
+ "authors": [
+  {
+   "id": 13778,
+   "name": "Aoyama Gosho",
+   "slug": "aoyama-gosho"
+  }
+ ],
+ "current_seller": {
+  "id": 1,
+  "sku": "5418258624186",
+  "name": "Tiki Trading",
+  "link": "https://tiki.vn/cua-hang/tiki-trading",
+  "logo": "https://vcdn.tikicdn.com/ts/seller/d1/3f/ae/13ce3d83ab6b6c5e77e6377ad61dc4a5.jpg",
+  "price": 23000,
+  "product_id": "262303710",
+  "store_id": 40395,
+  "is_best_store": false,
+  "is_offline_installment_supported": null
+ },
+ "specifications": [
+  {
+   "name": "Thông tin chung",
+   "attributes": [
+    {
+     "code": "book_version",
+     "name": "Phiên bản sách",
+     "value": "Phiên bản thường"
+    },
+    {
+     "code": "Organization_address",
+     "name": "Địa chỉ tổ chức chịu trách nhiệm về hàng hóa",
+     "value": "Số 55 Quang Trung, Phường Hai Bà Trưng, Thành phố Hà Nội"
+    },
+    {
+     "code": "Organization_name",
+     "name": "Tên đơn vị/tổ chức chịu trách nhiệm về hàng hóa",
+     "value": "Nhà Xuất Bản Kim Đồng"
+    },
+    {
+     "code": "origin",
+     "name": "Xuất xứ (Made in)",
+     "value": "Việt Nam"
+    },
+    {
+     "code": "publisher_vn",
+     "name": "Công ty phát hành",
+     "value": "Nhà Xuất Bản Kim Đồng"
+    },
+    {
+     "code": "publication_date",
+     "name": "Ngày xuất bản",
+     "value": "2014-06-01 00:00:00"
+    },
+    {
+     "code": "dimensions",
+     "name": "Kích thước",
+     "value": "11.3 x 17.6 cm"
+    },
+    {
+     "code": "dich_gia",
+     "name": "Dịch Giả",
+     "value": "Nhiều người dịch"
+    },
+    {
+     "code": "book_cover",
+     "name": "Loại bìa",
+     "value": "Bìa mềm"
+    },
+    {
+     "code": "number_of_page",
+     "name": "Số trang",
+     "value": "176"
+    },
+    {
+     "code": "manufacturer",
+     "name": "Nhà xuất bản",
+     "value": "Nhà Xuất Bản Kim Đồng"
+    }
+   ]
+  }
+ ],
+ "categories": {
+  "id": 2,
+  "name": "Root",
+  "is_leaf": false
+ },
+ "breadcrumbs": [
+  {
+   "url": "/nha-sach-tiki/c8322",
+   "name": "Nhà Sách Tiki",
+   "category_id": 8322
+  },
+  {
+   "url": "/sach-truyen-tieng-viet/c316",
+   "name": "Sách tiếng Việt",
+   "category_id": 316
+  },
+  {
+   "url": "/truyen-tranh/c1084",
+   "name": "Truyện Tranh, Manga, Comic",
+   "category_id": 1084
+  },
+  {
+   "url": "https://tiki.vn/tham-tu-lung-danh-conan-tap-2-tai-ban-2014-p262303707.html",
+   "name": "Thám Tử Lừng Danh Conan Tập 2",
+   "category_id": 0
+  }
+ ],
+ "inventory_status": "available"
+}

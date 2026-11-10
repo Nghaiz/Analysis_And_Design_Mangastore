@@ -1,0 +1,132 @@
+{
+ "data": [
+  {
+   "id": 262303707,
+   "name": "Thám Tử Lừng Danh Conan Tập 2",
+   "seller_id": 1,
+   "seller_name": "Tiki Trading",
+   "quantity_sold": {
+    "text": "Đã bán 121",
+    "value": 121
+   }
+  },
+  {
+   "id": 249026044,
+   "name": "Thám Tử Lừng Danh Conan - Tập 1 [Tái Bản 2023]",
+   "seller_id": 1,
+   "seller_name": "Tiki Trading",
+   "quantity_sold": {
+    "text": "Đã bán 125",
+    "value": 125
+   }
+  },
+  {
+   "id": 262346925,
+   "name": "Thám Tử Lừng Danh Conan - Tập 77",
+   "seller_id": 1,
+   "seller_name": "Tiki Trading",
+   "quantity_sold": {
+    "text": "Đã bán 23",
+    "value": 23
+   }
+  },
+  {
+   "id": 276425570,
+   "name": "Thám Tử Lừng Danh Conan (Bản Nâng Cấp) - [Chọn Tập Lẻ",
+   "seller_id": 1,
+   "seller_name": "Tiki Trading",
+   "quantity_sold": {
+    "text": "Đã bán 312",
+    "value": 312
+   }
+  },
+  {
+   "id": 279594562,
+   "name": "Sách Thám Tử Lừng Danh Conan  Tập 77 (Bản Nâng Cấp)",
+   "seller_id": 1,
+   "seller_name": "Tiki Trading",
+   "quantity_sold": {
+    "text": "Đã bán 9",
+    "value": 9
+   }
+  },
+  {
+   "id": 91031914,
+   "name": "Thám Tử Lừng Danh Conan Hoạt Hình Màu: Thủ Phạm Trong Đôi Mắt - Tập 2",
+   "seller_id": 53660,
+   "seller_name": "Nhà sách Fahasa",
+   "quantity_sold": {
+    "text": "Đã bán 26",
+    "value": 26
+   }
+  },
+  {
+   "id": 270712353,
+   "name": "Thám Tử Lừng Danh Conan - Tập 2",
+   "seller_id": 229023,
+   "seller_name": "Nhà Sách Phương Nam",
+   "quantity_sold": {
+    "text": "Đã bán 4",
+    "value": 4
+   }
+  },
+  {
+   "id": 270717761,
+   "name": "Thám Tử Lừng Danh Conan - Tập 77",
+   "seller_id": 229023,
+   "seller_name": "Nhà Sách Phương Nam",
+   "quantity_sold": {
+    "text": "Đã bán 1",
+    "value": 1
+   }
+  },
+  {
+   "id": 273846395,
+   "name": "Combo Thám Tử Lừng Danh Conan - Tái Bản",
+   "seller_id": 1,
+   "seller_name": "Tiki Trading",
+   "quantity_sold": {
+    "text": "Đã bán 48",
+    "value": 48
+   }
+  },
+  {
+   "id": 217411484,
+   "name": "Truyện tranh - Bộ 100 cuốn thám tử lừng danh Conan - KĐ",
+   "seller_id": 259784,
+   "seller_name": "Bảo Châu Books",
+   "quantity_sold": {
+    "text": "Đã bán 3",
+    "value": 3
+   }
+  },
+  {
+   "id": 270790098,
+   "name": "Thám Tử Lừng Danh Conan 54",
+   "seller_id": 1,
+   "seller_name": "Tiki Trading",
+   "quantity_sold": {
+    "text": "Đã bán 29",
+    "value": 29
+   }
+  },
+  {
+   "id": 999000005,
+   "name": "Thám Tử Lừng Danh Conan Tập 5 (Sách cũ)",
+   "seller_id": 999,
+   "seller_name": "crafted: hàng cũ",
+   "quantity_sold": {
+    "value": 1
+   }
+  }
+ ],
+ "paging": {
+  "total": 750,
+  "total_text": "750",
+  "per_page": 40,
+  "current_page": 1,
+  "last_page": 1,
+  "from": 1,
+  "to": 40
+ }
+}
