@@ -14,8 +14,6 @@ import vn.tiemtruyen.util.Passwords;
 /** Đăng nhập và đăng kí của khách (contracts §5.3, ch.9 tr.60). */
 public class ClientDAO extends UserDAO {
 
-    private static final int MYSQL_DUPLICATE_ENTRY = 1062;
-
     private static final String SELECT_CLIENT =
             "SELECT dob, idCard, phone, email, address FROM tblClient WHERE userId = ?";
     private static final String INSERT_USER = "INSERT INTO tblUser (username, password, fullName) VALUES (?, ?, ?)";
@@ -97,7 +95,7 @@ public class ClientDAO extends UserDAO {
                 insertCart(newId[0]);
                 return true;
             } catch (SQLException e) {
-                if (e.getErrorCode() == MYSQL_DUPLICATE_ENTRY) {
+                if (isDuplicateEntry(e)) {
                     return false;
                 }
                 throw e;

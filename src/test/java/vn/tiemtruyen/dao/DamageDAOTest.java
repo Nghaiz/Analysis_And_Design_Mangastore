@@ -45,6 +45,16 @@ class DamageDAOTest {
     }
 
     @Test
+    void wildcardCharactersInKeywordAreLiteral() throws Exception {
+        try (DamageDAO dao = new DamageDAO(db.connection())) {
+            assertEquals(List.of(), dao.searchDamage("%"), "% phải khớp đúng chữ %, không phải mọi dòng");
+            assertEquals(List.of(), dao.searchDamage("_"), "_ phải khớp đúng chữ _, không phải một kí tự bất kì");
+            assertEquals(List.of(), dao.searchDamage("\\"));
+            assertEquals(List.of("Vết bẩn, viết vẽ"), names(dao.searchDamage("n, v")));
+        }
+    }
+
+    @Test
     void addAssignsIdAndDuplicateNameReturnsFalse() throws Exception {
         try (DamageDAO dao = new DamageDAO(db.connection())) {
             Damage glue = damage("Dính keo", "Trang truyện bị dính keo");

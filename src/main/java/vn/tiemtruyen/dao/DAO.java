@@ -33,7 +33,7 @@ import vn.tiemtruyen.util.Db;
  *             newId[0] = ...;
  *             return true;
  *         } catch (SQLException e) {
- *             if (e.getErrorCode() == MYSQL_DUPLICATE_ENTRY) {
+ *             if (isDuplicateEntry(e)) {
  *                 return false;
  *             }
  *             throw e;
@@ -50,6 +50,8 @@ import vn.tiemtruyen.util.Db;
  * DAO mà {@code ArchitectureTest} đếm. Hàm public duy nhất lớp này thêm là {@link #close()}.
  */
 public abstract class DAO implements AutoCloseable {
+
+    private static final int MYSQL_DUPLICATE_ENTRY = 1062;
 
     private final Connection con;
 
@@ -138,6 +140,29 @@ public abstract class DAO implements AutoCloseable {
         } catch (SQLException rollbackFailure) {
             failure.addSuppressed(rollbackFailure);
         }
+    }
+
+    /**
+     * Lỗi có phải vi phạm khoá UNIQUE không (mã MySQL 1062, {@code ER_DUP_ENTRY}). Hàm ghi dùng để trả
+     * {@code false} thay vì ném (contracts §5.2).
+     *
+     * @param e lỗi SQL vừa bắt
+     * @return {@code true} khi lỗi là trùng UNIQUE
+     */
+    protected static boolean isDuplicateEntry(SQLException e) {
+        return e.getErrorCode() == MYSQL_DUPLICATE_ENTRY;
+    }
+
+    /**
+     * Mẫu LIKE "chứa chuỗi" cho từ khoá người dùng gõ: thoát {@code \}, {@code %}, {@code _} (kí tự thoát mặc định
+     * của MySQL là {@code \}) rồi bọc {@code %...%}, để từ khoá {@code 50%} chỉ khớp đúng chuỗi {@code 50%}.
+     *
+     * @param keyword từ khoá thô, không null
+     * @return mẫu truyền vào tham số của {@code LIKE ?}
+     */
+    protected static String containsPattern(String keyword) {
+        String escaped = keyword.replace("\\", "\\\\").replace("%", "\\%").replace("_", "\\_");
+        return "%" + escaped + "%";
     }
 
     /**

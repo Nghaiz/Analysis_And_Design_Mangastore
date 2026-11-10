@@ -19,8 +19,6 @@ import vn.tiemtruyen.util.Codes;
  */
 public class BookDAO extends DAO {
 
-    private static final int MYSQL_DUPLICATE_ENTRY = 1062;
-
     /**
      * Mỗi dòng là một đầu truyện khớp từ khoá ghép với một quyển đang sẵn sàng (không có {@code tblRentedBook} của
      * phiếu chưa huỷ trỏ vào, contracts §1); đầu truyện hết quyển ra một dòng với cột quyển NULL.
@@ -69,7 +67,7 @@ public class BookDAO extends DAO {
      */
     public List<Book> searchBook(String keyword) throws SQLException {
         Objects.requireNonNull(keyword, "keyword");
-        String pattern = "%" + keyword + "%";
+        String pattern = containsPattern(keyword);
         List<Book> result = new ArrayList<>();
         try (PreparedStatement ps = con().prepareStatement(SEARCH)) {
             int p = 1;
@@ -171,7 +169,7 @@ public class BookDAO extends DAO {
 
     /** Trùng UNIQUE (mã 1062) thành {@code false}; lỗi khác ném lại (contracts §5.2). */
     private static boolean falseOnDuplicate(SQLException e) throws SQLException {
-        if (e.getErrorCode() == MYSQL_DUPLICATE_ENTRY) {
+        if (isDuplicateEntry(e)) {
             return false;
         }
         throw e;

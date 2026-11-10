@@ -140,7 +140,7 @@ public class RentalBillDAO extends DAO {
             return readBills("r.id = ? ORDER BY r.id DESC", id.getAsInt());
         }
         String text = keyword.strip();
-        String like = "%" + text.replace("\\", "\\\\").replace("%", "\\%").replace("_", "\\_") + "%";
+        String like = containsPattern(text);
         return readBills("cu.fullName LIKE ? OR c.idCard = ? ORDER BY r.id DESC", like, text);
     }
 

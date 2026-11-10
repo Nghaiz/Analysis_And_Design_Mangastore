@@ -13,8 +13,6 @@ import vn.tiemtruyen.model.Damage;
 /** Loại lỗi của quyển truyện (contracts §5.3, ch.9 tr.85). */
 public class DamageDAO extends DAO {
 
-    private static final int MYSQL_DUPLICATE_ENTRY = 1062;
-
     private static final String SEARCH =
             "SELECT id, name, description FROM tblDamage WHERE name LIKE ? ORDER BY id";
     private static final String INSERT = "INSERT INTO tblDamage (name, description) VALUES (?, ?)";
@@ -48,7 +46,7 @@ public class DamageDAO extends DAO {
         Objects.requireNonNull(keyword, "keyword");
         List<Damage> result = new ArrayList<>();
         try (PreparedStatement ps = con().prepareStatement(SEARCH)) {
-            ps.setString(1, "%" + keyword + "%");
+            ps.setString(1, containsPattern(keyword));
             try (ResultSet rs = ps.executeQuery()) {
                 while (rs.next()) {
                     Damage damage = new Damage();
@@ -85,7 +83,7 @@ public class DamageDAO extends DAO {
                 }
                 return true;
             } catch (SQLException e) {
-                if (e.getErrorCode() == MYSQL_DUPLICATE_ENTRY) {
+                if (isDuplicateEntry(e)) {
                     return false;
                 }
                 throw e;
