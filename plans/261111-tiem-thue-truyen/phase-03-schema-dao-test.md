@@ -16,16 +16,16 @@ Hợp đồng: `docs/contracts.md` (chữ kí DAO, luật DAO, K1, D9, Deferred 
 
 ## Các bước
 
-- [ ] **3.0 Orchestrator, tuần tự (file dùng chung):**
+- [x] **3.0 Orchestrator, tuần tự (file dùng chung):**
   - `V1__schema.sql`: 13 bảng InnoDB utf8mb4 theo brainstorm §2.1, tên bảng và cột đúng ch.8, `tblUser.password varchar(255)` (D1), `tblClient.userId` và `tblStaff.userId` là khoá chính kiêm khoá ngoại, `tblBook.publishYear` cho phép NULL; UNIQUE `tblUser.username`, `tblClient.idCard`, `tblClient.phone`, `tblClient.email`, `tblCart.clientId`, `tblBookCopy.barcode`, `tblDamage.name`, `tblCollateral.name`; index `tblRentedBook(bookCopyId)`, `tblRentalBill(status)`, `tblBook(name)`, `tblBook(author)`. Không cột dẫn xuất (không số lượng, tổng tiền, trạng thái quyển).
   - `V2__catalog_seed.sql`: loại lỗi (có "Rách bìa", "Rách trang", "Vết bẩn, viết vẽ" với mô tả đúng ch.2 và "Ố vàng"), loại tài sản cọc (có "Căn cước công dân", "Tiền mặt" với mô tả đúng ch.2), nhân viên Nguyễn Thu Hà (`hant`, chức vụ "Nhân viên bán hàng") và một nhân viên chức vụ "Quản lí", vài khách mẫu không trùng với khách của ch.2 (mỗi khách kèm một dòng `tblCart`, như `ClientDAO.addClient`); V2 nạp ở mọi lần chạy vì dự án chỉ chạy localhost (Deferred #26, #28); mật khẩu là chuỗi Argon2id sinh sẵn bằng `Passwords` (ghi mật khẩu gốc vào `docs/dev-accounts.md`).
   - `db/e2e/V10__e2e_catalog.sql`: đầu truyện của ch.2 với id khớp mã (DT001 Doraemon - Tập 1, DT002 Doraemon - Tập 2, DT015 Doraemon: Nobita và lâu đài dưới đáy biển, DT020 và DT021 Thám tử lừng danh Conan - Tập 1, 2), tác giả, thể loại, giá thuê đúng ch.2, nhà xuất bản Kim Đồng, năm 2023 cho DT001; không có "Thần đồng đất Việt" (D3); quyển truyện đủ để màn hình hiện đúng số lượng của ch.2 sau khi fixture của phase 8 giữ chỗ (DT001 cần quyển 01, 02 bị giữ để quyển được gán là DT001-03 theo Deferred #10; DT020 cần quyển 01 bị giữ để gán DT020-02).
   - Thêm phụ thuộc vào `pom.xml` nếu lane cần (Testcontainers 2.0.5 `testcontainers-mysql`, Connector/J 26.10.0, Flyway 13.12.1, HikariCP 7.1.0, Password4j 1.8.4, Jackson 3.3.0); `scripts/accept/phase-03.mjs`. Commit trước khi spawn.
-- [ ] **3.1 Lane 3A `model-util`, tuần tự (các lane DAO cần lớp model):** chạy migration lần đầu trên Testcontainers `mysql:8.4.13` để kiểm Flyway 13 với MySQL 8.4 sớm nhất.
-- [ ] **3.2 Lane 3B `dao-user-book`**, **3.3 Lane 3C `dao-cart-bill`**, **3.4 Lane 3D `kiem-kien-truc`** song song (3 chỗ).
-- [ ] **3.5 Orchestrator:** merge; chạy Accept.
-- [ ] **3.6 Orchestrator, phụ (Deferred #22):** dùng cua-driver mở MySQL Workbench 8.0, Database → Reverse Engineer vào MySQL của compose (127.0.0.1:3307), chụp ERD, đối chiếu với `images/svg/design_database.svg`; mỗi lần bấm kiểm lại bằng `verify_state`; nếu cửa sổ con mở ra thì `get_window_state` lại theo `window_id` của chính nó. Ghi `plans/reports/phase-03-workbench-<ts>.md`. Nếu cua-driver chưa nạp: báo chủ dự án khởi động lại. Nếu UIPI chặn: dừng bước này, báo chủ dự án, không lùi về script GUI.
-- [ ] **3.7 Orchestrator:** đánh dấu, push nhánh phase, mở PR vào `main` và merge bằng merge commit (`contract.md` §9).
+- [x] **3.1 Lane 3A `model-util`, tuần tự (các lane DAO cần lớp model):** chạy migration lần đầu trên Testcontainers `mysql:8.4.13` để kiểm Flyway 13 với MySQL 8.4 sớm nhất.
+- [x] **3.2 Lane 3B `dao-user-book`**, **3.3 Lane 3C `dao-cart-bill`**, **3.4 Lane 3D `kiem-kien-truc`** song song (3 chỗ).
+- [x] **3.5 Orchestrator:** merge; chạy Accept.
+- [x] **3.6 Orchestrator, phụ (Deferred #22):** dùng cua-driver mở MySQL Workbench 8.0, Database → Reverse Engineer vào MySQL của compose (127.0.0.1:3307), chụp ERD, đối chiếu với `images/svg/design_database.svg`; mỗi lần bấm kiểm lại bằng `verify_state`; nếu cửa sổ con mở ra thì `get_window_state` lại theo `window_id` của chính nó. Ghi `plans/reports/phase-03-workbench-<ts>.md`. Nếu cua-driver chưa nạp: báo chủ dự án khởi động lại. Nếu UIPI chặn: dừng bước này, báo chủ dự án, không lùi về script GUI.
+- [x] **3.7 Orchestrator:** đánh dấu, push nhánh phase, mở PR vào `main` và merge bằng merge commit (`contract.md` §9).
 
 ## Luật khoá K1 và D9 (tóm tắt, bản đủ ở `docs/contracts.md`)
 
