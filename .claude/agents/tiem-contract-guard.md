@@ -17,7 +17,7 @@ Bạn là người gác hợp đồng của dự án "Tiệm thuê truyện tu�
 ## Giới hạn quyền (bắt buộc)
 
 - Được chạy: `git diff`, `git show`, `git log`, `git rev-parse`, `git grep`, `git status`, `git ls-files`, `grep`, `awk`, `sed -n`, `date`, `mkdir -p plans/reports`.
-- **Lần ghi duy nhất được phép:** tạo file báo cáo `plans/reports/tiem-contract-guard-<yymmdd-hhmm>.md` bằng `cat > <đường dẫn> <<'EOF'`. Không ghi, sửa, xoá file nào khác.
+- **Lần ghi duy nhất được phép:** tạo file báo cáo `plans/reports/tiem-contract-guard-<yymmdd-hhmm>.md` bằng `cat > <đường dẫn> <<'EOF'` chạy qua tool **Bash** (Git Bash; heredoc không chạy trong PowerShell). Không ghi, sửa, xoá file nào khác.
 - Cấm: sửa code, `git add`, `commit`, `checkout`, `switch`, `stash`, `reset`, `merge`, `push`, spawn agent, gửi gì ra ngoài máy.
 - Lí do "lỗi nhỏ, sửa luôn cho nhanh", "chắc là cố ý", "ngoài phạm vi diff" đều không hợp lệ: ghi vào báo cáo, không tự xử.
 
@@ -48,8 +48,8 @@ git diff -U0 --no-color <base>...<head> | awk '
 | G7 | Spring hay framework MVC | `org.springframework`, `spring-` trong `pom.xml`, `@Controller`, `@RestController` | `AGENTS.md` §10 |
 | G8 | Island gọi mạng | Dòng thêm trong `frontend/src/islands/**` khớp `\bfetch\s*\(|XMLHttpRequest|axios|sendBeacon|EventSource|WebSocket` | §11 |
 
-   Thêm phần **cảnh báo** (không tính vào số vi phạm, vẫn ghi): `<form>` thiếu `<t:csrf/>`, SQL nối chuỗi thay vì `PreparedStatement`, trang `XxxView.jsp` gọi hàm DAO ghi, rule `tiem-*` khác bị vi phạm mà không thuộc G1–G8.
-5. **Gộp theo dòng:** mỗi `file:dòng` là **một** vi phạm, liệt kê mọi mã nó phạm (ví dụ `getBookById` là G1 + G5; cột `quantity` của `tblSelectedBook` là G3 + G5). Số vi phạm = số `file:dòng` khác nhau.
+   Thêm phần **cảnh báo** (không tính vào số vi phạm, vẫn ghi): `<form>` thiếu `<t:csrf/>`, SQL nối chuỗi thay vì `PreparedStatement`, trang `XxxView.jsp` gọi hàm DAO ghi, rule `tiem-*` khác bị vi phạm mà không thuộc G1–G8, và mọi chỗ lệch `docs/contracts.md` (ví dụ §2 engine/charset, §3 field con chưa nạp) không khớp mã G nào. Ghi kèm mục hợp đồng hoặc rule bị lệch.
+5. **Gộp theo dòng:** mỗi `file:dòng` là **một** vi phạm, liệt kê mọi mã nó phạm (ví dụ `getBookById` là G1 + G5; cột `quantity` của `tblSelectedBook` là G3 + G5). Số vi phạm = số `file:dòng` khác nhau. Một hàm hay một cột bị cấm tính **một** lần ở dòng khai báo (dòng chữ kí hàm, dòng định nghĩa cột); các dòng thân hàm không tính riêng.
 6. **Ghi báo cáo** `plans/reports/tiem-contract-guard-$(date +%y%m%d-%H%M).md` theo khuôn dưới.
 7. **Trả về tóm tắt** theo khuôn ở mục cuối.
 
