@@ -1,12 +1,15 @@
-// Làm sạch tên sản phẩm thành tên đầu truyện (CONTRACT §9): bỏ "Sách - ", "(YYYY)", "(Tái bản YYYY)",
-// "(Tặng ...)", "(N tập)", số tập đệm "Tập 01" → "Tập 1". Năm bỏ khỏi tên được trả lại để làm publishYear.
+// Làm sạch tên sản phẩm thành tên đầu truyện (CONTRACT §9): bỏ "Sách - " và "Sách " đứng trước chữ hoa,
+// "(YYYY)", "(Tái bản YYYY)" hay "[Tái Bản YYYY]", "(Tặng ...)", "(N tập)", "(Bản thường)"; "(Tập N)" → " - Tập N";
+// số tập đệm "Tập 01" → "Tập 1". Năm bỏ khỏi tên được trả lại để làm publishYear.
 import { cleanLine, collapseSpaces, fold } from './text.mjs';
 import { validYear } from './title.mjs';
 
-const SHOP_PREFIX = /^(?:sách|sach)\s*[-–:]\s*/iu;
-const REPRINT_PAREN = /\(\s*tái\s*bản\b[^)]*\)/giu;
+const SHOP_PREFIX = /^[Ss][áa]ch(?:\s*[-–:]\s*|\s+(?=\p{Lu}))/u;
+const REPRINT_PAREN = /[([]\s*tái\s*bản\b[^)\]]*[)\]]/giu;
 const BARE_YEAR_PAREN = /\(\s*(\d{4})\s*\)/gu;
 const GIFT_PAREN = /\(\s*tặng(?=[\s)])[^)]*\)/giu;
+const PLAIN_EDITION_PAREN = /\(\s*bản\s+thường\s*\)/giu;
+const VOLUME_PAREN = /\s*\(\s*(tập\s*\d+)\s*\)/giu;
 const COUNT_PAREN = /\(\s*\d+\s*(?:tập|cuốn|quyển)\s*\)/giu;
 const PADDED_NUMBER = /(^|[\s(])(tập|quyển|vol\.?|#)\s*0+(\d)/giu;
 const YEAR_IN = /(?<!\d)(\d{4})(?!\d)/u;
@@ -33,7 +36,8 @@ export function cleanTitle(raw) {
     removed.push(whole);
     return ' ';
   });
-  name = name.replace(GIFT_PAREN, ' ').replace(COUNT_PAREN, ' ');
+  name = name.replace(GIFT_PAREN, ' ').replace(COUNT_PAREN, ' ').replace(PLAIN_EDITION_PAREN, ' ');
+  name = name.replace(VOLUME_PAREN, (_whole, volume) => ` - ${volume}`);
   name = name.replace(PADDED_NUMBER, (_whole, before, label, digit) => `${before}${label} ${digit}`);
   name = collapseSpaces(name).replace(/\s+([-–—:,])\s*$/u, '').replace(DANGLING, '');
   const cleaned = collapseSpaces(name);

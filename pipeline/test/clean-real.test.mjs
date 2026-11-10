@@ -62,6 +62,11 @@ describe('3. nhiễu trong tên', () => {
     expect(cleanTitle('X - Tập 2 (Tái Bản 2025)')).toEqual({ name: 'X - Tập 2', year: 2025 });
     expect(cleanTitle('X - Tập 2 (Tặng kèm bookmark) (Tặng Sticker)').name).toBe('X - Tập 2');
     expect(cleanTitle('Tập 10 (Bản đặc biệt)').name).toBe('Tập 10 (Bản đặc biệt)');
+    expect(cleanTitle('Thám Tử Lừng Danh Conan - Tập 1 [Tái Bản 2023]')).toEqual({ name: 'Thám Tử Lừng Danh Conan - Tập 1', year: 2023 });
+    expect(cleanTitle('Sách Thần Đồng Đất Việt (Tập 182) - Chơi Khăm Quan Phủ').name).toBe('Thần Đồng Đất Việt - Tập 182 - Chơi Khăm Quan Phủ');
+    expect(cleanTitle('One Piece (Tập 34)').name).toBe('One Piece - Tập 34');
+    expect(cleanTitle('Chú Thuật Hồi Chiến - Tập 3 (Bản thường)').name).toBe('Chú Thuật Hồi Chiến - Tập 3');
+    expect(cleanTitle('Sách giáo khoa Toán').name).toBe('Sách giáo khoa Toán');
   });
 
   it('publishYear: nguồn trước, rồi năm trong tên', async () => {
