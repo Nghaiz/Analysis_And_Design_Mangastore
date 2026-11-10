@@ -11,6 +11,7 @@ Cột bảng: `tblBook(id int PK, name varchar(255), author varchar(100), publis
 | `data/cache/http/<host>/<sha256(url)>.body` + `.meta.json` | 4A fetch | Thân phản hồi và `{url, status, contentType, fetchedAt}`; `fetchedAt` ISO UTC lúc tải thật lần đầu |
 | `data/raw/<run>/<source>.jsonl` | 4A crawl | Bản ghi theo `schema/raw-record.schema.json`, thứ tự ổn định (theo bộ trong `series.json`, rồi `sourceUrl`) |
 | `data/raw/<run>/census.json` | 4A census | `{ "<seriesKey>": { "kimdong": n, "tiki": n } }` |
+| `data/stage/<run>/image-sources.jsonl` | 4B clean | `{bookId, source}`: nguồn của ảnh mỗi Book (cho manifest) |
 | `data/stage/<run>/clean.jsonl` → `images.jsonl` → `copies.jsonl` → `price.jsonl` | 4B | Bản ghi theo `schema/clean-record.schema.json`, mỗi bước đọc tệp của bước trước, sắp theo `id` |
 | `data/images/<run>/<bookId>/cover-{160,320,640}.{webp,avif}`, `extra-{n}-{160,320,640}.webp` | 4B images | Đúng tên file của `contract.md` §6 |
 | `data/reports/<run>/validate.md`, `validate.json`, `index.html` | 4B validate | Báo cáo; `index.html` mở thẳng được từ đĩa (ảnh dẫn tương đối tới `data/images/<run>/`) |
@@ -22,7 +23,7 @@ Cột bảng: `tblBook(id int PK, name varchar(255), author varchar(100), publis
 ## 2. CLI (`pipeline/cli.mjs`, của 4A; bước của 4B đăng kí qua `src/steps/index.mjs`)
 
 ```
-node pipeline/cli.mjs <lệnh> [--run <tên>] [--limit <n>] [--offline] [--dry-run] [--json] [--series <key,key>]
+node pipeline/cli.mjs <lệnh> [--run <tên>] [--limit <n>] [--offline] [--dry-run] [--json] [--series <key,key>] [--project <tên>]
 lệnh: census | crawl | <tên bước> | run | help
 ```
 
@@ -33,6 +34,7 @@ lệnh: census | crawl | <tên bước> | run | help
 - `--json`: lệnh in đúng một đối tượng JSON ra **stdout**; mọi thông điệp khác ra **stderr**.
 - Exit: 0 sạch; 1 có lỗi chặn hoặc lỗi chạy; 2 sai cách gọi (lệnh lạ, cờ lạ, thiếu giá trị cờ).
 - `publish` không nằm trong `run`; orchestrator chạy riêng.
+- `--project <tên>`: tên compose project cho `publish` (mặc định `tiemtruyen`), đưa vào `ctx.project`.
 
 ## 3. Đăng kí bước (`pipeline/src/steps/index.mjs`, của 4B)
 
@@ -51,9 +53,12 @@ export const extraCommands = [ { name: 'publish', describe: '...', run: async (c
 | `rootDir` | string tuyệt đối | thư mục gốc repo |
 | `dataDir` | string tuyệt đối | `<rootDir>/data` |
 | `pipelineDir` | string tuyệt đối | `<rootDir>/pipeline` |
+| `project` | string | compose project, mặc định `tiemtruyen` |
 | `log(msg)` | function | ghi một dòng ra stderr |
 | `http` | object | bộ tải của 4A: `getJson(url)`, `getText(url)`, `getBuffer(url)` trả `Promise`; dùng cache, throttle ≥ 2 giây mỗi host, robots.txt, lùi dần; offline thì chỉ đọc cache |
 | `http.fetchedAt(url)` | function → string \| null | `fetchedAt` trong cache của URL |
+
+`cli.mjs` dựng `ctx.http` cho **mọi** lệnh (kể cả export, validate, publish), vì export cần `http.fetchedAt` cho manifest.
 
 Bước trả `{ exitCode, summary? }`. Với `--json`, `cli.mjs` in `summary` (hoặc của bước cuối khi `run`) ra stdout.
 
@@ -105,4 +110,4 @@ Exit 1 khi `blocking` không rỗng. `book-count` (ngoài 300–500) chỉ xét 
 
 ## 8. Manifest (`pipeline/manifest.jsonl`, vào git, do export ghi khi `run = full`)
 
-Đúng `contract.md` §6: mỗi dòng `{"kind":"book"|"image","bookId","source","sourceUrl","fetchedAt","winner","sha256"}`; `kind=book`: `sha256` là null, `winner` là nguồn thắng; `kind=image`: một dòng mỗi ảnh gốc (bìa và ảnh phụ), `sha256` của ảnh gốc, `winner` là nguồn của ảnh. Không có `name`, `description` hay bất kì nội dung nào. Sắp theo `bookId`, rồi `kind` (book trước), rồi `sourceUrl`.
+Đúng `contract.md` §6: mỗi dòng `{"kind":"book"|"image","bookId","source","sourceUrl","fetchedAt","winner","sha256"}`; `kind=book`: một dòng cho mỗi bản ghi nguồn đã gộp vào Book đó (`source`/`sourceUrl`/`fetchedAt` của bản ghi đó), `winner` là nguồn thắng, `sha256` null; `kind=image`: một dòng mỗi ảnh gốc (bìa và ảnh phụ), `sha256` của ảnh gốc, `winner` là nguồn của ảnh. Không có `name`, `description` hay bất kì nội dung nào. Sắp theo `bookId`, rồi `kind` (book trước), rồi `sourceUrl`.
