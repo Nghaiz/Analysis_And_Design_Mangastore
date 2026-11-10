@@ -1,0 +1,39 @@
+# Bí mật: chỉ .env.example vào git
+.env
+.env.*
+!.env.example
+
+# Dữ liệu crawl, ảnh bìa, file SQL sinh ra: không vào git (D11)
+data/
+
+# Build
+node_modules/
+target/
+src/main/webapp/static/
+
+# Kết quả kiểm tra
+plans/reports/screens/
+e2e/test-results/
+e2e/playwright-report/
+*.log
+
+# Bộ TheOneKit trong .claude/ không vào repo (Deferred #4).
+# Chỉ file của dự án, tiền tố tiem-, được đưa vào.
+/.claude/*
+!/.claude/rules/
+/.claude/rules/*
+!/.claude/rules/tiem-*.md
+!/.claude/skills/
+/.claude/skills/*
+!/.claude/skills/tiem-*/
+!/.claude/agents/
+/.claude/agents/*
+!/.claude/agents/tiem-*.md
+
+# Hệ điều hành và IDE
+.DS_Store
+Thumbs.db
+desktop.ini
+.idea/
+*.iml
+.vscode/
