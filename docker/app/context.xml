@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  conf/context.xml của ảnh app (contract.md §10): nạp cho mọi webapp.
+  Ba WatchedResource giữ nguyên bản mặc định của Tomcat 11.0.27; thêm RedissonSessionManager để session nằm ở Redis
+  và sống qua lần khởi động lại container app (tiêu chí 5 của phase 1).
+  Jar redisson-all và redisson-tomcat-11 4.8.0 nằm ở $CATALINA_HOME/lib (xem Dockerfile).
+  readMode=REDIS: thuộc tính session chỉ nằm ở Redis. updateMode=DEFAULT: ghi Redis ngay ở mỗi setAttribute.
+-->
+<Context>
+    <WatchedResource>WEB-INF/web.xml</WatchedResource>
+    <WatchedResource>WEB-INF/tomcat-web.xml</WatchedResource>
+    <WatchedResource>${catalina.base}/conf/web.xml</WatchedResource>
+
+    <Manager className="org.redisson.tomcat.RedissonSessionManager"
+             configPath="${catalina.base}/conf/redisson.yaml"
+             readMode="REDIS"
+             updateMode="DEFAULT"
+             broadcastSessionEvents="false"
+             keyPrefix="tiemtruyen:"/>
+</Context>

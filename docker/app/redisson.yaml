@@ -1,0 +1,15 @@
+# Cấu hình Redisson cho RedissonSessionManager (contract.md §10).
+# ${...} do Redisson thay bằng biến môi trường lúc khởi động; không có giá trị mặc định nên thiếu biến thì
+# Tomcat không khởi động được webapp (lỗi nói rõ tên biến), không âm thầm chạy session trong bộ nhớ.
+singleServerConfig:
+  address: "${APP_REDIS_ADDRESS}"
+  database: 0
+  connectTimeout: 5000
+  timeout: 3000
+  connectionMinimumIdleSize: 2
+  connectionPoolSize: 8
+  subscriptionConnectionMinimumIdleSize: 1
+  subscriptionConnectionPoolSize: 4
+password: "${REDIS_PASSWORD}"
+threads: 4
+nettyThreads: 8
