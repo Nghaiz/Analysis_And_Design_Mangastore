@@ -3,7 +3,7 @@ import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import Ajv2020 from 'ajv/dist/2020.js';
 import { describe, expect, it } from 'vitest';
-import { kimdongCandidates, kimdongRecord, listSitemapProducts, planKimdong } from '../src/sources/kimdong.mjs';
+import { kimdongCandidates, kimdongRecord, listSitemapProducts, planKimdong, splitPeople } from '../src/sources/kimdong.mjs';
 import { isComboName, isUsedGoods, matchVolume } from '../src/sources/text.mjs';
 import { pickTikiProduct, rankCandidates, searchTiki, tikiCandidates, tikiRecord } from '../src/sources/tiki.mjs';
 import { wikidataRecord } from '../src/sources/wikidata.mjs';
@@ -97,6 +97,23 @@ describe('Kim Đồng', () => {
     });
     expect(record.descriptionHtml).toContain('Mô tả cắt ngắn');
     expect(record.descriptionHtml).not.toContain('ISBN');
+  });
+
+  it.each([
+    ['dragon-quest-dau-an-roto-nhung-nguoi-ke-thua-tap-1-tang-kem-postcard', ['Kamui Fujiwara', 'Chiaki Kawamata', 'Yuji Horii']],
+    ['truong-hoc-biet-tuot-tap-1-len-duong-thoi-nguyen-tu-va-phan-tu', ['Monster Chemistry Group', 'Guo Rurong']],
+  ])('nhiều tác giả (mỗi người một <a>, cách bằng <br>) tách thành nhiều phần tử: %s', async (alias, authors) => {
+    const { http } = fixtureClient();
+    const record = await kimdongRecord(http, { ...CONAN, key: 'x' }, { volume: 1, alias });
+    expectValid(record);
+    expect(record.authors).toEqual(authors);
+  });
+
+  it('splitPeople: dấu phẩy, chấm phẩy, "và", thẻ rỗng, trùng', () => {
+    expect(splitPeople({ html: ' Gosho Aoyama' })).toEqual(['Gosho Aoyama']);
+    expect(splitPeople({ html: ' A, B; C và D' })).toEqual(['A', 'B', 'C', 'D']);
+    expect(splitPeople({ html: '<a href="/x">A</a><a href="/y"><br></a>&nbsp;<a>A</a>' })).toEqual(['A']);
+    expect(splitPeople(undefined)).toEqual([]);
   });
 
   it('sản phẩm 404 bị bỏ, không làm hỏng cả bộ', async () => {

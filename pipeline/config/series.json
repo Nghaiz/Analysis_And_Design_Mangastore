@@ -2,6 +2,7 @@
   {
     "key": "conan",
     "name": "Thám tử lừng danh Conan",
+    "author": "Gosho Aoyama",
     "aliases": [
       "thám tử lừng danh conan",
       "conan",
@@ -21,6 +22,7 @@
   {
     "key": "doraemon-truyen-ngan",
     "name": "Doraemon truyện ngắn",
+    "author": "Fujiko F. Fujio",
     "aliases": [
       "doraemon truyện ngắn",
       "doraemon chú mèo máy đến từ tương lai",
@@ -40,6 +42,7 @@
   {
     "key": "than-dong-dat-viet",
     "name": "Thần đồng đất Việt",
+    "author": "Lê Linh",
     "aliases": [
       "thần đồng đất việt"
     ],
@@ -55,6 +58,7 @@
   {
     "key": "doraemon-truyen-dai",
     "name": "Doraemon truyện dài",
+    "author": "Fujiko F. Fujio",
     "aliases": [
       "doraemon truyện dài"
     ],
@@ -90,6 +94,7 @@
   {
     "key": "shin-cau-be-but-chi",
     "name": "Shin - Cậu bé bút chì",
+    "author": "Yoshito Usui",
     "aliases": [
       "shin cậu bé bút chì",
       "shin"
@@ -125,6 +130,7 @@
   {
     "key": "nhoc-maruko",
     "name": "Nhóc Maruko",
+    "author": "Momoko Sakura",
     "aliases": [
       "nhóc maruko"
     ],
@@ -157,6 +163,7 @@
   {
     "key": "dragon-ball",
     "name": "Dragon Ball - 7 viên ngọc rồng",
+    "author": "Akira Toriyama",
     "aliases": [
       "dragon ball 7 viên ngọc rồng",
       "7 viên ngọc rồng",
@@ -192,6 +199,7 @@
   {
     "key": "one-piece",
     "name": "One Piece",
+    "author": "Eiichiro Oda",
     "aliases": [
       "one piece",
       "đảo hải tặc"
@@ -210,6 +218,7 @@
   {
     "key": "naruto",
     "name": "Naruto",
+    "author": "Masashi Kishimoto",
     "aliases": [
       "naruto"
     ],
@@ -225,6 +234,7 @@
   {
     "key": "asari",
     "name": "Asari - Cô bé tinh nghịch",
+    "author": "Mayumi Muroyama",
     "aliases": [
       "asari cô bé tinh nghịch",
       "cô bé asari",
@@ -263,6 +273,7 @@
   {
     "key": "slam-dunk",
     "name": "Slam Dunk - Deluxe Edition",
+    "author": "Takehiko Inoue",
     "aliases": [
       "slam dunk deluxe edition",
       "slam dunk"
@@ -282,6 +293,7 @@
   {
     "key": "thanh-guom-diet-quy",
     "name": "Thanh gươm diệt quỷ",
+    "author": "Koyoharu Gotouge",
     "aliases": [
       "thanh gươm diệt quỷ",
       "kimetsu no yaiba"
@@ -300,6 +312,7 @@
   {
     "key": "chu-thuat-hoi-chien",
     "name": "Chú thuật hồi chiến",
+    "author": "Gege Akutami",
     "aliases": [
       "chú thuật hồi chiến",
       "jujutsu kaisen"
@@ -318,6 +331,7 @@
   {
     "key": "spy-x-family",
     "name": "Spy x Family",
+    "author": "Tatsuya Endo",
     "aliases": [
       "spy x family",
       "spy family"
@@ -336,6 +350,7 @@
   {
     "key": "takagi",
     "name": "Nhất quỷ nhì ma, thứ ba Takagi",
+    "author": "Soichiro Yamamoto",
     "aliases": [
       "nhất quỷ nhì ma thứ ba takagi"
     ],
@@ -353,6 +368,7 @@
   {
     "key": "yona",
     "name": "Yona - Công chúa bình minh",
+    "author": "Mizuho Kusanagi",
     "aliases": [
       "yona công chúa bình minh"
     ],
@@ -370,6 +386,7 @@
   {
     "key": "bach-tuyet-toc-do",
     "name": "Bạch tuyết tóc đỏ",
+    "author": "Sorata Akiduki",
     "aliases": [
       "bạch tuyết tóc đỏ"
     ],
@@ -404,6 +421,7 @@
   {
     "key": "tan-ninja-hattori",
     "name": "Tân Ninja Hattori",
+    "author": "Fujiko A. Fujio",
     "aliases": [
       "tân ninja hattori"
     ],
@@ -421,6 +439,7 @@
   {
     "key": "perman",
     "name": "Perman - Cậu bé siêu nhân",
+    "author": "Fujiko F. Fujio",
     "aliases": [
       "perman cậu bé siêu nhân",
       "perman"
@@ -456,6 +475,7 @@
   {
     "key": "kinh-van-hoa",
     "name": "Kính vạn hoa",
+    "author": "Nguyễn Nhật Ánh",
     "aliases": [
       "kính vạn hoa"
     ],
@@ -474,6 +494,7 @@
   {
     "key": "haikyu",
     "name": "Haikyu!! - Chàng khổng lồ tí hon",
+    "author": "Haruichi Furudate",
     "aliases": [
       "haikyu chàng khổng lồ tí hon",
       "haikyu"

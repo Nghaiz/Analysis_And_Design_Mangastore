@@ -102,6 +102,24 @@ describe('series.json thật', () => {
     expect(total).toBeLessThanOrEqual(450);
   });
 
+  it('author tuỳ chọn: chuỗi ≤ 100 kí tự; có cho các bộ nguồn hay ghi chung chung', () => {
+    for (const s of series.filter((x) => 'author' in x)) {
+      expect(typeof s.author, s.key).toBe('string');
+      expect(s.author.trim().length, s.key).toBeGreaterThan(0);
+      expect(s.author.length, s.key).toBeLessThanOrEqual(100);
+    }
+    expect(byKey['than-dong-dat-viet'].author).toBe('Lê Linh');
+    expect(byKey['doraemon-truyen-ngan'].author).toBe('Fujiko F. Fujio');
+  });
+
+  it('series.json có author sai kiểu thì loadSeries báo lỗi rõ', () => {
+    const dir = tempDir();
+    mkdirSync(join(dir, 'config'));
+    copyFileSync(join(pipelineDir, 'config', 'categories.json'), join(dir, 'config', 'categories.json'));
+    writeFileSync(join(dir, 'config', 'series.json'), JSON.stringify([{ ...CONAN, author: '' }]));
+    expect(() => loadSeries(dir)).toThrow(/author/);
+  });
+
   it('Doraemon truyện dài là truyện dài; Thần đồng đất Việt lấy Tiki, không có tiền tố Kim Đồng', () => {
     expect(byKey['doraemon-truyen-dai'].longStory).toBe(true);
     expect(byKey['doraemon-truyen-ngan'].longStory).toBe(false);

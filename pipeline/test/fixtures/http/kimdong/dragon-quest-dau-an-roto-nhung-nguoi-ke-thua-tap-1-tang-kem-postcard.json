@@ -1,0 +1,61 @@
+{
+ "id": 60927038,
+ "name": "Dragon Quest - Dấu ấn Roto - Những người kế thừa - Tập 1 (Tặng Kèm Postcard)",
+ "alias": "dragon-quest-dau-an-roto-nhung-nguoi-ke-thua-tap-1-tang-kem-postcard",
+ "vendor": "Khác",
+ "product_type": "Manga - comic",
+ "price": 36000,
+ "price_max": 36000,
+ "price_min": 36000,
+ "price_varies": false,
+ "compare_at_price_max": 40000,
+ "compare_at_price_min": 40000,
+ "compare_at_price_varies": false,
+ "tags": [
+  "15"
+ ],
+ "summary": null,
+ "content": "<ul><li style=\"text-align: justify;\">ISBN:&nbsp;<strong>978-604-2-32856-2</strong></li><li style=\"text-align: justify;\">Tác giả:&nbsp;<a href=\"https://nxbkimdong.com.vn/collections/kamui-fujiwara\">Kamui Fujiwara</a><br>&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;&nbsp;<a href=\"https://nxbkimdong.com.vn/collections/chiaki-kawamata\">Chiaki Kawamata</a><br>&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;&nbsp;<a href=\"https://nxbkimdong.com.vn/collections/yuji-horii\">Yuji Horii</a></li><li style=\"text-align: justify;\">Đối tượng:&nbsp;<a href=\"https://nxbkimdong.com.vn/collections/tuoi-moi-lon-15-18\">Tuổi mới lớn (15 – 18)</a></li><li style=\"text-align: justify;\">Khuôn Khổ:&nbsp;13x18 cm</li><li style=\"text-align: justify;\">Số trang: 210</li><li style=\"text-align: justify;\">Định dạng: bìa mềm</li><li style=\"text-align: justify;\">Trọng lượng: 230 gram</li><li style=\"text-align: justify;\">Bộ sách:&nbsp;<a href=\"https://nxbkimdong.com.vn/collections/dragon-quest-dau-an-roto-nhung-nguoi-ke-thua\">Dragon Quest - Dấu ấn Roto - Những người kế thừa</a><hr>\n<p>Mô tả cắt ngắn cho test.</p></li>\n</ul>",
+ "featured_image": "https://bizweb.dktcdn.net/100/576/749/products/1-d109d0b1cc364e6cb100af480a2db661.jpg?v=1760796675893",
+ "images": [
+  "https://bizweb.dktcdn.net/100/576/749/products/1-d109d0b1cc364e6cb100af480a2db661.jpg?v=1760796675893"
+ ],
+ "options": [
+  {
+   "name": "Title",
+   "position": 1
+  }
+ ],
+ "variants": [
+  {
+   "id": 172064017,
+   "barcode": "9786042328562",
+   "sku": "5232216700001",
+   "unit": "Cuốn",
+   "price": 36000,
+   "compare_at_price": 40000,
+   "price_original": 40000,
+   "compare_at_price_original": 40000,
+   "options": [
+    "Default Title"
+   ],
+   "option1": "Default Title",
+   "option2": null,
+   "option3": null,
+   "title": "Default Title",
+   "inventory_management": "bizweb",
+   "inventory_policy": "deny",
+   "inventory_quantity": 12,
+   "weight": 230,
+   "weight_unit": "g",
+   "featured_image": {
+    "src": "https://bizweb.dktcdn.net/100/576/749/products/1-d109d0b1cc364e6cb100af480a2db661.jpg?v=1760796675893"
+   },
+   "available": true,
+   "url": "/dragon-quest-dau-an-roto-nhung-nguoi-ke-thua-tap-1-tang-kem-postcard?variant=172064017",
+   "taxable": true
+  }
+ ],
+ "available": true,
+ "url": "/dragon-quest-dau-an-roto-nhung-nguoi-ke-thua-tap-1-tang-kem-postcard"
+}
