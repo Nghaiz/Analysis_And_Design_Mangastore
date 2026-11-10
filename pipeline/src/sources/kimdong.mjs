@@ -110,15 +110,33 @@ export async function planKimdong(http, series, products, log = () => {}) {
   return [...plan.values()].sort((a, b) => a.volume - b.volume);
 }
 
-/** Các dòng "<li>Nhãn: giá trị</li>" của content, khoá là nhãn đã gấp chữ. */
+/**
+ * Các dòng "<li>Nhãn: giá trị</li>" của content: `{ text, html }` theo nhãn đã gấp chữ.
+ * `html` là phần sau dấu ":" đầu tiên, giữ thẻ để tách nhiều người (mỗi người một <a>, cách bằng <br>).
+ */
 function specFields(content) {
   const fields = {};
   for (const li of content.split(/<li\b[^>]*>/i).slice(1)) {
-    const text = htmlToText(li.split(/<hr\b/i)[0]);
-    const m = text.match(/^([^:]{1,40}):\s*(.*)$/);
-    if (m) fields[foldText(m[1])] = m[2].trim();
+    const html = li.split(/<hr\b/i)[0].replace(/<\/li>[\s\S]*$/i, '');
+    const m = htmlToText(html).match(/^([^:]{1,40}):\s*(.*)$/);
+    if (!m) continue;
+    const colon = html.indexOf(':');
+    fields[foldText(m[1])] = { text: m[2].trim(), html: colon >= 0 ? html.slice(colon + 1) : '' };
   }
   return fields;
+}
+
+const specText = (spec, key) => spec[key]?.text || null;
+
+/** Ranh giới giữa hai người: <br>, mở/đóng <a>; rồi dấu phẩy, chấm phẩy, "&", " và ". */
+const PERSON_BREAK = /<br\s*\/?>|<\/?a\b[^>]*>/gi;
+const PERSON_SEPARATOR = /\s*(?:\||[,;]|\s&\s|\svà\s)\s*/u;
+
+/** Danh sách người của một trường (tác giả), giữ thứ tự, bỏ trùng. */
+export function splitPeople(field) {
+  if (!field?.html) return [];
+  const text = htmlToText(field.html.replace(PERSON_BREAK, ' | '));
+  return [...new Set(text.split(PERSON_SEPARATOR).map((s) => s.trim()).filter(Boolean))];
 }
 
 function descriptionOf(content) {
@@ -127,8 +145,6 @@ function descriptionOf(content) {
   const html = content.slice(hr.index + hr[0].length).trim();
   return htmlToText(html) ? html : null;
 }
-
-const splitPeople = (value) => (value ? value.split(/\s*[,;]\s*/).map((s) => s.trim()).filter(Boolean) : []);
 
 /** Bản ghi thô (raw-record.schema.json) của một mục kế hoạch; null nếu không lấy được. */
 export async function kimdongRecord(http, series, entry, log = () => {}) {
@@ -141,16 +157,16 @@ export async function kimdongRecord(http, series, entry, log = () => {}) {
     source: 'kimdong', level: 'volume', seriesKey: series.key,
     fetchedAt: http.fetchedAt(productJsonUrl(entry.alias)),
     authors: splitPeople(spec['tac gia']), publisher: KIMDONG_PUBLISHER,
-    pages: Number.parseInt(spec['so trang'], 10) || null,
-    categoryHints: [product.product_type, spec['doi tuong']].filter(Boolean).map((s) => String(s).trim()),
+    pages: Number.parseInt(specText(spec, 'so trang'), 10) || null,
+    categoryHints: [product.product_type, specText(spec, 'doi tuong')].filter(Boolean).map((s) => String(s).trim()),
     descriptionHtml: descriptionOf(content),
   };
   if (entry.variantId === undefined) {
     if (isComboName(product.name)) return null;
     return {
       ...base, sourceId: entry.alias, sourceUrl: `${KIMDONG_ORIGIN}/${entry.alias}`,
-      name: product.name.trim(), publishedAt: spec['nam xuat ban'] ?? tagYear,
-      isbn: spec.isbn ?? null, imageUrls: (product.images ?? []).map(toHttps).filter(Boolean),
+      name: product.name.trim(), publishedAt: specText(spec, 'nam xuat ban') ?? tagYear,
+      isbn: specText(spec, 'isbn'), imageUrls: (product.images ?? []).map(toHttps).filter(Boolean),
     };
   }
   const variant = (product.variants ?? []).find((v) => v.id === entry.variantId);
@@ -162,6 +178,6 @@ export async function kimdongRecord(http, series, entry, log = () => {}) {
     sourceUrl: `${KIMDONG_ORIGIN}/${entry.alias}?variant=${variant.id}`,
     name: `${baseName} - ${String(variant.title).trim()}`,
     publishedAt: String(variant.title).match(VARIANT_YEAR)?.[1] ?? tagYear,
-    isbn: spec.isbn ?? null, imageUrls: cover ? [cover] : [],
+    isbn: specText(spec, 'isbn'), imageUrls: cover ? [cover] : [],
   };
 }

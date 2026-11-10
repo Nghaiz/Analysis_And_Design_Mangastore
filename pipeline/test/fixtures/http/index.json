@@ -1,15 +1,60 @@
 {
   "_note": "Phản hồi ghi sẵn: chụp từ request thật ngày 2026-11-11, cắt ngắn (mô tả thay bằng câu giả). Mục có \"crafted\" là biến thể dựng từ phản hồi thật để thử một nhánh.",
-  "https://nxbkimdong.com.vn/robots.txt": { "file": "kimdong/robots.txt", "contentType": "text/plain" },
-  "https://nxbkimdong.com.vn/sitemap.xml": { "file": "kimdong/sitemap.xml", "contentType": "application/xml" },
-  "https://nxbkimdong.com.vn/sitemap_products_1.xml": { "file": "kimdong/sitemap_products_1.xml", "contentType": "application/xml" },
-  "https://nxbkimdong.com.vn/products/tham-tu-lung-danh-conan-tap-107.json": { "file": "kimdong/tham-tu-lung-danh-conan-tap-107.json", "contentType": "application/json; charset=utf-8" },
-  "https://nxbkimdong.com.vn/products/tap-le-doraemon-truyen-ngan-chu-meo-may-den-tu-tuong-lai.json": { "file": "kimdong/tap-le-doraemon-truyen-ngan-chu-meo-may-den-tu-tuong-lai.json", "contentType": "application/json; charset=utf-8" },
-  "https://nxbkimdong.com.vn/products/tap-le-bluelock.json": { "status": 404, "body": "Not Found", "contentType": "text/html" },
-  "https://tiki.vn/robots.txt": { "file": "tiki/robots.txt", "contentType": "text/plain" },
-  "https://tiki.vn/api/v2/products?limit=40&q=th%C3%A1m%20t%E1%BB%AD%20l%E1%BB%ABng%20danh%20conan%20t%E1%BA%ADp": { "file": "tiki/search-conan-p1.json", "contentType": "application/json; charset=UTF-8" },
-  "https://tiki.vn/api/v2/products/262303707": { "file": "tiki/product-262303707.json", "contentType": "application/json; charset=UTF-8" },
-  "https://query.wikidata.org/robots.txt": { "file": "wikidata/robots-query.txt", "contentType": "text/plain" },
-  "https://www.wikidata.org/robots.txt": { "file": "wikidata/robots-www.txt", "contentType": "text/plain" },
-  "https://www.wikidata.org/wiki/Special:EntityData/Q235311.json": { "file": "wikidata/Q235311.json", "contentType": "application/json" }
+  "https://nxbkimdong.com.vn/robots.txt": {
+    "file": "kimdong/robots.txt",
+    "contentType": "text/plain"
+  },
+  "https://nxbkimdong.com.vn/sitemap.xml": {
+    "file": "kimdong/sitemap.xml",
+    "contentType": "application/xml"
+  },
+  "https://nxbkimdong.com.vn/sitemap_products_1.xml": {
+    "file": "kimdong/sitemap_products_1.xml",
+    "contentType": "application/xml"
+  },
+  "https://nxbkimdong.com.vn/products/tham-tu-lung-danh-conan-tap-107.json": {
+    "file": "kimdong/tham-tu-lung-danh-conan-tap-107.json",
+    "contentType": "application/json; charset=utf-8"
+  },
+  "https://nxbkimdong.com.vn/products/tap-le-doraemon-truyen-ngan-chu-meo-may-den-tu-tuong-lai.json": {
+    "file": "kimdong/tap-le-doraemon-truyen-ngan-chu-meo-may-den-tu-tuong-lai.json",
+    "contentType": "application/json; charset=utf-8"
+  },
+  "https://nxbkimdong.com.vn/products/tap-le-bluelock.json": {
+    "status": 404,
+    "body": "Not Found",
+    "contentType": "text/html"
+  },
+  "https://tiki.vn/robots.txt": {
+    "file": "tiki/robots.txt",
+    "contentType": "text/plain"
+  },
+  "https://tiki.vn/api/v2/products?limit=40&q=th%C3%A1m%20t%E1%BB%AD%20l%E1%BB%ABng%20danh%20conan%20t%E1%BA%ADp": {
+    "file": "tiki/search-conan-p1.json",
+    "contentType": "application/json; charset=UTF-8"
+  },
+  "https://tiki.vn/api/v2/products/262303707": {
+    "file": "tiki/product-262303707.json",
+    "contentType": "application/json; charset=UTF-8"
+  },
+  "https://query.wikidata.org/robots.txt": {
+    "file": "wikidata/robots-query.txt",
+    "contentType": "text/plain"
+  },
+  "https://www.wikidata.org/robots.txt": {
+    "file": "wikidata/robots-www.txt",
+    "contentType": "text/plain"
+  },
+  "https://www.wikidata.org/wiki/Special:EntityData/Q235311.json": {
+    "file": "wikidata/Q235311.json",
+    "contentType": "application/json"
+  },
+  "https://nxbkimdong.com.vn/products/dragon-quest-dau-an-roto-nhung-nguoi-ke-thua-tap-1-tang-kem-postcard.json": {
+    "file": "kimdong/dragon-quest-dau-an-roto-nhung-nguoi-ke-thua-tap-1-tang-kem-postcard.json",
+    "contentType": "application/json; charset=utf-8"
+  },
+  "https://nxbkimdong.com.vn/products/truong-hoc-biet-tuot-tap-1-len-duong-thoi-nguyen-tu-va-phan-tu.json": {
+    "file": "kimdong/truong-hoc-biet-tuot-tap-1-len-duong-thoi-nguyen-tu-va-phan-tu.json",
+    "contentType": "application/json; charset=utf-8"
+  }
 }

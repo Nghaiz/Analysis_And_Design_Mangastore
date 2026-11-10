@@ -6,6 +6,8 @@ import { join } from 'node:path';
 const SOURCES = ['kimdong', 'tiki'];
 const KEY_PATTERN = /^[a-z0-9-]+$/;
 const QID_PATTERN = /^Q\d+$/;
+/** tblBook.author là varchar(100). */
+const AUTHOR_MAX_LENGTH = 100;
 const REQUIRED = [
   'key', 'name', 'aliases', 'publisher', 'preferredSource', 'category', 'longStory',
   'kimdongSlugPrefixes', 'tikiQuery', 'wikidataId', 'maxVolumes',
@@ -28,6 +30,8 @@ function validateOne(entry, index, categories) {
   check(typeof entry.tikiQuery === 'string', `${where}: tikiQuery phải là chuỗi`);
   check(entry.wikidataId === null || QID_PATTERN.test(entry.wikidataId), `${where}: wikidataId phải là Q<số> hoặc null`);
   check(Number.isInteger(entry.maxVolumes) && entry.maxVolumes > 0, `${where}: maxVolumes phải là số nguyên dương`);
+  check(!('author' in entry) || (typeof entry.author === 'string' && entry.author.trim() && entry.author.length <= AUTHOR_MAX_LENGTH),
+    `${where}: author (tuỳ chọn) phải là chuỗi không rỗng, tối đa ${AUTHOR_MAX_LENGTH} kí tự`);
   check(entry.preferredSource !== 'tiki' || entry.tikiQuery.trim(), `${where}: nguồn ưu tiên tiki cần tikiQuery`);
 }
 
