@@ -3,7 +3,7 @@
   Xem, tự gửi. DAO: StaffDAO.checkLogin. Session W: staff (không mật khẩu, C5).
   Chỉ xử lí khi POST + dispatcher REQUEST + có btnLogin (phase-06-integration.md §2); mọi trường hợp khác chỉ hiển thị,
   kể cả khi LoginRateLimitFilter chặn (filter đặt message = LOGIN_FAILED và bọc request thành GET).
-  Thành công: đổi session id, ghi staff, chuyển (302) tới /nhan-vien/StaffHomeView.jsp. Thất bại: LOGIN_FAILED,
+  Thành công: huỷ session cũ, mở session mới, ghi staff, chuyển (302) tới /nhan-vien/StaffHomeView.jsp. Thất bại: LOGIN_FAILED,
   giữ txtUsername, để trống txtPassword. GET có expired=1 (C16): hiện SESSION_EXPIRED (kind info).
 --%>
 <%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" trimDirectiveWhitespaces="true" %>
@@ -34,9 +34,12 @@
         user.setPassword(null);
         if (staff != null) {
             staff.setPassword(null);
-            request.getSession();
-            request.changeSessionId();
-            session.setAttribute("staff", staff);
+            // Máy quầy dùng chung: không kế thừa thuộc tính của người trước, nên huỷ session cũ rồi mở session mới.
+            HttpSession old = request.getSession(false);
+            if (old != null) {
+                old.invalidate();
+            }
+            request.getSession(true).setAttribute("staff", staff);
             response.sendRedirect(ctx + "/nhan-vien/StaffHomeView.jsp");
             return;
         }
