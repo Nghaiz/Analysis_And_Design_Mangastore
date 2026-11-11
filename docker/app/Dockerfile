@@ -3,12 +3,12 @@
 #   docker build -f docker/app/Dockerfile -t tiemtruyen-app:local .
 # File loại trừ: docker/app/Dockerfile.dockerignore. Các tầng:
 #   frontend     Node 24: npm ci && npm run build trong frontend/ → src/main/webapp/static (manifest Vite)
-#   war          Maven 3.9.16 + Temurin 25: mvn package -DskipTests (Checkstyle vẫn chạy ở pha validate)
+#   war          Maven 3.9.16 + Temurin 25 (Ubuntu noble, cùng nền với ảnh runtime): mvn package -DskipTests (Checkstyle vẫn chạy ở pha validate)
 #   session-libs Maven: tải redisson-all + redisson-tomcat-11 (kiểm checksum Maven Central và SHA-256 ghim dưới đây)
 #   runtime      Tomcat 11.0.27 / Java 25, chạy bằng user không phải root
 
 ARG NODE_IMAGE=node:24.22.2-bookworm-slim
-ARG MAVEN_IMAGE=maven:3.9.16-eclipse-temurin-25
+ARG MAVEN_IMAGE=maven:3.9.16-eclipse-temurin-25-noble
 ARG TOMCAT_IMAGE=tomcat:11.0.27-jre25-temurin-noble
 
 FROM ${NODE_IMAGE} AS frontend

@@ -111,7 +111,7 @@ Lệch so với kế hoạch, đã ghi vào hợp đồng:
 - Nhánh lane là `lane/0N-<slug>/<lane>`: git không cho nhánh `phase/01-khung` và `phase/01-khung/<lane>` cùng tồn tại (`contract.md` §9).
 - `node --test scripts/check/` của Node 24 không nhận thư mục trần; dùng `node --test "scripts/check/*.test.mjs"` (`contract.md` §10).
 - MySQL trên Docker Desktop Windows bỏ qua file `.cnf` world-writable (0777): compose chép file với mode 0644 trước entrypoint. Redis đi qua `docker-entrypoint.sh` để không chạy bằng root.
-- Thêm ngoài danh sách: `scripts/dev/mvnw.mjs` (chạy mvnw với JDK 25 cho riêng tiến trình con), `scripts/accept/_lib.mjs` (thư viện chung của Accept, có `--only`), `frontend/public/img/cover-fallback.svg` và `favicon.svg` (tự vẽ, phase 5 có thể vẽ lại), `util/JsonReader` (đọc manifest khi pom chưa có thư viện JSON; phase 3 thêm Jackson thì thay), `util/DbShutdownListener`.
+- Thêm ngoài danh sách: `scripts/dev/mvnw.mjs` (chạy mvnw với JDK 25 cho riêng tiến trình con), `scripts/accept/_lib.mjs` (thư viện chung của Accept, có `--only`), `frontend/public/img/cover-fallback.svg` và `favicon.svg` (tự vẽ, phase 5 có thể vẽ lại), `util/JsonReader` (đọc manifest khi pom chưa có thư viện JSON; soát 11/11/2026 chốt giữ lại làm bộ đọc JSON chặt cho manifest Vite và `categories.json` của phase 5, Jackson trong `JsonUtil` chỉ ghi props island), `util/DbShutdownListener`.
 - JDK 25.0.5 (Temurin) cài bằng winget; JDK 24.0.2 giữ nguyên.
 
 Việc để phase sau: `lucide-react` và `radix-ui` (lane 1B đề xuất, phase 5 ghim); `npm audit` báo 2 lỗi mức moderate chỉ ở devDependencies (deepmerge qua shadcn, minimatch qua eslint 10), không `audit fix --force` vì sẽ hạ major.

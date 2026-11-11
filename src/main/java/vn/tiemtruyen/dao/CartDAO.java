@@ -32,8 +32,8 @@ public class CartDAO extends DAO {
     private static final String CART_OF_CLIENT = "SELECT id FROM tblCart WHERE clientId = ?";
     private static final String NOT_IN_ACTIVE_BILL = " AND NOT EXISTS (SELECT 1 FROM tblRentedBook rb"
             + " JOIN tblRentalBill r ON r.id = rb.rentalBillId WHERE rb.selectedBookId = sb.id AND r.status <> ?)";
-    private static final String FREE_LINES = "SELECT sb.id, bc.id AS copyId, bc.barcode, b.id AS bookId, b.name,"
-            + " b.author, b.publisher, b.publishYear, b.category, b.description, b.rentalPrice"
+    private static final String FREE_LINES = "SELECT sb.id, bc.id AS copyId, bc.barcode, b.id AS bookId, "
+            + bookColumns("b")
             + " FROM tblSelectedBook sb JOIN tblBookCopy bc ON bc.id = sb.bookCopyId JOIN tblBook b ON b.id = bc.bookId"
             + " WHERE sb.cartId = ?" + NOT_IN_ACTIVE_BILL + " ORDER BY sb.id";
     private static final String FREE_LINE_COPIES = "SELECT sb.id, sb.bookCopyId FROM tblSelectedBook sb"
@@ -145,7 +145,7 @@ public class CartDAO extends DAO {
                 while (rs.next()) {
                     Book book = books.get(rs.getInt("bookId"));
                     if (book == null) {
-                        book = readBook(rs);
+                        book = readBook(rs, "bookId");
                         books.put(book.getId(), book);
                     }
                     BookCopy copy = new BookCopy();
@@ -160,19 +160,6 @@ public class CartDAO extends DAO {
             }
         }
         return lines;
-    }
-
-    private static Book readBook(ResultSet rs) throws SQLException {
-        Book book = new Book();
-        book.setId(rs.getInt("bookId"));
-        book.setName(rs.getString("name"));
-        book.setAuthor(rs.getString("author"));
-        book.setPublisher(rs.getString("publisher"));
-        book.setPublishYear(rs.getObject("publishYear", Integer.class));
-        book.setCategory(rs.getString("category"));
-        book.setDescription(rs.getString("description"));
-        book.setRentalPrice(rs.getFloat("rentalPrice"));
-        return book;
     }
 
     private Map<Integer, Integer> readFreeLineCopies(int cartId) throws SQLException {

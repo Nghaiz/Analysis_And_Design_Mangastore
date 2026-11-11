@@ -7,7 +7,7 @@ Kiểm bằng: `scripts/check/contracts-doc.test.mjs` (phase 2), `MessagesTest`,
 
 Phạm vi: nghiệp vụ và tích hợp trang (thực thể, bảng, DAO, khoá, session, trang, field form, thông báo, props island, phân quyền, hiển thị). Hạ tầng (cổng, biến môi trường, build, cây thư mục) nằm ở `plans/261111-tiem-thue-truyen/contract.md`. Hai file nói khác nhau về nghiệp vụ thì file này thắng; về hạ tầng thì `contract.md` thắng.
 
-Nguồn, theo thứ tự ưu tiên: brief `prompt-web-tiem-thue-truyen.md` §3 (thầy đã duyệt) → quyết định D1–D11 của `plans/reports/brainstorm-261111-web-tiem-thue-truyen.md` → `plans/261111-tiem-thue-truyen/plan.md` mục "Deferred decisions" → báo cáo PDF ch.2, ch.8, ch.9, ch.10. Chỗ nào nguồn không trả lời thì ghi ở mục 14 "Chưa chốt" kèm lựa chọn tạm; không tự đặt luật nghiệp vụ mới.
+Nguồn, theo thứ tự ưu tiên: brief `prompt-web-tiem-thue-truyen.md` §3 (thầy đã duyệt) → quyết định D1–D11 của `plans/reports/brainstorm-261111-web-tiem-thue-truyen.md` → `plans/261111-tiem-thue-truyen/plan.md` mục "Deferred decisions" → báo cáo PDF ch.2, ch.8, ch.9, ch.10. Chỗ nào nguồn không trả lời thì theo mục 14 (C1–C13, đã chốt); điểm mới chưa có ở đó thì dừng và hỏi chủ dự án, không tự đặt luật nghiệp vụ mới.
 
 Kí hiệu: `(ch.9 tr.62)` là trang in của báo cáo; `(C3)` trỏ tới điểm số 3 ở mục 14.
 
@@ -243,13 +243,13 @@ Tham số và kiểu trả về theo ký hiệu UML của ch.9 (`T[]` = `List<T>
 | StaffDAO extends UserDAO | `checkLogin(user: User): Staff` | Như ClientDAO, lấy `position`; `null` nếu sai hoặc không phải nhân viên (tr.84–85) |
 | BookDAO extends DAO | `searchBook(keyword: String): Book[]` | Đầu truyện có tên hoặc tác giả chứa từ khoá, mỗi đầu truyện kèm các quyển **đang sẵn sàng** (tr.70) |
 | BookDAO extends DAO | `addBook(book: Book): boolean` | Ngoài báo cáo (D6). Lưu đầu truyện cùng `listBookCopy` |
-| BookDAO extends DAO | `updateBook(book: Book): boolean` | Ngoài báo cáo (D6). Hàm cập nhật duy nhất của Book; quyển đi qua Book chủ (C12) |
+| BookDAO extends DAO | `updateBook(book: Book): boolean` | Ngoài báo cáo (D6). Hàm cập nhật duy nhất của Book; quyển đi qua Book chủ (C12). Quyển mới (`id = 0`) nhận mã `DTxxx-NN` với `NN` = số thứ tự lớn nhất đang có của mã cùng tiền tố (không phân biệt hoa thường) cộng 1, không theo số dòng, nên mã lạc số không sinh mã trùng |
 | CartDAO extends DAO | `getCart(client: Client): Cart` | Giỏ cùng các dòng **chưa thuộc phiếu mượn nào, trừ phiếu đã huỷ**, mỗi dòng kèm quyển và đầu truyện; danh sách rỗng nếu giỏ trống (tr.69) |
 | CartDAO extends DAO | `updateCart(cart: Cart): boolean` | Trong một giao dịch: thêm dòng mới (`id = 0`), xoá dòng bị bỏ; không đụng dòng đã thuộc phiếu chưa huỷ (tr.70). Không khoá quyển. Trả `false` (rollback) duy nhất khi một dòng mới trỏ vào quyển đã có trong giỏ (bất biến mục 6.2). Xoá dòng từng thuộc phiếu **đã huỷ** thì gỡ `tblRentedBook.selectedBookId` của phiếu huỷ đó về NULL trước (khoá ngoại); quyển thực giao của phiếu huỷ giữ nguyên |
 | RentalBillDAO extends DAO | `addRentalBill(rentalBill: RentalBill): boolean` | Trong một giao dịch, khoá K1: kiểm quyển vẫn sẵn sàng, quyển đã bị phiếu khác giữ thì đổi sang quyển khác cùng đầu truyện, lưu phiếu "Chờ nhận" cùng các dòng; `false` nếu không còn đủ quyển (tr.70) |
 | RentalBillDAO extends DAO | `getRentalBillList(client: Client): RentalBill[]` | Phiếu của khách kèm quyển (cùng lỗi) và khoản cọc (tr.70) |
 | RentalBillDAO extends DAO | `searchRentalBill(keyword: String): RentalBill[]` | Phiếu có mã phiếu, tên khách hoặc số CCCD khớp từ khoá, kèm thông tin khách và quyển (tr.85; cách khớp: C9) |
-| RentalBillDAO extends DAO | `updateRentalBill(rentalBill: RentalBill): boolean` | Trong một giao dịch: lưu thông tin và trạng thái, đồng bộ dòng phiếu cùng tình trạng khi giao, lỗi và khoản cọc theo `rentalBill`, kiểm quyển mới thêm còn sẵn sàng (K1); khoá dòng phiếu và kiểm trạng thái trong DB vẫn "Chờ nhận" (D9); `false` nếu không còn đủ quyển hoặc trạng thái đã đổi (tr.70, 85) |
+| RentalBillDAO extends DAO | `updateRentalBill(rentalBill: RentalBill): boolean` | Trong một giao dịch: lưu thông tin và trạng thái, đồng bộ dòng phiếu cùng tình trạng khi giao, lỗi và khoản cọc theo `rentalBill`, kiểm quyển mới thêm còn sẵn sàng (K1); khoá dòng phiếu và kiểm trạng thái trong DB vẫn "Chờ nhận" (D9); `false` nếu không còn đủ quyển hoặc trạng thái đã đổi (tr.70, 85). Lỗi (`tblRentedDamage`) và khoản cọc (`tblRentalCollateral`) được ghi lại toàn bộ theo `rentalBill`, nên id của các dòng này đổi sau mỗi lần gọi: không bảng nào có khoá ngoại tới chúng, và trang không giữ id này qua một lần lưu |
 | DamageDAO extends DAO | `searchDamage(keyword: String): Damage[]` | Loại lỗi có tên chứa từ khoá (tr.85) |
 | DamageDAO extends DAO | `addDamage(damage: Damage): boolean` | Gán `damage.id` khi thành công; `false` nếu tên lỗi đã tồn tại (tr.85) |
 | CollateralDAO extends DAO | `searchCollateral(keyword: String): Collateral[]` | Loại tài sản có tên chứa từ khoá (tr.85) |
@@ -586,7 +586,7 @@ Mỗi trang: thành phần theo đúng thứ tự (ch.9 và SVG `images/svg/ui_m
 
 #### Trang quản trị D6 (Deferred #14; ngoài báo cáo)
 
-Chỉ Staff có `position = "Quản lí"`. Tên trang và hàm DAO đã chốt; thành phần và field là đề xuất tạm, chốt ở C12 trước phase 7.
+Chỉ Staff có `position = "Quản lí"`. Tên trang, hàm DAO, thành phần và field theo bảng dưới, đã chốt ở C12 (mục 14).
 
 | Trang | Đề xuất |
 |---|---|

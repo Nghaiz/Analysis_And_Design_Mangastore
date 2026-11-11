@@ -75,7 +75,7 @@ async function processBook(ctx, book, previous, counters, reference) {
   const fetched = await chooseCover(downloaded, reference);
   if (fetched !== downloaded) {
     counters.coverSwapped += 1;
-    ctx.log(`[images] Book ${book.id}: bìa ứng viên không màu hoặc sai dáng bìa, dùng ${fetched[0].image.sourceUrl} làm bìa`);
+    ctx.log(`[images] Book ${book.id}: bìa ứng viên không màu, sai dáng bìa hoặc có dải nhãn người bán, dùng ${fetched[0].image.sourceUrl} làm bìa`);
   }
   const before = previous.get(book.id);
   if (before && signature(before) === signature(fetched.map((f) => f.image)) && (await allFilesExist(dir, before))) {

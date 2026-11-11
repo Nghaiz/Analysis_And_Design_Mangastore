@@ -1,9 +1,12 @@
 package vn.tiemtruyen.dao;
 
 import java.sql.Connection;
+import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.Callable;
+import vn.tiemtruyen.model.Book;
 import vn.tiemtruyen.util.Db;
 
 /**
@@ -52,6 +55,12 @@ import vn.tiemtruyen.util.Db;
 public abstract class DAO implements AutoCloseable {
 
     private static final int MYSQL_DUPLICATE_ENTRY = 1062;
+    /**
+     * Bảy cột của {@code tblBook} ngoài id, theo thứ tự của {@link #readBook(ResultSet, String)}. Tên cột trùng tên
+     * thuộc tính của {@link Book} (contracts §3) nên cũng là khoá JSON của {@link #bookJson(String)}.
+     */
+    private static final List<String> BOOK_COLUMNS = List.of("name", "author", "publisher", "publishYear", "category",
+            "description", "rentalPrice");
 
     private final Connection con;
 
@@ -163,6 +172,57 @@ public abstract class DAO implements AutoCloseable {
     protected static String containsPattern(String keyword) {
         String escaped = keyword.replace("\\", "\\\\").replace("%", "\\%").replace("_", "\\_");
         return "%" + escaped + "%";
+    }
+
+    /**
+     * Cột của Book (trừ id) cho mệnh đề {@code SELECT}, để đọc bằng {@link #readBook(ResultSet, String)}.
+     *
+     * @param alias bí danh của {@code tblBook} trong câu SQL
+     * @return ví dụ {@code b.name, b.author, ..., b.rentalPrice}
+     */
+    protected static String bookColumns(String alias) {
+        StringBuilder sql = new StringBuilder();
+        for (String column : BOOK_COLUMNS) {
+            sql.append(sql.isEmpty() ? "" : ", ").append(alias).append('.').append(column);
+        }
+        return sql.toString();
+    }
+
+    /**
+     * Biểu thức {@code JSON_OBJECT} của Book (id và bảy cột) cho hàm đọc dựng đồ thị bằng JSON rồi Jackson gán vào
+     * {@link Book}; không có {@code listBookCopy}.
+     *
+     * @param alias bí danh của {@code tblBook} trong câu SQL
+     * @return ví dụ {@code JSON_OBJECT('id', b.id, 'name', b.name, ...)}
+     */
+    protected static String bookJson(String alias) {
+        StringBuilder sql = new StringBuilder("JSON_OBJECT('id', ").append(alias).append(".id");
+        for (String column : BOOK_COLUMNS) {
+            sql.append(", '").append(column).append("', ").append(alias).append('.').append(column);
+        }
+        return sql.append(')').toString();
+    }
+
+    /**
+     * Đọc Book ở dòng hiện tại của {@code rs} (cột chọn bằng {@link #bookColumns(String)}); {@code listBookCopy} để
+     * rỗng, lớp con tự gắn quyển.
+     *
+     * @param rs kết quả đang đứng ở một dòng
+     * @param idColumn nhãn cột chứa id đầu truyện ({@code id} hay {@code bookId} tuỳ câu SQL)
+     * @return Book mới
+     * @throws SQLException khi thiếu cột
+     */
+    protected static Book readBook(ResultSet rs, String idColumn) throws SQLException {
+        Book book = new Book();
+        book.setId(rs.getInt(idColumn));
+        book.setName(rs.getString("name"));
+        book.setAuthor(rs.getString("author"));
+        book.setPublisher(rs.getString("publisher"));
+        book.setPublishYear(rs.getObject("publishYear", Integer.class));
+        book.setCategory(rs.getString("category"));
+        book.setDescription(rs.getString("description"));
+        book.setRentalPrice(rs.getFloat("rentalPrice"));
+        return book;
     }
 
     /**

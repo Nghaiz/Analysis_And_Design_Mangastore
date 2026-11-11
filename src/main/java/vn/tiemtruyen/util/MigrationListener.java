@@ -11,8 +11,8 @@ import org.flywaydb.core.api.output.MigrateResult;
 
 /**
  * Chạy Flyway lúc webapp khởi động (contract.md §5): {@code classpath:db/migration} (V1 schema, V2 danh mục và
- * tài khoản mẫu) cộng giá trị của {@code FLYWAY_DATA_LOCATION} (mặc định {@code filesystem:/flyway/data}, lần chạy
- * E2E đặt {@code classpath:db/e2e}).
+ * tài khoản mẫu) cộng {@link AppConfig#flywayDataLocation()} (biến {@code FLYWAY_DATA_LOCATION}, mặc định
+ * {@code filesystem:/flyway/data}, lần chạy E2E đặt {@code classpath:db/e2e}).
  *
  * <p>Location không tồn tại (ví dụ gõ sai {@code FLYWAY_DATA_LOCATION}) là lỗi, không lặng lẽ bỏ catalog; thư mục
  * có mà rỗng thì hợp lệ (chỉ chạy V1, V2). Migration lỗi thì ngoại lệ Flyway ném ra khỏi
@@ -24,17 +24,12 @@ public final class MigrationListener implements ServletContextListener {
 
     /** Location của schema và dữ liệu mẫu, có ở mọi lần chạy. */
     public static final String SCHEMA_LOCATION = "classpath:db/migration";
-    /** Biến môi trường chọn location dữ liệu catalog. */
-    public static final String DATA_LOCATION_VARIABLE = "FLYWAY_DATA_LOCATION";
-    /** Location catalog khi biến không đặt: volume {@code catalog_data} gắn vào container app. */
-    public static final String DEFAULT_DATA_LOCATION = "filesystem:/flyway/data";
 
     private static final Logger LOG = Logger.getLogger(MigrationListener.class.getName());
 
     @Override
     public void contextInitialized(ServletContextEvent event) {
-        String dataLocation = AppConfig.get().optional(DATA_LOCATION_VARIABLE, DEFAULT_DATA_LOCATION);
-        migrate(Db.dataSource(), dataLocation);
+        migrate(Db.dataSource(), AppConfig.get().flywayDataLocation());
     }
 
     /**

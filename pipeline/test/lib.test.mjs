@@ -51,6 +51,18 @@ describe('title', () => {
     expect(isCombo('Tủ sách tuổi thơ - Tập 1')).toBe(false);
     expect(isCombo('Thám tử lừng danh Conan - Tập 1')).toBe(false);
   });
+
+  it('"bộ" so trên chữ có dấu: "Bố …", "bò", "bỏ" không phải combo (#82, #88)', () => {
+    expect(isCombo('Bố Sói - Con Thỏ - Đón con sớm nhé!')).toBe(false);
+    expect(isCombo('Shin - Cậu Bé Bút Chì - Phiên Bản Hoạt Hình Màu - Tập 30: Cu Shin Chăm Bố Ốm')).toBe(false);
+    expect(isCombo('Naruto Tập 47: Phong Ấn Bị Phá Bỏ!!')).toBe(false);
+    expect(isCombo('Thần Đồng Đất Việt 164 - Bò Cái Tịt Ngòi')).toBe(false);
+    expect(isCombo('BỘ TRUYỆN DORAEMON 5 CUỐN')).toBe(true);
+    expect(isCombo('Bộ Conan 3 tập'.normalize('NFD'))).toBe(true);
+    expect(isCombo('Doraemon - Bộ')).toBe(true);
+    // Không gõ dấu thì "bo" không phân biệt được bộ hay bố: vẫn coi là combo như trước.
+    expect(isCombo('bo truyen conan 3 tap')).toBe(true);
+  });
 });
 
 describe('authors', () => {

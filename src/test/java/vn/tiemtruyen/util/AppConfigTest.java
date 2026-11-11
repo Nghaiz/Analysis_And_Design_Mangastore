@@ -50,6 +50,7 @@ class AppConfigTest {
         assertEquals(10, config.dbPoolSize());
         assertFalse(config.viteDev());
         assertEquals("/covers", config.coversBaseUrl());
+        assertEquals("filesystem:/flyway/data", config.flywayDataLocation());
         assertThrows(IllegalStateException.class, config::dbUrl);
         assertThrows(IllegalStateException.class, config::dbUser);
     }
@@ -97,6 +98,12 @@ class AppConfigTest {
     void viteDevOriginMustBeAPlainOrigin(String value) {
         AppConfig config = AppConfig.of(Map.of("APP_VITE_DEV_ORIGIN", value));
         assertThrows(IllegalStateException.class, config::viteDevOrigin);
+    }
+
+    @Test
+    void flywayDataLocationIsReadFromItsVariable() {
+        AppConfig config = AppConfig.of(Map.of("FLYWAY_DATA_LOCATION", " classpath:db/e2e "));
+        assertEquals("classpath:db/e2e", config.flywayDataLocation());
     }
 
     @Test

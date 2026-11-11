@@ -36,6 +36,8 @@ Tối đa 3 agent cùng lúc. Thứ tự: 6A, 6B, 6C chạy cùng lúc → 6D v�
 | 6E `xac-minh-m1` | Playwright MCP đi kịch bản ch.2 mục 2.1 và hai ngoại lệ (bước 6, bước 10) trên seed e2e, khổ 390×844 và 1440×900; console sạch, không request hỏng; ảnh vào `plans/reports/screens/phase-06/m1/` | `t1k-web-testing-tester` | chỉ ghi `plans/reports/` | 6A, 6B đã merge |
 | 6F `xac-minh-m2` | Playwright MCP đi kịch bản ch.2 mục 2.2 và mọi ngoại lệ (bước 2, bước 5 "Thần đồng đất Việt", bước 24 xem và huỷ phiếu), cả khi tắt JS (bản HTML của "Truyện đã chọn" vẫn dùng được); ảnh vào `plans/reports/screens/phase-06/m2/` | `t1k-web-testing-tester` | chỉ ghi `plans/reports/` | 6C, 6D đã merge |
 
+Mang từ phase 1 (`plans/reports/phase-01-frontend-khung-261111-0342.md` mục 158, soát 11/11/2026): loader gọi `createRoot` với `onUncaughtError` để log có tên island, và gắn `data-island-state="mounted|failed"` lên khung island để E2E phase 8 chờ island mount thay cho chờ theo thời gian. Đã làm ở phase 5 (c3af339 trên `phase/05-he-thiet-ke-giao-dien`, hằng `STATE_ATTRIBUTE` ở `frontend/src/loader/mount-islands.ts`, 3 test): `mounted` khi lượt render đầu đã lên lịch, `failed` khi island bị loại, không nạp được hoặc crash (crash sau ghi đè `mounted`, không ngược lại), `console.error` đúng một lần kèm tên island. 6D chỉ kiểm lại trên island `SelectedStack`.
+
 Mọi spawn: `model: "opus"`, `effort` = giá trị `CLAUDE_EFFORT`, chạy nền; agent con không spawn agent. Trang dùng tag của phase 5 (`layout.tag`, `ui/*.tag`), không tự viết CSS riêng; cần component mới thì báo orchestrator. Mọi form gửi tới `doXxx.jsp` có `<t:csrf/>`. Mọi ghi DB đi qua `doXxx.jsp` không giao diện. Dòng được chọn trong danh sách do trang chứa danh sách lưu vào session.
 
 ## Tiêu chí hoàn thành

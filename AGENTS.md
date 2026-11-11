@@ -20,7 +20,7 @@ Công nghệ bắt buộc: **JSP + DAO + MySQL**, kiến trúc JSP-DAO như báo
 
 | Cần biết | File |
 |---|---|
-| Hợp đồng nghiệp vụ và tích hợp: bảng, model, DAO, khoá K1, session, 28 trang, field form, 28 thông báo, props island, phân quyền, hiển thị, mục **Chưa chốt** | `docs/contracts.md` (SSOT, thắng mọi file khác về nghiệp vụ) |
+| Hợp đồng nghiệp vụ và tích hợp: bảng, model, DAO, khoá K1, session, 28 trang, field form, 28 thông báo, props island, phân quyền, hiển thị, mục 14 (điểm báo cáo không trả lời, đã chốt) | `docs/contracts.md` (SSOT, thắng mọi file khác về nghiệp vụ) |
 | Hạ tầng: cây thư mục, service, cổng, biến môi trường, build, Accept, file dùng chung, git | `plans/261111-tiem-thue-truyen/contract.md` (thắng về hạ tầng) |
 | Kế hoạch, phase, quyết định Deferred | `plans/261111-tiem-thue-truyen/plan.md`, `phase-0N-*.md` |
 | Ai đang làm lane nào | `plans/261111-tiem-thue-truyen/agent-map.md` |
@@ -43,7 +43,8 @@ Chạy từ gốc repo. Cột "Có từ" là phase đầu tiên mà lệnh chạ
 | Test frontend (Vitest) | `npm --prefix frontend run test` | phase 1 |
 | Kiểm kiểu TypeScript | `npm --prefix frontend run typecheck` | phase 1 |
 | Build frontend (ra `src/main/webapp/static/`) | `npm --prefix frontend run build` | phase 1 |
-| Vite dev server (cổng 5173, đặt `APP_VITE_DEV=true`) | `npm --prefix frontend run dev` | phase 1 |
+| Vite dev server (cổng 5173); bật trang dev bằng `APP_VITE_DEV=true docker compose up --build -d --wait` (không sửa `.env`), mở `http://localhost:8080` | `npm --prefix frontend run dev` | phase 1 |
+| Kiểm CSP và nguồn nạp của một trang (`--mode dev` khi đang bật Vite dev) | `node scripts/check/csp-page-check.mjs --mode build` | phase 4 |
 | Build và test Java (Checkstyle, JUnit, Testcontainers) bằng JDK 25, không đổi env hệ thống | `node scripts/dev/mvnw.mjs -B verify` | phase 1 |
 | Build WAR, bỏ test | `node scripts/dev/mvnw.mjs -B package -DskipTests` | phase 1 |
 | Dựng và chạy stack (app, db, redis, nginx), chờ healthy | `docker compose up --build -d --wait` | phase 1 |
@@ -78,6 +79,8 @@ Chạy từ gốc repo. Cột "Có từ" là phase đầu tiên mà lệnh chạ
 | Accept phase 8 (E2E, actionlint, Lighthouse) | `node scripts/accept/phase-08.mjs` | phase 8 |
 
 Script Accept in `[accept] PASS …` / `[accept] FAIL … → <việc cần làm>`, exit 0 khi mọi bước PASS, 1 khi có bước FAIL, 2 khi thiếu công cụ (`contract.md` §7). `node --test` của Node 24 không nhận thư mục trần nên luôn truyền glob trong ngoặc kép.
+
+Mọi worktree dùng chung compose project `tiemtruyen` (một bộ volume). `docker compose up` từ một worktree khác tạo lại `db` và `redis` vì mount bind trỏ thư mục khác; `app` khởi động đúng lúc đó thì `MigrationListener` không nối được DB. Chữa: `docker compose up --build -d --wait` lại từ cùng một worktree. Mỗi lúc chỉ một phiên dùng stack; phiên khác đang chạy thì báo trước khi `up`. Không bao giờ `down -v`.
 
 ## 4. Cây thư mục
 
