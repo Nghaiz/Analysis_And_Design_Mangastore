@@ -23,8 +23,8 @@ Chạy song song với phase 4. Khi phase 4 còn lane chạy, phase 5 chỉ dùn
 - [x] **5.2 Lane 5B `loader-react`** (xếp hàng tới khi có chỗ).
 - [x] **5.3 Lane 5C `ke-3d`** (xếp hàng tới khi có chỗ).
 - [x] **5.4 Orchestrator:** merge; chạy nền build và compose; mở `/dev/StyleGuideView.jsp` và `/dev/HomePreviewView.jsp` (bản dựng thử bố cục trang chủ có gắn `ShelfScene`; HomeView thật làm ở phase 6). Đã xong: Accept phase 5 ALL PASS (`plans/reports/accept-phase-05-261111-0814.log`), lần đầu FAIL vì HomePreviewView dùng `<%= %>` trong thân scriptless của `layout.tag` (sửa ở c3af339).
-- [ ] **5.5 Lane 5D `xac-minh`:** Playwright MCP soi StyleGuideView và HomePreviewView ở 390×844 và 1440×900, có và không có `prefers-reduced-motion`, có và không có WebGL (tắt bằng cờ trình duyệt); đọc console và network; chụp vào `plans/reports/screens/phase-05/`; đo Lighthouse mobile một lần trên hai trang (bước đo rủi ro, chưa phải cổng; công cụ `npx lighthouse` bản tra npm lúc chạy). Ghi `plans/reports/phase-05-xac-minh-<ts>.md`.
-- [ ] **5.6 Orchestrator:** đọc số Lighthouse; HomePreviewView dưới 80 thì kill (c) của `plan.md`: dừng, đưa chủ dự án chọn hướng. Ghi số đo vào mục Re-score của `plan.md`. Chạy Accept, đánh dấu, push nhánh phase, mở PR vào `main` và merge bằng merge commit (`contract.md` §9).
+- [x] **5.5 Lane 5D `xac-minh`:** Playwright MCP soi StyleGuideView và HomePreviewView ở 390×844 và 1440×900, có và không có `prefers-reduced-motion`, có và không có WebGL (tắt bằng cờ trình duyệt); đọc console và network; chụp vào `plans/reports/screens/phase-05/`; đo Lighthouse mobile một lần trên hai trang (bước đo rủi ro, chưa phải cổng; công cụ `npx lighthouse` bản tra npm lúc chạy). Ghi `plans/reports/phase-05-xac-minh-<ts>.md`.
+- [x] **5.6 Orchestrator:** đọc số Lighthouse; HomePreviewView dưới 80 thì kill (c) của `plan.md`: dừng, đưa chủ dự án chọn hướng. Ghi số đo vào mục Re-score của `plan.md`. Chạy Accept, đánh dấu, push nhánh phase, mở PR vào `main` và merge bằng merge commit (`contract.md` §9).
 
 ## Lane trong phase
 

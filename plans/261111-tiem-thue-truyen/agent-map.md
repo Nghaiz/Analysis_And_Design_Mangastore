@@ -2,7 +2,7 @@
 
 Nguồn sự thật cho việc giao lane của mọi phiên cook. Đọc lại đầu phiên và sau mỗi lần compact (cùng `CLAUDE.md` và file phase đang làm). Giao hay nhận việc xong là cập nhật file này ngay, trước khi làm việc khác.
 
-Phase 1–4 xong: phase 1, 2, 3 đã vào `main` (PR #1, #2, #3), phase 4 vào `main` qua PR của `phase/04-pipeline`. Phase đang làm: 5
+Phase 1–4 xong: phase 1, 2, 3 đã vào `main` (PR #1, #2, #3), phase 4 vào `main` qua PR của `phase/04-pipeline`. Phase 1–5 xong; phase tiếp theo: 6
 Cập nhật lần cuối: 2026-11-11 (phiên cook phase 5)
 Nhánh phase: `phase/05-he-thiet-ke-giao-dien`, worktree orchestrator `D:/Coding/mangastore-wt/05-orch`
 
@@ -19,7 +19,6 @@ Nhánh phase: `phase/05-he-thiet-ke-giao-dien`, worktree orchestrator `D:/Coding
 
 | Lane | Agent | Bắt đầu | Worktree / nhánh | Báo cáo |
 |---|---|---|---|---|
-| 5D `xac-minh` | `t1k-web-testing-tester` | 2026-11-11 | không worktree (chỉ ghi `plans/reports/` của 05-orch) | |
 
 ## Hàng đợi
 
@@ -53,7 +52,7 @@ Nhánh phase: `phase/05-he-thiet-ke-giao-dien`, worktree orchestrator `D:/Coding
 | 5 | 5A `token-tag` | token, font, CSS, tag JSP, StyleGuide, kiểm tương phản và font | `t1k-web-ui-developer` | xem `phase-05` | 5.0 | xong (5660371) | `plans/reports/phase-05-token-tag-261111-0812.md` |
 | 5 | 5B `loader-react` | loader cách B, component React, ESLint chặn fetch, ngân sách | `t1k-web-core-developer` | xem `phase-05` | 5.0 | xong (6349b00) | `plans/reports/phase-05-loader-react-261111-0756.md` |
 | 5 | 5C `ke-3d` | ShelfScene, quạt trần, ảnh tĩnh, HomePreview | `t1k-web-core-developer` | xem `phase-05` | 5.0 | xong (b5de396) | `plans/reports/phase-05-ke-3d-261111-0801.md` |
-| 5 | 5D `xac-minh` | Playwright MCP và đo Lighthouse | `t1k-web-testing-tester` | `plans/reports/` | 5A, 5B, 5C | đang chạy | |
+| 5 | 5D `xac-minh` | Playwright MCP và đo Lighthouse | `t1k-web-testing-tester` | `plans/reports/` | 5A, 5B, 5C | xong | `plans/reports/phase-05-xac-minh-261111-0828.md` |
 | 6 | 6.0 orchestrator | web.xml filter, compose e2e, smoke M1–M2, Accept | phiên chính | xem `phase-06` | phase 4, 5 | chờ | |
 | 6 | 6A `filter-chung` | 5 filter, csrf tag, trang lỗi | `t1k-web-core-developer` | xem `phase-06` | 6.0 | chờ | |
 | 6 | 6B `trang-m1` | 5 trang M1 | `t1k-web-core-developer` | xem `phase-06` | 6.0 | chờ | |
@@ -102,3 +101,4 @@ Nhánh phase: `phase/05-he-thiet-ke-giao-dien`, worktree orchestrator `D:/Coding
 | 2026-11-11 | Merge PR #5, #6 của main vào nhánh phase. 5B xong (DONE_WITH_CONCERNS: thẻ HTML chưa ghim), merge (eab90f0); hợp đồng giao diện thêm §3a, nhắn 5A khớp theo; 5B đề xuất 3 gotcha, đã thêm vào skill `tiem-create-react-island`; loader 2,25 kB gzip |
 | 2026-11-11 | 5C xong (DONE_WITH_CONCERNS: chưa soi trình duyệt, HomePreview cần layout.tag của 5A), merge (289a89e); đổi import sang `@/hooks/useReducedMotion`, xoá hook tạm (a46b254); 88 test xanh, check:budget PASS (loader 2,36 kB, ShelfCanvas 247 kB gzip chỉ ShelfScene); đề xuất `posterAvifSrcSet` trong contracts §11.4 để sau số Lighthouse |
 | 2026-11-11 | 5A dừng ở giới hạn 75 lượt, nhắn làm tiếp, xong (5660371), merge (c419293); áp đề xuất tài liệu, Accept thêm bước 4b chặn hex; loader thêm `data-island-state` (mục phiên 9b mang từ phase 1); Accept lần 1 FAIL bước 6 (HomePreviewView 500: `<%= %>` trong thân scriptless), sửa (c3af339), lần 2 ALL PASS; spawn 5D. Stack compose do phase 5 giữ tới khi xong 5.5 (đã hẹn phiên 9b) |
+| 2026-11-11 | 5D lần 1: L1 (CSS ảnh thiếu lớp JSP) sửa ở Dockerfile + Accept bước 6; chủ dự án đổi font (Fuzzy Bubbles + Momo), lane 5E và lane tài liệu làm; 5C sửa ánh sáng, chuyển mờ, nhãn 390, lọc warning THREE.Clock; 5D đo lại PASS; chủ dự án giao chọn font số → Nunito (`--font-num`); Accept ALL PASS (0908); Lighthouse HomePreview 96, StyleGuide 98; ảnh tĩnh kệ cho điện thoại ghi sang phase 6 |

@@ -33,7 +33,7 @@ Uncertainties (theo tác động):
 4. Flyway 13.12.1 với MySQL 8.4 (Redgate không liệt kê 8.4) → migration đầu tiên chạy trên Testcontainers `mysql:8.4.13` ngay bước 3.1.
 5. Ảnh Docker `tomcat:11.0.27-jdk25-*` và JDK 25 trên máy (máy đang có 24.0.2, đã đo 11/11/2026) → kiểm ở bước 1.0.
 Kill / no-regression: (a) chạy thử 10 đầu truyện có dưới 6 đầu đủ trường bắt buộc và có bìa → dừng, không crawl đầy đủ, hỏi chủ dự án đổi nguồn; (b) test tranh chấp K1 không xanh sau 3 lần sửa → dừng, xem lại kiến trúc với chủ dự án; (c) Lighthouse mobile HomeView dưới 80 sau bước đo ở phase 5 → đưa chủ dự án chọn hướng (chỉ ảnh tĩnh trên điện thoại hoặc giảm cảnh). Rollback: mỗi phase nằm trên nhánh riêng, `main` chỉ nhận merge của phase đã đạt Accept, gỡ bằng `git revert -m 1 <merge>`; volume Docker không bị xoá khi rollback.
-Re-score: (chưa có)
+Re-score: phase 5 (11/11/2026), Lighthouse 13.6.0 mobile, chưa phải cổng: HomePreviewView perf 96 / a11y 100 / BP 100 (LCP 2,7 s, TBT 0 ms, CLS 0; đo trên ảnh tĩnh, chunk 3D không tải lúc đo), StyleGuideView 98 / 100 / 100 (LCP 0,8 s, TBT 140 ms, CLS 0,04). Đo sau khi đổi sang bộ font của chủ dự án; Nunito (font số, nạp lười, HomePreview không dùng) thêm sau lần đo. Kill (c) không kích hoạt (96 ≥ 80). Báo cáo: `plans/reports/phase-05-xac-minh-261111-0828.md`.
 Not checked: tồn tại thẻ ảnh Docker Tomcat cho Java 25; ranh giới Community/PRO của Redisson Tomcat manager; tương thích Connector/J 26.10.0 với MySQL 8.4; điều khoản của Tiki (trang chạy JS, chưa đọc được); số liệu Lighthouse thật; phiên bản các GitHub Action, Trivy, actionlint, Lighthouse, Fontsource, Checkstyle (tra ở phase dùng tới).
 
 ## Phases
