@@ -2,10 +2,7 @@
 
 Worktree `D:/Coding/mangastore-wt/06-filter-chung`, nhánh `lane/06-chuc-nang-1-2/filter-chung`. Đã merge hai commit phase theo yêu cầu orchestrator: `8c1bccd` (§6.1 "Chung", 405, Throwable) và `612cdd3` (C14 doLogout, C16 `?expired=1`).
 
-Trạng thái: **DONE_WITH_CONCERNS**. Năm filter, trang lỗi, test xong và xanh. Hai việc chưa xong, lí do nằm ngoài lane:
-
-1. **Bộ đếm Redisson chưa viết được**: `pom.xml` không có dependency `org.redisson`, nên lớp dùng Redisson không biên dịch được. Theo brief, tôi dừng phần này và ghi đề xuất ở mục 4. Trong lúc chờ, filter dùng `UnconfiguredLoginAttemptStore`: mọi POST đăng nhập có `btnLogin` trả **500** kèm log SEVERE. Không lặng lẽ cho qua.
-2. **Docker Desktop hỏng giữa phiên**: mọi lệnh gọi API engine (`docker version`, `docker ps`, `docker compose up`) trả `500 Internal Server Error`. Vì vậy chưa chạy được stack `tiemtruyen-6a`, bước kiểm bằng curl và các test DAO dùng Testcontainers (mục 3). Tôi không khởi động lại Docker Desktop, vì làm vậy đụng stack `tiemtruyen` của orchestrator và `tiemtruyen-7b` của phiên phase 7.
+Trạng thái cuối (vòng 2, sau merge `a0bc269`): **DONE**. Bộ đếm Redisson đã nối, `error.jsp` đã có, header theo nginx, đăng nhập bằng session mới đã được xử lí. Kiểm cần Docker (verify đủ có Testcontainers, stack, curl) do orchestrator chạy sau khi merge, theo kế hoạch mới (mục 5). Mục 1–4 là bản vòng 1; chỗ nào vòng 2 đổi thì mục 5 thắng.
 
 ## 1. Việc đã làm
 
@@ -166,3 +163,51 @@ Hiện chỉ có 403, 404, 405, 500 và `Throwable`. Tomcat vẫn hiện trang t
 - LoginView đọc `expired=1` ở GET để hiện `SESSION_EXPIRED` (C16). Filter chỉ gắn tham số, không đặt `message`.
 - Trang bị chặn vì sai nhiều lần nhận request có `getMethod() == "GET"` kèm request attribute `message = LOGIN_FAILED`. Trang phải hiện `message` khi có, ở cả nhánh GET.
 - Đến khi có bộ đếm Redisson (mục 3.1), POST đăng nhập có `btnLogin` trả 500 trên mọi stack dựng từ nhánh có lane này.
+
+## 5. Vòng 2 (sau merge `a0bc269`: pom có `org.redisson:redisson` 4.8.0 provided, web.xml có error-page mặc định)
+
+### 5.1 Việc đã làm
+
+| File | Nội dung |
+|---|---|
+| `filter/RedissonLoginAttemptStore.java` (mới) | Bản §3.1, đã chỉnh theo API 4.8.0 đọc bằng `javap` trên jar: mật khẩu đặt ở `Config.setPassword` (bản ở `SingleServerConfig` đã deprecated trong 4.x, khớp `redisson.yaml` để `password` ở cấp trên). Timeout giống `redisson.yaml` (5000/3000 ms); pool 4 kết nối, 2 luồng (mặc định của Redisson là 64 kết nối, quá thừa cho bộ đếm). `INCR` + `EXPIRE NX`; mọi `RedisException` bọc thành `LoginAttemptStoreException` |
+| `filter/LoginRateLimitFilter.java` | `init` gọi `RedissonLoginAttemptStore.connect(AppConfig.get())`. Không nối được thì log SEVERE và dùng `UnavailableLoginAttemptStore`: POST đăng nhập trả 500, webapp vẫn deploy. `destroy` gọi `close()` (`client.shutdown()`) |
+| `filter/UnavailableLoginAttemptStore.java` | Đổi tên từ `UnconfiguredLoginAttemptStore`, nhận lí do và cause; dùng khi Redis không tới được lúc khởi động |
+| `filter/SecurityHeadersFilter.java` | nginx là SSOT. `NGINX_OWNED` = `X-Content-Type-Options: nosniff`, `Referrer-Policy: strict-origin-when-cross-origin`: cùng giá trị nginx, và nginx ẩn bản của app nên qua nginx chỉ còn một giá trị; filter vẫn đặt để chạy thẳng Tomcat cũng an toàn. `APP_OWNED` = `X-Frame-Options: DENY` (nginx không đặt; CSP của nginx có `frame-ancestors 'none'`, cùng ý). Thêm `Cache-Control: no-store` cho JSP. Không đặt CSP, `Permissions-Policy` |
+| `filter/CsrfFilter.java` | Sau POST tới LoginView, đọc lại `getSession(false)`. Session mới (id khác, do trang `invalidate()` + `getSession(true)`) luôn nhận token mới, kể cả khi cùng người đăng nhập lại; cùng session mà danh tính đổi cũng thay token |
+| `webapp/error/error.jsp` (mới) | Trang chung tiếng Việt cho mã không có trang riêng; chữ theo mã (400, 413, 414, 501, còn lại chung chung); không đặt lại mã, giữ mã Tomcat đã đặt; không in chi tiết lỗi |
+| Test | `BasicFiltersTest.filterHeadersAgreeWithNginx` đọc `docker/nginx/snippets/security-headers.conf` và `proxy-app.conf`. Header trong `NGINX_OWNED` phải trùng giá trị và bị nginx ẩn; header trong `APP_OWNED` thì nginx không được đặt. Sửa nginx hay filter mà lệch nhau thì test đỏ. `CsrfFilterTest` thêm 3 test login bằng session mới (khách, khách đăng nhập lại cùng người, nhân viên). `LoginRateLimitFilterTest` đổi trang giả sang `invalidate()` + session mới, thêm test thành công qua session mới và qua đổi vai trên cùng session. `FakeHttp` có lại `invalidate()`; chain giả tách sang `FakeChain.java` để giữ dưới 300 dòng |
+
+Kiểm lại luật thành công của rate limit với cách đăng nhập mới: trước chain lấy id session cũ. Sau chain `getSession(false)` trả session mới mang vai, id khác, nên coi là thành công và xoá bộ đếm. Sai mật khẩu thì trang không huỷ session, vai không đổi, nên tăng bộ đếm. Khách đang đăng nhập thử sai tiếp thì session và vai giữ nguyên, nên vẫn tăng. Có test cho cả ba nhánh.
+
+### 5.2 Kết quả lệnh kiểm (vòng 2)
+
+| Lệnh | Kết quả |
+|---|---|
+| `node scripts/dev/mvnw.mjs -B verify "-Dtest=vn.tiemtruyen.filter.**,AppConfigTest,MessagesTest" -Dsurefire.failIfNoSpecifiedTests=false` | **BUILD SUCCESS**, 124 test, 0 fail (AuthFilterTest 33, CsrfFilterTest 31, LoginRateLimitFilterTest 18, BasicFiltersTest 5, AppConfigTest 33, MessagesTest 4) |
+| `node scripts/dev/mvnw.mjs -B -DskipTests verify` | **BUILD SUCCESS**, 0 vi phạm Checkstyle, không cảnh báo biên dịch (`-Xlint:all`) |
+| Làm đỏ có chủ đích (vòng 2) | Bỏ nhánh session mới trong `rotateAfterLogin` (chỉ còn `if (loggedIn)`) và đặt lại `Referrer-Policy: same-origin`: **3 fail** (`sameClientLoggingInAgainOnANewSessionStillGetsAToken` vì session mới không có token, `filterHeadersAgreeWithNginx`, `securityHeadersAreSetOnJspPagesBeforeThePageRuns`). Đã trả lại hai file, `grep` cho 0 dòng còn bản hỏng |
+| `mvnw -B verify` đủ, stack `tiemtruyen-6a`, curl | **Không chạy**, theo lệnh orchestrator (Docker quá tải). Không còn process Maven hay compose nào của lane đang chạy; project `tiemtruyen-6a` chưa từng tạo container |
+
+### 5.3 Checklist cho orchestrator chạy sau merge (stack E2E, `B=http://127.0.0.1:8080`)
+
+Header (qua nginx):
+- `curl -sD - -o /dev/null $B/HomeView.jsp`: mỗi header có đúng một dòng. `Referrer-Policy: strict-origin-when-cross-origin`, `X-Content-Type-Options: nosniff`, `X-Frame-Options: DENY`, `Cache-Control: no-store`, CSP và `Permissions-Policy` của nginx.
+
+Phân quyền, session hết hạn:
+- GET `/ClientHomeView.jsp` không cookie → 302 `/LoginView.jsp` (không có `expired`). GET `/nhan-vien/x.jsp` → 302 `/nhan-vien/LoginView.jsp`.
+- GET `/ClientHomeView.jsp` với `-b 'JSESSIONID=khong-con'` → 302 `/LoginView.jsp?expired=1`.
+- POST không cookie: `/doAddSelectedBook.jsp` → 302 `/LoginView.jsp?expired=1`; `/nhan-vien/doAddDamage.jsp` → 302 `/nhan-vien/LoginView.jsp?expired=1`; `/doRegister.jsp` → 302 `/RegisterView.jsp`.
+- Có cookie từ GET `/HomeView.jsp`: POST thiếu hoặc sai `csrf` → 403, trang tiếng Việt, không có "Apache Tomcat" hay exception.
+
+Trang mở và trang lỗi:
+- `/dev/StyleGuideView.jsp` → 200. `/health.jsp` → 200 `ok`, không có `Set-Cookie`.
+- `/khong-co-trang` → 404 tiếng Việt. PUT `/HomeView.jsp` → 405 tiếng Việt.
+- `curl -s "$B/HomeView.jsp?a=%"` (hoặc URL có `%` hỏng) → 400 kèm `error.jsp` tiếng Việt "400 · Yêu cầu không hợp lệ".
+
+Đăng nhập thật qua Redis (cần LoginView của 6B; dựng với `E2E_LOGIN_RATE_MAX_FAILS=3`):
+- Sai 3 lần `khach01` → lần thứ 4, kể cả đúng mật khẩu, hiện `LOGIN_FAILED`, không đăng nhập.
+- `docker compose ... exec redis sh -c 'redis-cli -a "$REDIS_PASSWORD" --no-auth-warning GET "tiemtruyen:login-fail:client:<IP>:khach01"'` cho 3 và không tăng ở lần bị chặn; `TTL` gần bằng `E2E_LOGIN_RATE_WINDOW_SECONDS`.
+- Đăng nhập đúng tài khoản khác (bộ đếm khác) → 302 `/ClientHomeView.jsp`, cookie session mới, form kế tiếp gửi được (token mới có trong session mới).
+- Log app không có dòng SEVERE "Không nối được Redis" lúc khởi động.
+

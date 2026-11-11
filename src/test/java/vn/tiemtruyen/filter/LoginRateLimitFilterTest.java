@@ -2,6 +2,7 @@ package vn.tiemtruyen.filter;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static vn.tiemtruyen.filter.CsrfFilterTest.client;
@@ -16,7 +17,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.Consumer;
 import org.junit.jupiter.api.Test;
-import vn.tiemtruyen.filter.FakeHttp.Chain;
 import vn.tiemtruyen.filter.FakeHttp.Request;
 import vn.tiemtruyen.filter.FakeHttp.Response;
 import vn.tiemtruyen.filter.FakeHttp.Session;
@@ -42,7 +42,7 @@ class LoginRateLimitFilterTest {
             }
             loginAttemptsByPage.add(r.getParameter(LoginRateLimitFilter.USERNAME));
             if (success) {
-                r.changeSessionId();
+                r.getSession(false).invalidate();
                 String role = r.getServletPath().startsWith("/nhan-vien/") ? Requests.STAFF : Requests.CLIENT;
                 r.getSession(true).setAttribute(role, Requests.STAFF.equals(role) ? staff(4) : client(11));
             }
@@ -54,9 +54,9 @@ class LoginRateLimitFilterTest {
                 .header(LoginRateLimitFilter.REAL_IP_HEADER, IP).session(FakeHttp.session());
     }
 
-    private Chain run(Request request, boolean success) throws IOException, ServletException {
+    private FakeChain run(Request request, boolean success) throws IOException, ServletException {
         response = new Response();
-        Chain chain = new Chain(page(success));
+        FakeChain chain = new FakeChain(page(success));
         filter.doFilter(request.proxy(), response.proxy(), chain.proxy());
         return chain;
     }
@@ -70,8 +70,8 @@ class LoginRateLimitFilterTest {
     @Test
     void getAndPostWithoutTheLoginButtonAreNotCounted() throws IOException, ServletException {
         store.breakDown();
-        Chain get = run(Request.get("/LoginView.jsp"), false);
-        Chain register = run(Request.post("/LoginView.jsp").param(LoginRateLimitFilter.USERNAME, "minhanh"), false);
+        FakeChain get = run(Request.get("/LoginView.jsp"), false);
+        FakeChain register = run(Request.post("/LoginView.jsp").param(LoginRateLimitFilter.USERNAME, "minhanh"), false);
         assertEquals(1, get.calls());
         assertEquals(1, register.calls());
         assertNull(response.error(), "không gọi tới bộ đếm nên Redis sập cũng không ảnh hưởng");
@@ -103,7 +103,7 @@ class LoginRateLimitFilterTest {
         fail(MAX_FAILS);
         assertEquals(MAX_FAILS, loginAttemptsByPage.size());
         Request blocked = login("/LoginView.jsp", "khach01");
-        Chain chain = run(blocked, true);
+        FakeChain chain = run(blocked, true);
         assertEquals(1, chain.calls(), "trang vẫn hiển thị");
         assertEquals("GET", chain.seen().getMethod());
         assertEquals(Messages.LOGIN_FAILED, blocked.attribute(Requests.MESSAGE));
@@ -143,6 +143,26 @@ class LoginRateLimitFilterTest {
     }
 
     @Test
+    void successIsDetectedThroughTheReplacedSession() throws IOException, ServletException {
+        fail(MAX_FAILS - 1);
+        Request request = login("/LoginView.jsp", "khach01");
+        Session old = request.currentSession();
+        run(request, true);
+        assertTrue(old.invalidated());
+        assertNotNull(request.currentSession().attribute(Requests.CLIENT));
+        assertEquals(0, store.failures(CLIENT_KEY));
+    }
+
+    @Test
+    void loginOnTheSameSessionWithANewRoleAlsoCountsAsSuccess() throws IOException, ServletException {
+        fail(MAX_FAILS - 1);
+        response = new Response();
+        FakeChain chain = new FakeChain(r -> r.getSession(false).setAttribute(Requests.CLIENT, client(11)));
+        filter.doFilter(login("/LoginView.jsp", "khach01").proxy(), response.proxy(), chain.proxy());
+        assertEquals(0, store.failures(CLIENT_KEY));
+    }
+
+    @Test
     void clientAndStaffCountersAreSeparate() throws IOException, ServletException {
         fail(MAX_FAILS);
         run(login("/nhan-vien/LoginView.jsp", "khach01"), true);
@@ -167,7 +187,7 @@ class LoginRateLimitFilterTest {
     @Test
     void storeDownBeforeThePageGives500AndThePageDoesNotRun() throws IOException, ServletException {
         store.breakDown();
-        Chain chain = run(login("/LoginView.jsp", "khach01"), true);
+        FakeChain chain = run(login("/LoginView.jsp", "khach01"), true);
         assertEquals(0, chain.calls());
         assertEquals(500, response.error());
     }
@@ -176,7 +196,7 @@ class LoginRateLimitFilterTest {
     void storeDownAfterThePageGives500WhenTheResponseIsNotCommitted() throws IOException, ServletException {
         Request request = login("/LoginView.jsp", "khach01");
         response = new Response();
-        Chain chain = new Chain(r -> store.breakDown());
+        FakeChain chain = new FakeChain(r -> store.breakDown());
         filter.doFilter(request.proxy(), response.proxy(), chain.proxy());
         assertEquals(500, response.error());
     }
@@ -186,7 +206,7 @@ class LoginRateLimitFilterTest {
         Request request = login("/LoginView.jsp", "khach01");
         response = new Response();
         Response committed = response;
-        Chain chain = new Chain(r -> {
+        FakeChain chain = new FakeChain(r -> {
             committed.commit();
             store.breakDown();
         });
@@ -195,10 +215,11 @@ class LoginRateLimitFilterTest {
     }
 
     @Test
-    void unconfiguredStoreNeverLetsALoginThroughSilently() throws IOException, ServletException {
-        LoginRateLimitFilter unconfigured = new LoginRateLimitFilter(new UnconfiguredLoginAttemptStore(), 5, WINDOW);
+    void unavailableStoreNeverLetsALoginThroughSilently() throws IOException, ServletException {
+        LoginRateLimitFilter unconfigured = new LoginRateLimitFilter(
+                new UnavailableLoginAttemptStore("Redis giả không tới được", null), 5, WINDOW);
         response = new Response();
-        Chain chain = new Chain(page(true));
+        FakeChain chain = new FakeChain(page(true));
         unconfigured.doFilter(login("/LoginView.jsp", "khach01").proxy(), response.proxy(), chain.proxy());
         assertEquals(0, chain.calls());
         assertEquals(500, response.error());

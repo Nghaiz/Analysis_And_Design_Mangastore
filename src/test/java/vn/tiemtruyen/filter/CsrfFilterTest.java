@@ -13,7 +13,6 @@ import java.util.function.Consumer;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
-import vn.tiemtruyen.filter.FakeHttp.Chain;
 import vn.tiemtruyen.filter.FakeHttp.Request;
 import vn.tiemtruyen.filter.FakeHttp.Response;
 import vn.tiemtruyen.filter.FakeHttp.Session;
@@ -27,13 +26,13 @@ class CsrfFilterTest {
     private final CsrfFilter filter = new CsrfFilter();
     private final Response response = new Response();
 
-    private Chain run(Request request, Consumer<HttpServletRequest> page) throws IOException, ServletException {
-        Chain chain = new Chain(page);
+    private FakeChain run(Request request, Consumer<HttpServletRequest> page) throws IOException, ServletException {
+        FakeChain chain = new FakeChain(page);
         filter.doFilter(request.proxy(), response.proxy(), chain.proxy());
         return chain;
     }
 
-    private Chain run(Request request) throws IOException, ServletException {
+    private FakeChain run(Request request) throws IOException, ServletException {
         return run(request, r -> { });
     }
 
@@ -66,7 +65,7 @@ class CsrfFilterTest {
     void healthCheckAndNonJspPathsDoNotCreateASession() throws IOException, ServletException {
         for (String path : new String[] {"/health.jsp", "/static/assets/app.js", "/favicon.ico"}) {
             Request request = Request.get(path);
-            Chain chain = run(request);
+            FakeChain chain = run(request);
             assertEquals(1, chain.calls(), path);
             assertNull(request.currentSession(), path);
         }
@@ -74,14 +73,14 @@ class CsrfFilterTest {
 
     @Test
     void postWithoutTokenIs403AndThePageDoesNotRun() throws IOException, ServletException {
-        Chain chain = run(Request.post("/doRegister.jsp").session(withToken()));
+        FakeChain chain = run(Request.post("/doRegister.jsp").session(withToken()));
         assertEquals(0, chain.calls());
         assertEquals(403, response.error());
     }
 
     @Test
     void postWithWrongTokenIs403() throws IOException, ServletException {
-        Chain chain = run(Request.post("/nhan-vien/doAddDamage.jsp").session(withToken()).param("csrf", "gia-mao"));
+        FakeChain chain = run(Request.post("/nhan-vien/doAddDamage.jsp").session(withToken()).param("csrf", "gia-mao"));
         assertEquals(0, chain.calls());
         assertEquals(403, response.error());
     }
@@ -106,7 +105,7 @@ class CsrfFilterTest {
             throws IOException, ServletException {
         Request request = Request.post(path).contextPath("/tiem").param("csrf", "token-cua-session-da-het-han")
                 .param("btnLogin", "");
-        Chain chain = run(request);
+        FakeChain chain = run(request);
         assertEquals(0, chain.calls(), "không ghi gì: trang không chạy");
         assertNull(response.error());
         assertEquals("/tiem" + target, response.redirect());
@@ -116,14 +115,14 @@ class CsrfFilterTest {
     @Test
     void postOnALiveSessionThatLostItsTokenIsTreatedAsExpired() throws IOException, ServletException {
         Request request = Request.post("/doAddRentalBill.jsp").session(FakeHttp.session()).param("csrf", "bat-ki");
-        Chain chain = run(request);
+        FakeChain chain = run(request);
         assertEquals(0, chain.calls());
         assertEquals("/LoginView.jsp?expired=1", response.redirect());
     }
 
     @Test
     void postWithEmptyTokenOnALiveSessionIs403() throws IOException, ServletException {
-        Chain chain = run(Request.post("/doRegister.jsp").session(withToken()).param("csrf", ""));
+        FakeChain chain = run(Request.post("/doRegister.jsp").session(withToken()).param("csrf", ""));
         assertEquals(0, chain.calls());
         assertEquals(403, response.error());
         assertNull(response.redirect());
@@ -131,7 +130,7 @@ class CsrfFilterTest {
 
     @Test
     void postWithMatchingTokenReachesThePage() throws IOException, ServletException {
-        Chain chain = run(Request.post("/doAddSelectedBook.jsp").session(withToken()).param("csrf", TOKEN));
+        FakeChain chain = run(Request.post("/doAddSelectedBook.jsp").session(withToken()).param("csrf", TOKEN));
         assertEquals(1, chain.calls());
         assertNull(response.error());
     }
@@ -158,6 +157,44 @@ class CsrfFilterTest {
                 .session(withToken().with(Requests.CLIENT, client(7)));
         run(request, r -> r.getSession(false).setAttribute(Requests.CLIENT, client(8)));
         assertNotEquals(TOKEN, request.currentSession().attribute(Requests.CSRF_TOKEN));
+    }
+
+    @Test
+    void loginThatReplacesTheSessionGivesTheNewSessionAFreshToken() throws IOException, ServletException {
+        Session old = withToken();
+        Request request = Request.post("/LoginView.jsp").session(old).param("csrf", TOKEN);
+        run(request, CsrfFilterTest::loginWithNewSession);
+        assertTrue(old.invalidated());
+        assertNotEquals(old.id(), request.currentSession().id());
+        Object token = request.currentSession().attribute(Requests.CSRF_TOKEN);
+        assertNotNull(token, "session mới phải có token, nếu không POST kế tiếp bị coi là hết hạn");
+        assertNotEquals(TOKEN, token);
+    }
+
+    @Test
+    void sameClientLoggingInAgainOnANewSessionStillGetsAToken() throws IOException, ServletException {
+        Request request = Request.post("/LoginView.jsp").param("csrf", TOKEN)
+                .session(withToken().with(Requests.CLIENT, client(7)));
+        run(request, CsrfFilterTest::loginWithNewSession);
+        Object token = request.currentSession().attribute(Requests.CSRF_TOKEN);
+        assertNotNull(token);
+        assertNotEquals(TOKEN, token);
+    }
+
+    @Test
+    void staffLoginThatReplacesTheSessionGivesAFreshToken() throws IOException, ServletException {
+        Request request = Request.post("/nhan-vien/LoginView.jsp").session(withToken()).param("csrf", TOKEN);
+        run(request, r -> {
+            r.getSession(false).invalidate();
+            r.getSession(true).setAttribute(Requests.STAFF, staff(2));
+        });
+        assertNotNull(request.currentSession().attribute(Requests.CSRF_TOKEN));
+    }
+
+    /** LoginView thành công: huỷ session cũ, tạo session mới, ghi client (phase-06-integration.md §2). */
+    private static void loginWithNewSession(HttpServletRequest r) {
+        r.getSession(false).invalidate();
+        r.getSession(true).setAttribute(Requests.CLIENT, client(7));
     }
 
     @Test

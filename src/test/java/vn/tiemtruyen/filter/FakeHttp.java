@@ -1,8 +1,5 @@
 package vn.tiemtruyen.filter;
 
-import jakarta.servlet.FilterChain;
-import jakarta.servlet.ServletRequest;
-import jakarta.servlet.ServletResponse;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
@@ -11,7 +8,6 @@ import java.lang.reflect.Proxy;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.function.Consumer;
 
 /**
  * Request, response, session và chain giả cho test filter, dựng bằng {@link Proxy} (không cần Tomcat hay thư viện
@@ -48,6 +44,7 @@ final class FakeHttp {
     static final class Session {
         private final Map<String, Object> attributes = new HashMap<>();
         private String id = "S" + SESSION_IDS.incrementAndGet();
+        private boolean invalidated;
         private final HttpSession proxy = fake(HttpSession.class, (p, m, a) -> switch (m.getName()) {
             case "getAttribute" -> attributes.get((String) a[0]);
             case "setAttribute" -> {
@@ -56,6 +53,10 @@ final class FakeHttp {
             }
             case "removeAttribute" -> attributes.remove((String) a[0]);
             case "getId" -> id;
+            case "invalidate" -> {
+                invalidated = true;
+                yield null;
+            }
             default -> throw unsupported(m.getName());
         });
 
@@ -70,6 +71,10 @@ final class FakeHttp {
 
         String id() {
             return id;
+        }
+
+        boolean invalidated() {
+            return invalidated;
         }
 
         HttpSession proxy() {
@@ -191,6 +196,9 @@ final class FakeHttp {
         }
 
         private HttpSession session(boolean create) {
+            if (session != null && session.invalidated) {
+                session = null;
+            }
             if (session == null && create) {
                 session = new Session();
             }
@@ -255,41 +263,6 @@ final class FakeHttp {
 
         HttpServletResponse proxy() {
             return proxy;
-        }
-    }
-
-    /** Chain giả: đếm số lần gọi, giữ request đã nhận, chạy "trang" tuỳ ý. */
-    static final class Chain {
-        private int calls;
-        private HttpServletRequest seen;
-        private final Consumer<HttpServletRequest> page;
-        private final FilterChain proxy;
-
-        Chain() {
-            this(r -> { });
-        }
-
-        Chain(Consumer<HttpServletRequest> page) {
-            this.page = page;
-            this.proxy = this::run;
-        }
-
-        int calls() {
-            return calls;
-        }
-
-        HttpServletRequest seen() {
-            return seen;
-        }
-
-        FilterChain proxy() {
-            return proxy;
-        }
-
-        private void run(ServletRequest request, ServletResponse response) {
-            calls++;
-            seen = (HttpServletRequest) request;
-            page.accept(seen);
         }
     }
 }

@@ -10,7 +10,6 @@ import java.io.IOException;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.junit.jupiter.api.Test;
-import vn.tiemtruyen.filter.FakeHttp.Chain;
 import vn.tiemtruyen.filter.FakeHttp.Request;
 import vn.tiemtruyen.filter.FakeHttp.Response;
 import vn.tiemtruyen.filter.FakeHttp.Session;
@@ -22,11 +21,11 @@ class AuthFilterTest {
     private static final String CONTEXT = "/tiem";
 
     private Response response;
-    private Chain chain;
+    private FakeChain chain;
 
     private void run(Request request) throws IOException, ServletException {
         response = new Response();
-        chain = new Chain();
+        chain = new FakeChain();
         new AuthFilter().doFilter(request.contextPath(CONTEXT).proxy(), response.proxy(), chain.proxy());
     }
 

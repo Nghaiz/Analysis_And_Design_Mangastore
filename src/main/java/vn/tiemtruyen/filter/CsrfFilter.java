@@ -24,8 +24,8 @@ import java.util.Set;
  *   <li>POST tới trang JSP khi session chưa có token (chưa có session hoặc session đã hết hạn): 302, xem
  *       {@link #expiredSessionTarget(String)}; trang không chạy, không ghi gì.</li>
  *   <li>Session còn token mà POST thiếu hoặc sai tham số {@code csrf} (so hằng thời gian): 403, trang không chạy.</li>
- *   <li>POST tới một trong hai {@code LoginView.jsp}: sau khi trang chạy, danh tính đăng nhập trong session đổi
- *       (có {@code client} id &gt; 0 hoặc {@code staff} mới) thì thay token mới.</li>
+ *   <li>POST tới một trong hai {@code LoginView.jsp}: sau khi trang chạy, đọc lại session; session mới (trang
+ *       đã huỷ session cũ) hoặc danh tính đăng nhập đổi thì đặt token mới.</li>
  * </ul>
  *
  * <p>GET {@code /health.jsp} không tạo session: healthcheck gọi vài giây một lần, không mang cookie, nếu tạo thì
@@ -76,8 +76,9 @@ public class CsrfFilter implements Filter {
             return;
         }
         String before = Requests.identity(session);
+        String sessionIdBefore = session.getId();
         chain.doFilter(request, response);
-        rotateAfterLogin(httpRequest, before);
+        rotateAfterLogin(httpRequest, before, sessionIdBefore);
     }
 
     /**
@@ -103,13 +104,20 @@ public class CsrfFilter implements Filter {
         };
     }
 
-    private void rotateAfterLogin(HttpServletRequest request, String before) {
+    /**
+     * Sau trang LoginView: trang thành công thì huỷ session cũ và tạo session mới (phase-06-integration.md §2), nên
+     * đọc lại {@code getSession(false)}. Session mới (id khác) luôn nhận token mới, kể cả khi cùng người đăng nhập
+     * lại, vì session mới chưa có token; cùng session mà danh tính đổi thì cũng thay token.
+     */
+    private void rotateAfterLogin(HttpServletRequest request, String before, String sessionIdBefore) {
         HttpSession session = request.getSession(false);
         if (session == null) {
             return;
         }
         String after = Requests.identity(session);
-        if (!after.isEmpty() && !after.equals(before)) {
+        boolean newSession = !session.getId().equals(sessionIdBefore);
+        boolean loggedIn = !after.isEmpty() && !after.equals(before);
+        if (newSession || loggedIn || existingToken(session) == null) {
             session.setAttribute(Requests.CSRF_TOKEN, newToken());
         }
     }

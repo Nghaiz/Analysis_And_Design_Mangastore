@@ -69,13 +69,20 @@ public class LoginRateLimitFilter implements Filter {
         AppConfig config = AppConfig.get();
         maxFails = config.loginRateMaxFails();
         window = Duration.ofSeconds(config.loginRateWindowSeconds());
-        store = new UnconfiguredLoginAttemptStore();
+        try {
+            store = RedissonLoginAttemptStore.connect(config);
+        } catch (LoginAttemptStoreException e) {
+            LOG.log(Level.SEVERE, "Không nối được Redis cho bộ đếm đăng nhập sai; POST đăng nhập sẽ trả 500", e);
+            store = new UnavailableLoginAttemptStore("Redis không tới được lúc khởi động: " + e.getMessage(), e);
+        }
     }
 
+    /** Đóng bộ đếm (bản Redisson: {@code shutdown} client, dừng luồng Netty khi undeploy). */
     @Override
     public void destroy() {
         if (store != null) {
             store.close();
+            store = null;
         }
     }
 
