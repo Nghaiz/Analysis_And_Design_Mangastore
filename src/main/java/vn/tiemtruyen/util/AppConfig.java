@@ -16,6 +16,8 @@ public final class AppConfig {
 
     private static final int DEFAULT_POOL_SIZE = 10;
     private static final int MAX_POOL_SIZE = 100;
+    private static final int DEFAULT_LOGIN_RATE_MAX_FAILS = 5;
+    private static final int DEFAULT_LOGIN_RATE_WINDOW_SECONDS = 900;
     private static final String DEFAULT_COVERS_BASE_URL = "/covers";
     private static final String DEFAULT_FLYWAY_DATA_LOCATION = "filesystem:/flyway/data";
     private static final Pattern ORIGIN_PATTERN = Pattern.compile("https?://[A-Za-z0-9.\\-]+(:\\d{1,5})?");
@@ -108,6 +110,26 @@ public final class AppConfig {
         return optional("FLYWAY_DATA_LOCATION", DEFAULT_FLYWAY_DATA_LOCATION);
     }
 
+    /** Địa chỉ Redis ({@code redis://host:port}) dùng chung với session manager. */
+    public String redisAddress() {
+        return require("APP_REDIS_ADDRESS");
+    }
+
+    /** Mật khẩu Redis (bí mật, không có mặc định). */
+    public String redisPassword() {
+        return require("REDIS_PASSWORD");
+    }
+
+    /** Số lần đăng nhập sai thì chặn ({@code LOGIN_RATE_MAX_FAILS}), mặc định 5, tối thiểu 1. */
+    public int loginRateMaxFails() {
+        return positive("LOGIN_RATE_MAX_FAILS", DEFAULT_LOGIN_RATE_MAX_FAILS);
+    }
+
+    /** Cửa sổ đếm và thời gian chặn, tính bằng giây ({@code LOGIN_RATE_WINDOW_SECONDS}), mặc định 900. */
+    public int loginRateWindowSeconds() {
+        return positive("LOGIN_RATE_WINDOW_SECONDS", DEFAULT_LOGIN_RATE_WINDOW_SECONDS);
+    }
+
     /**
      * Giá trị bắt buộc của một biến; rỗng hoặc chỉ có khoảng trắng tính là thiếu.
      *
@@ -172,6 +194,14 @@ public final class AppConfig {
             case "false" -> false;
             default -> throw new IllegalStateException(name + " chỉ nhận true hoặc false, đang là \"" + value + "\"");
         };
+    }
+
+    private int positive(String name, int defaultValue) {
+        int value = intValue(name, defaultValue);
+        if (value < 1) {
+            throw new IllegalStateException(name + " phải lớn hơn hoặc bằng 1, đang là " + value);
+        }
+        return value;
     }
 
     private String raw(String name) {

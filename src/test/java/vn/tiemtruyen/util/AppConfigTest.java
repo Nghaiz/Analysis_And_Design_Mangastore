@@ -107,6 +107,39 @@ class AppConfigTest {
     }
 
     @Test
+    void loginRateUsesContractDefaultsWhenUnset() {
+        AppConfig config = AppConfig.of(Map.of());
+        assertEquals(5, config.loginRateMaxFails());
+        assertEquals(900, config.loginRateWindowSeconds());
+    }
+
+    @Test
+    void loginRateIsReadFromItsVariables() {
+        AppConfig config = AppConfig.of(Map.of("LOGIN_RATE_MAX_FAILS", "1000", "LOGIN_RATE_WINDOW_SECONDS", " 60 "));
+        assertEquals(1000, config.loginRateMaxFails());
+        assertEquals(60, config.loginRateWindowSeconds());
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {"0", "-3", "năm"})
+    void loginRateRejectsNonPositiveOrNonNumericValues(String value) {
+        AppConfig config = AppConfig.of(Map.of("LOGIN_RATE_MAX_FAILS", value, "LOGIN_RATE_WINDOW_SECONDS", value));
+        assertThrows(IllegalStateException.class, config::loginRateMaxFails);
+        assertThrows(IllegalStateException.class, config::loginRateWindowSeconds);
+    }
+
+    @Test
+    void redisSecretHasNoDefaultAndNamesTheVariable() {
+        AppConfig config = AppConfig.of(Map.of());
+        IllegalStateException e = assertThrows(IllegalStateException.class, config::redisPassword);
+        assertTrue(e.getMessage().contains("REDIS_PASSWORD"), e.getMessage());
+        assertThrows(IllegalStateException.class, config::redisAddress);
+        AppConfig set = AppConfig.of(Map.of("APP_REDIS_ADDRESS", "redis://redis:6379", "REDIS_PASSWORD", "r3d"));
+        assertEquals("redis://redis:6379", set.redisAddress());
+        assertEquals("r3d", set.redisPassword());
+    }
+
+    @Test
     void sharedInstanceReadsTheProcessEnvironment() {
         assertSameValue(System.getenv("PATH"), AppConfig.get().optional("PATH", null));
     }
