@@ -100,3 +100,10 @@ Gotcha JspC: chạy theo danh sách file thì lỗi `org.apache.jsp.tag.web.layo
 3. Loader (`frontend/src/loader/`): C2, C3 nhắc hai việc mà loader chưa làm. Một là `data-submit-on-change` (trang đặt thuộc tính này trên `chkReceived`, `txtDueDate`, `txtDiscount` của bản fallback). Hai là gọi `window.print()` trước khi gửi nút "In phiếu"; trang đặt `data-print` trên `btnPrint`, tên thuộc tính này chưa có trong hợp đồng.
 4. `docs/contracts.md` §9.2: ghi các id mới `lnkManageBook` (C12), `rentalBillId`, và việc ô "Nhận" chỉ sống trong request (mục 5).
 5. RentedBook do AddRentedBookView (7B) thêm phải có `bookCopy.book` (tên, id). Process và Print ném `IllegalStateException` khi thiếu, thay vì in dòng trống.
+
+## 7. Bổ sung sau khi bàn giao (11/11/2026)
+
+- Đã merge `5eae7b9` (lane 7B, phase 6 `a0bc269`).
+- `LoginView.jsp`: khi đăng nhập thành công thì `invalidate()` session cũ rồi `getSession(true)` mới ghi `staff`, thay cho `changeSessionId()` (máy quầy dùng chung). Commit `6e58f1a`.
+- Ô "Nhận" giờ nằm ở thuộc tính session kĩ thuật `uncheckedBarcodes` (`ArrayList<String>`), theo quyết định của chủ dự án. Vì vậy mối lo ở mục 5 đã hết. `ProcessRentalBillView` ghi thuộc tính này từ `chkReceived` khi request mang field bàn quầy, còn những lúc khác thì render ô tích theo nó; mã vạch không còn trong phiếu bị bỏ. `SearchRentalBillView` bỏ thuộc tính khi mở một phiếu "Chờ nhận", `doUpdateRentalBill` bỏ khi lưu xong. Commit `336de14`.
+- Kiểm: `mvnw -B -q compile` qua; JspC trên toàn webapp báo 0 lỗi. `mvnw -B verify` và stack 8084 đã khởi chạy nhưng bị dừng giữa chừng theo lệnh orchestrator (Docker treo lại), nên **verify chưa có kết quả** và chưa chạy smoke.

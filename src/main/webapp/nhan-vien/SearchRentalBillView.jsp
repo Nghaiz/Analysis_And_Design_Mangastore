@@ -79,6 +79,8 @@
                 chosen.setBorrowDate(today);
                 chosen.setDueDate(today.plusDays(chosen.getExpectedDays()));
                 session.setAttribute("rentalBill", chosen);
+                // Phiếu mới mở: mọi quyển tích sẵn "Nhận" (ch.2 bước 10), bỏ danh sách bỏ tích của phiếu trước.
+                session.removeAttribute("uncheckedBarcodes");
                 response.sendRedirect(ctx + "/nhan-vien/ProcessRentalBillView.jsp");
                 return;
             } else {

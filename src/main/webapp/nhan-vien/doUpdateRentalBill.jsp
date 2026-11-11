@@ -151,6 +151,7 @@
 
     if (saved) {
         session.setAttribute("rentalBill", bill);
+        session.removeAttribute("uncheckedBarcodes");
         @SuppressWarnings("unchecked")
         List<RentalBill> listRentalBill = (List<RentalBill>) session.getAttribute("listRentalBill");
         if (listRentalBill != null) {

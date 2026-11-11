@@ -17,9 +17,11 @@
   - btnCancel: hiện hộp huỷ (CANCEL_CONFIRM, txtCancelReason, from=staff, btnConfirmCancel → /doCancelRentalBill.jsp, C8);
     btnCloseCancel: đóng hộp. doCancelRentalBill forward về kèm câu (CANCEL_REASON_REQUIRED, INPUT_TOO_LONG; C17) thì
     mở lại hộp với chữ đã nhập, ô lí do aria-invalid.
-  Ô "Nhận" (chkReceived, value = mã vạch) không có thuộc tính trong model nên không vào session: mở mới (GET, hay quay về
-  từ trang khác) tích sẵn mọi quyển (ch.2 2.3 bước 10); request mang field bàn quầy của chính phiếu này (tự gửi, hay
-  doUpdateRentalBill/doCancelRentalBill forward về kèm câu báo) thì tích theo chkReceived đã gửi; mã vạch lạ bị bỏ.
+  Ô "Nhận" (chkReceived, value = mã vạch) không có trong model: các mã đã bỏ tích nằm ở thuộc tính session kĩ thuật
+  uncheckedBarcodes (ArrayList<String>, không thuộc 12 thuộc tính §7; chủ dự án quyết 11/11/2026). Request mang field
+  bàn quầy của chính phiếu này (tự gửi, hay doUpdateRentalBill/doCancelRentalBill forward về) thì ghi lại nó từ
+  chkReceived (mã vạch lạ bị bỏ); ngược lại (GET, quay về từ AddCondition, Edit, AddRentalCollateral) tích theo nó.
+  SearchRentalBillView bỏ nó khi mở phiếu (mọi quyển tích sẵn, ch.2 bước 10); doUpdateRentalBill bỏ khi lưu xong.
   Tổng một dòng = giá chốt × số quyển đang tích của dòng × số ngày (C3); tổng tiền thuê = tổng các dòng − giảm giá.
   Island ProcessBillDesk (§11.2): bản HTML nằm trong data-island-fallback (input có name ở ngoài div data-island),
   chỗ edit-list, add-collateral, note theo plans/reports/phase-07-islands-m3-261111-1057.md §4.
@@ -54,6 +56,9 @@
 <%!
     /** Độ dài tối đa của tblRentalBill.note (docs/contracts.md §2). */
     private static final int NOTE_MAX_LENGTH = 255;
+
+    /** Thuộc tính session kĩ thuật: mã vạch đã bỏ tích "Nhận" của phiếu đang mở (quyết định chủ dự án 11/11/2026). */
+    private static final String UNCHECKED_ATTRIBUTE = "uncheckedBarcodes";
 
     /** Chữ tình trạng khi giao theo §13: tên lỗi nối ", "; ghi nhận mà không lỗi → "Không có lỗi"; chưa → null. */
     private static String conditionText(RentedBook row) {
@@ -169,15 +174,37 @@
     for (RentedBook row : bill.getListRentedBook()) {
         barcodes.add(row.getBookCopy().getBarcode());
     }
-    Set<String> received = new HashSet<>();
+    // Ô "Nhận": thuộc tính session kĩ thuật uncheckedBarcodes (mã vạch đã bỏ tích của phiếu đang mở, không thuộc 12
+    // thuộc tính nghiệp vụ §7). Request mang field bàn quầy thì cập nhật từ chkReceived; ngược lại render theo nó.
+    Set<String> received = new HashSet<>(barcodes);
+    @SuppressWarnings("unchecked")
+    List<String> storedUnchecked = (List<String>) session.getAttribute(UNCHECKED_ATTRIBUTE);
+    ArrayList<String> unchecked = new ArrayList<>();
     if (fromThisForm) {
         String[] ticked = request.getParameterValues("chkReceived");
+        received.clear();
         if (ticked != null) {
             received.addAll(Arrays.asList(ticked));
             received.retainAll(barcodes);
         }
-    } else {
-        received.addAll(barcodes);
+        for (RentedBook row : bill.getListRentedBook()) {
+            String barcode = row.getBookCopy().getBarcode();
+            if (!received.contains(barcode)) {
+                unchecked.add(barcode);
+            }
+        }
+    } else if (storedUnchecked != null) {
+        for (String barcode : storedUnchecked) {
+            if (barcodes.contains(barcode)) {
+                unchecked.add(barcode);
+            }
+        }
+        received.removeAll(unchecked);
+    }
+    if (unchecked.isEmpty()) {
+        session.removeAttribute(UNCHECKED_ATTRIBUTE);
+    } else if (!unchecked.equals(storedUnchecked)) {
+        session.setAttribute(UNCHECKED_ATTRIBUTE, unchecked);
     }
 
     boolean dueInvalid = false;
