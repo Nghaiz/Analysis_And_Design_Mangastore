@@ -21,6 +21,7 @@
     "@fontsource/fuzzy-bubbles": "5.3.0",
     "@fontsource/momo-signature": "5.3.0",
     "@fontsource/momo-trust-display": "5.3.0",
+    "@fontsource/nunito": "5.3.0",
     "@react-three/drei": "10.7.9",
     "@react-three/fiber": "9.8.2",
     "class-variance-authority": "0.7.1",
