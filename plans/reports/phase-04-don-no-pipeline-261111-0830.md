@@ -76,3 +76,25 @@ Không đổi `tblBookCopy`, `rentalPrice` (không Book nào qua mốc hiếm 20
 - Test: `pipeline/test/lib.test.mjs`, `pipeline/test/sources.test.mjs`, `pipeline/test/images.test.mjs`, `pipeline/test/clean-real.test.mjs`.
 - Tài liệu: `pipeline/CONTRACT.md` (§1, §5, §9), `docs/data-pipeline.md`, `docs/adr/0010-nguon-du-lieu-kim-dong-tiki.md`.
 - Dữ liệu (bị ignore, không commit): `data/stage/full/*`, `data/images/full/*` (32 Book đổi bìa), `data/reports/full/*`, `data/export/V10__catalog_data.sql`.
+
+## 7. Bổ sung sau quyết định của orchestrator (phương án mạng)
+
+**Trạng thái sau bổ sung: DONE.** `run --offline` chạy được từ đầu tới cuối.
+
+- **Request mạng thật: 11.** Lệnh `crawl --series than-dong-dat-viet` gọi 1 request (`tiki.vn/api/v2/products/378986`; `stats` báo `network: 1`, `cacheHits: 27`; throttle tiki.vn 4 s, User-Agent chung, robots như cũ, Tiki không chặn). Sau đó `run --offline` vẫn dừng ở bước images, vì 10 ảnh của tập 164 trên `salt.tikicdn.com` chưa có trong cache. Tôi chạy `node pipeline/cli.mjs images` có mạng một lần để tải 10 ảnh đó; đây đúng là phần "cộng ảnh của tập đó" trong phương án đã chọn. Cache mới có đúng 10 tệp `.body` ảnh, ngoài ra không có tệp mới nào khác.
+- `node pipeline/cli.mjs run --offline` chạy hai lần, cả hai exit 0, mã băm giống nhau giữa hai lần (tất định).
+- Mã băm cuối:
+  - **V10 `38f090234fb1`**: trước lane là `bd16251ff3b7`; bản giữa lane (mục Kiểm) là `ea48f8335561`.
+  - **V11 `ff6fb1b87a9a`**: không đổi.
+  - **`pipeline/manifest.jsonl` `a21d57fc8442`**: đã đổi (thêm dòng của tập 164, bỏ dòng của tập 209, dịch `bookId` từ 71 trở đi), đã commit.
+- `validate --json`: 396 Book, 1164 quyển, 0 lỗi chặn, 146 cảnh báo (toàn bộ `no-year`), thiếu bìa 0. `npm --prefix pipeline test`: 167/167 pass. `node --test "scripts/check/*.test.mjs"`: 56/56 pass.
+
+**Thay đổi so với trước lane (so theo khoá `bộ|tập|biến thể`):**
+- **Book mới:** id 71, Thần Đồng Đất Việt 164 - Bò Cái Tịt Ngòi. Năm 2013, 1 quyển, giá 4.000đ (hiếm vì chỉ có 1 quyển). Bìa đã soát bằng mắt: đúng bìa trước tập 164.
+- **Book bị bỏ:** tập 209 (trước là id 85).
+- **Book đổi id (+1):** 71→72, 72→73, 73→74, 74→75, 75→76, 76→77, 77→78, 78→79, 79→80, 80→81, 81→82, 82→83, 83→84, 84→85 (các tập 167, 170, 172, 175, 181, 182, 183, 184, 185, 187, 188, 189, 194, 208). Đã soát bằng mắt bìa ở id mới: cả 15 Book từ 71 đến 85 đúng số tập. Các trường khác của các Book này không đổi.
+- **Đổi năm (28 Book):** như mục "Mã băm".
+- **Đổi bìa (32 Book):** như mục 2. Các Book dịch id giữ nguyên bìa.
+- **V10:** dòng `tblBook` 71–85 đổi vì id dịch, 28 dòng đổi `publishYear`. Mọi dòng `tblBookCopy` từ quyển đầu của Book 71 trở đi được đánh số lại (tổng quyển 1168 → 1164, `AUTO_INCREMENT` của `tblBookCopy` 1169 → 1165), barcode `DT071`–`DT085` theo id mới.
+- **V11 vẫn trỏ đúng quyển:** phiếu mẫu giữ `DT004-01`, `DT018-01`, `DT020-01`, `DT023-01`. Các Book 4, 18, 20, 23 (id < 71) không dịch id, mỗi Book vẫn 1 quyển, và cả 4 barcode có trong V10 mới.
+- Skill `.claude/skills/tiem-add-crawl-source/SKILL.md:28` đã sửa: so "bộ" trên chữ có dấu bằng `hasSetWord` (`pipeline/src/lib/set-word.mjs`).
