@@ -13,7 +13,13 @@
 // - Chèn PM0126 "Chờ nhận" của khach01 (quyển DT021-01) cho ngoại lệ 11 (sửa danh sách truyện), 12 (huỷ
 //   tại quầy) và D9 "đã huỷ"; luồng chính trên PM0125 giữ đúng DT001-03, DT020-02 của ch.2.
 import { Session, StepError, assertEq, buttonValues, clean, hasId, messageOf, tableRows, valueOf } from './lib/http.mjs';
-import { BASE_URL as BASE, MissingStackError, addDays, isoDate, sql, vnToday } from './lib/e2e-db.mjs';
+import { BASE_URL as BASE, MissingStackError, addDays, isoDate, sql as sqlText, vnToday } from './lib/e2e-db.mjs';
+
+/** sql() của lib trả TSV; ở đây tách thành mảng dòng, mỗi dòng là mảng cột. */
+const sql = (statements) => {
+  const out = sqlText(statements);
+  return out ? out.split('\n').map((line) => line.split('\t')) : [];
+};
 
 const NV = '/nhan-vien';
 
