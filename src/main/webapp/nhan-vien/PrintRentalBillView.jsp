@@ -138,54 +138,58 @@
     </div>
 
     <p class="m-0 mb-2">Các quyển truyện đã nhận:</p>
-    <table id="tblRentedBook" class="tt-ledger-table">
-      <caption class="tt-ledger-table__caption sr-only">Các quyển truyện đã nhận</caption>
-      <thead>
-        <tr>
-          <th scope="col">Mã vạch</th>
-          <th scope="col">Tên đầu truyện</th>
-          <th scope="col">Giá thuê theo ngày</th>
-          <th scope="col">Số lượng</th>
-          <th scope="col">Tình trạng khi giao</th>
-          <th scope="col">Tổng tiền</th>
-        </tr>
-      </thead>
-      <tbody>
-        <c:forEach var="row" items="${bookRows}">
+    <div class="overflow-x-auto">
+      <table id="tblRentedBook" class="tt-ledger-table">
+        <caption class="tt-ledger-table__caption sr-only">Các quyển truyện đã nhận</caption>
+        <thead>
           <tr>
-            <td><ul class="m-0 list-none p-0"><c:forEach var="copy" items="${row.copies}"><li class="font-num"><c:out value="${copy.barcode}"/></li></c:forEach></ul></td>
-            <td><c:out value="${row.name}"/></td>
-            <td class="font-num">${row.price}</td>
-            <td class="font-num">${row.quantity}</td>
-            <td><ul class="m-0 list-none p-0"><c:forEach var="copy" items="${row.copies}"><li><ui:condition-tag text="${copy.conditionText}"/></li></c:forEach></ul></td>
-            <td class="font-num">${row.total}</td>
+            <th scope="col">Mã vạch</th>
+            <th scope="col">Tên đầu truyện</th>
+            <th scope="col">Giá thuê theo ngày</th>
+            <th scope="col">Số lượng</th>
+            <th scope="col">Tình trạng khi giao</th>
+            <th scope="col">Tổng tiền</th>
           </tr>
-        </c:forEach>
-      </tbody>
-    </table>
+        </thead>
+        <tbody>
+          <c:forEach var="row" items="${bookRows}">
+            <tr>
+              <td><ul class="m-0 list-none p-0"><c:forEach var="copy" items="${row.copies}"><li class="font-num"><c:out value="${copy.barcode}"/></li></c:forEach></ul></td>
+              <td><c:out value="${row.name}"/></td>
+              <td class="font-num">${row.price}</td>
+              <td class="font-num">${row.quantity}</td>
+              <td><ul class="m-0 list-none p-0"><c:forEach var="copy" items="${row.copies}"><li><ui:condition-tag text="${copy.conditionText}"/></li></c:forEach></ul></td>
+              <td class="font-num">${row.total}</td>
+            </tr>
+          </c:forEach>
+        </tbody>
+      </table>
+    </div>
 
     <p class="m-0 mb-2 mt-4">Các khoản đặt cọc:</p>
-    <table id="tblRentalCollateral" class="tt-ledger-table">
-      <caption class="tt-ledger-table__caption sr-only">Các khoản đặt cọc</caption>
-      <thead>
-        <tr>
-          <th scope="col">STT</th>
-          <th scope="col">Loại tài sản</th>
-          <th scope="col">Giá trị</th>
-          <th scope="col">Ghi chú</th>
-        </tr>
-      </thead>
-      <tbody>
-        <c:forEach var="item" items="${collaterals}">
+    <div class="overflow-x-auto">
+      <table id="tblRentalCollateral" class="tt-ledger-table">
+        <caption class="tt-ledger-table__caption sr-only">Các khoản đặt cọc</caption>
+        <thead>
           <tr>
-            <td class="font-num">${item.index}</td>
-            <td><c:out value="${item.collateralName}"/></td>
-            <td class="font-num"><c:out value="${item.value}"/></td>
-            <td><c:out value="${item.note}"/></td>
+            <th scope="col">STT</th>
+            <th scope="col">Loại tài sản</th>
+            <th scope="col">Giá trị</th>
+            <th scope="col">Ghi chú</th>
           </tr>
-        </c:forEach>
-      </tbody>
-    </table>
+        </thead>
+        <tbody>
+          <c:forEach var="item" items="${collaterals}">
+            <tr>
+              <td class="font-num">${item.index}</td>
+              <td><c:out value="${item.collateralName}"/></td>
+              <td class="font-num"><c:out value="${item.value}"/></td>
+              <td><c:out value="${item.note}"/></td>
+            </tr>
+          </c:forEach>
+        </tbody>
+      </table>
+    </div>
 
     <div class="mt-4">
       <p class="m-0">Tổng số quyển thuê: <span class="font-num">${totalCopies}</span></p>
