@@ -20,7 +20,7 @@ Nhánh phase: `phase/06-chuc-nang-1-2` (phiên 55, worktree `06-orch`) và `phas
 | Lane | Agent | Bắt đầu | Worktree / nhánh | Báo cáo |
 |---|---|---|---|---|
 | 6A `filter-chung` | `t1k-web-core-developer` | 2026-11-11 | `06-filter-chung` / `lane/06-chuc-nang-1-2/filter-chung` | |
-| 6B `trang-m1` | `t1k-web-core-developer` | 2026-11-11 | `06-trang-m1` / `lane/06-chuc-nang-1-2/trang-m1` | |
+| 6D `island-selected-stack` | `t1k-web-core-developer` | 2026-11-11 | `06-island-selected-stack` / `lane/06-chuc-nang-1-2/island-selected-stack` | |
 | 6C `trang-m2` | `t1k-web-core-developer` | 2026-11-11 | `06-trang-m2` / `lane/06-chuc-nang-1-2/trang-m2` | |
 | 7D `quan-tri` (phiên 93) | `t1k-web-core-developer` | 2026-11-11 | `07-quan-tri` / `lane/07-chuc-nang-3/quan-tri` | |
 | 7A `quay-xu-li` (phiên 93) | `t1k-web-core-developer` | 2026-11-11 | `07-quay-xu-li` / `lane/07-chuc-nang-3/quay-xu-li` | |
@@ -30,7 +30,6 @@ Nhánh phase: `phase/06-chuc-nang-1-2` (phiên 55, worktree `06-orch`) và `phas
 
 | Thứ tự | Lane | Chờ gì |
 |---|---|---|
-| 1 | 6D `island-selected-stack` | chỗ trống đầu tiên trong 6A–6C |
 | 2 | 6E `xac-minh-m1` | 6A, 6B đã merge |
 | 3 | 6F `xac-minh-m2` | 6C, 6D đã merge |
 
@@ -67,9 +66,9 @@ Nhánh phase: `phase/06-chuc-nang-1-2` (phiên 55, worktree `06-orch`) và `phas
 | 5 | 5D `xac-minh` | Playwright MCP và đo Lighthouse | `t1k-web-testing-tester` | `plans/reports/` | 5A, 5B, 5C | xong | `plans/reports/phase-05-xac-minh-261111-0828.md` |
 | 6 | 6.0 orchestrator | web.xml filter, compose e2e, smoke M1–M2, Accept | phiên chính | xem `phase-06` | phase 4, 5 | đang chạy (hợp đồng a96abb6) | `phase-06-integration.md` |
 | 6 | 6A `filter-chung` | 5 filter, csrf tag, trang lỗi | `t1k-web-core-developer` | xem `phase-06` | 6.0 | đang chạy | |
-| 6 | 6B `trang-m1` | 5 trang M1 | `t1k-web-core-developer` | xem `phase-06` | 6.0 | đang chạy | |
+| 6 | 6B `trang-m1` | 5 trang M1 | `t1k-web-core-developer` | xem `phase-06` | 6.0 | xong, merge (48c0823); chưa chạy trên Tomcat (Docker hỏng 10:56–11:20), smoke kiểm sau khi 6A merge | `plans/reports/phase-06-trang-m1-261111-1110.md` |
 | 6 | 6C `trang-m2` | 9 trang M2 | `t1k-web-core-developer` | xem `phase-06` | 6.0 | đang chạy | |
-| 6 | 6D `island-selected-stack` | island SelectedStack | `t1k-web-core-developer` | `frontend/src/islands/SelectedStack/**` | 6.0, chỗ trống | chờ | |
+| 6 | 6D `island-selected-stack` | island SelectedStack | `t1k-web-core-developer` | `frontend/src/islands/SelectedStack/**` | 6.0, chỗ trống | đang chạy (thêm loader submit-on-change, nút OK hộp báo) | |
 | 6 | 6E `xac-minh-m1` | Playwright MCP chức năng 1 | `t1k-web-testing-tester` | `plans/reports/` | 6A, 6B | chờ | |
 | 6 | 6F `xac-minh-m2` | Playwright MCP chức năng 2 | `t1k-web-testing-tester` | `plans/reports/` | 6C, 6D | chờ | |
 | 7 | 7.0 orchestrator | smoke M3, Accept | phiên chính | xem `phase-07` | phase 6 | chờ | |
@@ -118,3 +117,4 @@ Nhánh phase: `phase/06-chuc-nang-1-2` (phiên 55, worktree `06-orch`) và `phas
 | 2026-11-11 | Phase 7 chạy song song phase 6 (chủ dự án yêu cầu): phiên 93 tạo `phase/07-chuc-nang-3` từ `origin/main` 34879ed; mở 7A, 7B, 7C trước 7.0 vì Owns không chồng phase 6 và hợp đồng đã đủ; phụ thuộc csrf.tag và filter của 6A sẽ merge vào khi phiên 55 báo SHA; phiên 93 không chạy compose khi chưa hỏi phiên 55 |
 | 2026-11-11 | Phase 7: chủ dự án yêu cầu bao quát mọi ngoại lệ và edge case ngoài báo cáo → `phase-07-edge-cases.md`; duyệt 5 câu mới (phiên 55 ghi vào contracts §10.3 cùng 3 câu của phase 6, 612cdd3), quá giờ hẹn không xử lí, quầy không giới hạn 30 ngày. 7C xong (DONE_WITH_CONCERNS: quy ước data-island-fallback/slot, đã báo 7A, 7B và phiên 55); mở 7D. Để sau: chuyển `server-html.ts`, `motion.ts`, `props-guard.ts` của ProcessBillDesk sang `frontend/src/lib/` (CollateralDrawer đang import chéo) |
 | 2026-11-11 | Chủ dự án yêu cầu bao quát mọi ngoại lệ ch.2 và edge case thực tế: `phase-06-integration.md` §6 (064d59b); chốt qua AskUserQuestion: thêm câu báo, đăng xuất, số ngày thuê ≤ 30, phiếu quá hạn không làm gì; gộp với 5 câu phiên phase 7 thành `docs/contracts.md` §10.3 (8 câu) + C14–C19 (612cdd3); quy ước gắn island §11 theo lane 7C, smoke thêm edge case (5703549); fixture PM0110 = DT001-01+02, PM0117 = DT020-01 (71b29a8). Đã nhắn 6A, 6B, 6C merge và làm thêm |
+| 2026-11-11 | Docker Desktop hỏng ~10:56 (API 500), chủ dự án khởi động lại ~11:20. 6B xong (DONE_WITH_CONCERNS: chưa chạy Tomcat), merge; sửa LoginView sang session mới. 6A DONE_WITH_CONCERNS (thiếu Redisson trong pom) → orchestrator thêm Redisson provided, error.jsp mặc định (a0bc269), nhắn 6A làm tiếp. Mở 6D |
