@@ -39,7 +39,8 @@ await step('2 frontend: lint, typecheck, test (có test ProcessBillDesk, Collate
   if (!existsSync(join(ROOT, 'frontend', 'node_modules'))) npm(['ci'], 'kiểm frontend/package-lock.json');
   npm(['run', 'lint'], 'sửa lỗi ESLint trong frontend/src');
   npm(['run', 'typecheck'], 'sửa lỗi TypeScript');
-  const t = npm(['run', 'test'], 'sửa test Vitest đỏ');
+  // verbose: reporter mặc định không in tên file đã xanh khi không có TTY, nên không kiểm được test island đã chạy
+  const t = npm(['run', 'test', '--', '--reporter=verbose'], 'sửa test Vitest đỏ');
   const ran = ISLANDS.filter((n) => t.out.includes(`${n}.test.tsx`));
   if (ran.length !== ISLANDS.length) throw new Error(`Vitest không chạy test của ${ISLANDS.filter((n) => !ran.includes(n)).join(', ')} → kiểm include trong vite.config.ts`);
   npm(['run', 'build'], 'sửa lỗi build Vite');
