@@ -266,11 +266,12 @@ So khớp từ khoá dùng `LIKE '%…%'` có tham số (`PreparedStatement`, kh
 Áp cho mọi đường tạo `tblRentedBook`: `addRentalBill` và nhánh "thêm quyển mới" của `updateRentalBill`. Trong cùng transaction (READ COMMITTED, autocommit tắt):
 
 1. Khoá các đầu truyện liên quan theo id tăng dần: `SELECT id FROM tblBook WHERE id IN (…) ORDER BY id FOR UPDATE`.
+   Ngay sau đó (C21) khoá các dòng `tblSelectedBook` mà các dòng phiếu trỏ tới, theo id tăng dần (`FOR UPDATE`), rồi đếm lại bằng một lệnh đọc riêng (không gộp vào lệnh khoá: subquery trong lệnh `FOR UPDATE` đọc ảnh chụp trước lúc chờ khoá) rằng mỗi dòng còn tồn tại, thuộc giỏ của client của phiếu, không có `tblRentedBook` của phiếu chưa huỷ trỏ vào và không bị hai dòng phiếu cùng trỏ; sai thì rollback, trả `false`. Hàm khoá là hàm nội bộ package-private của `CartDAO`, không phải hàm DAO của §5.3.
 2. Với từng dòng, theo thứ tự danh sách, đọc lại quyển còn trống: `NOT EXISTS` dòng `tblRentedBook` của phiếu chưa huỷ trỏ vào quyển đó. Dòng còn lại và dòng vừa ghi của chính phiếu này cũng tính là bận, nên một quyển không vào phiếu hai lần.
 3. Quyển đã bận thì đổi sang quyển trống id nhỏ nhất cùng đầu truyện (mục 6.2, ch.9 tr.66); không đủ thì rollback và trả `false`. Chọn theo từng dòng nên dòng nào nhận quyển nào có thể khác cách chọn hai lượt; tập quyển thực giao như nhau (cùng đầu truyện, cùng giá).
 4. Ghi phiếu và dòng, commit. Quyển thực giao (sau khi đổi) được ghi lại vào `RentedBook.bookCopy` của đối tượng truyền vào để trang hiển thị đúng mã vạch.
 
-Huỷ phiếu và bỏ quyển không cần khoá (chỉ giải phóng). `updateCart` không giữ quyển nên không khoá. Không tin `book.listBookCopy` trong session.
+Huỷ phiếu và bỏ quyển không cần khoá (chỉ giải phóng). `updateCart` không giữ quyển nên không khoá quyển hay đầu truyện; nó chỉ khoá các dòng của chính giỏ theo id tăng dần trước khi đọc dòng tự do (C21), cùng thứ tự với bước 1 nên không deadlock với `addRentalBill`, và không xoá dòng vừa thuộc phiếu thiết bị khác mới xác nhận (tránh lỗi khoá ngoại 1451). Không tin `book.listBookCopy` trong session.
 
 Test bắt buộc (Testcontainers, phase 3): hai luồng tranh quyển cuối, đúng một thành công; N luồng tranh M quyển, tổng quyển được giữ bằng M; đổi quyển khi quyển đã chọn bị giữ; huỷ đúng lúc xác nhận (D9).
 

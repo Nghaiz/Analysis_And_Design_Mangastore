@@ -95,8 +95,8 @@ public class RentalBillDAO extends DAO {
     }
 
     /**
-     * Tạo phiếu "Chờ nhận" cùng các dòng trong một transaction có khoá K1; {@code false} và rollback khi thiếu quyển.
-     * Sau commit gán id phiếu, id dòng, trạng thái và quyển thực giao vào {@code RentedBook.bookCopy}.
+     * Tạo phiếu "Chờ nhận" cùng các dòng trong một transaction có khoá K1; {@code false} và rollback khi thiếu quyển
+     * hoặc dòng giỏ của phiếu không còn tự do (C21). Sau commit gán id phiếu, id dòng, trạng thái và quyển thực giao.
      */
     public boolean addRentalBill(RentalBill rentalBill) throws SQLException {
         Objects.requireNonNull(rentalBill, "rentalBill");
@@ -111,7 +111,7 @@ public class RentalBillDAO extends DAO {
             afterCommit.add(() -> rentalBill.setId(id));
             afterCommit.add(() -> rentalBill.setStatus(RentalBill.STATUS_PENDING));
             Map<RentedBook, Integer> rowIds = new IdentityHashMap<>();
-            if (!reserveCopies(id, rentalBill.getListRentedBook(), rowIds, afterCommit)) {
+            if (!reserveCopies(id, rentalBill.getClient(), rentalBill.getListRentedBook(), rowIds, afterCommit)) {
                 return false;
             }
             writeDetails(id, rentalBill, rowIds, afterCommit);
@@ -179,7 +179,7 @@ public class RentalBillDAO extends DAO {
                 throw new IllegalStateException("Dòng " + kept.getValue() + " không thuộc phiếu " + bill.getId());
             }
         }
-        if (!newRows.isEmpty() && !reserveCopies(bill.getId(), newRows, rowIds, afterCommit)) {
+        if (!newRows.isEmpty() && !reserveCopies(bill.getId(), bill.getClient(), newRows, rowIds, afterCommit)) {
             return false;
         }
         execute(UPDATE_BILL, bill.getExpectedPickupAt(), bill.getExpectedDays(), bill.getBorrowDate(),
@@ -199,11 +199,11 @@ public class RentalBillDAO extends DAO {
     }
 
     /**
-     * K1 (contracts §6.1, §6.2) cho dòng mới. (1) khoá đầu truyện theo id tăng dần; (2)–(3) từng dòng giữ quyển đã chọn
-     * nếu không có dòng của phiếu chưa huỷ nào trỏ vào, ngược lại lấy quyển trống id nhỏ nhất cùng đầu truyện; dòng
-     * còn lại của chính phiếu và dòng vừa ghi cũng tính là bận nên quyển đã có trong phiếu không bị chọn lại; (4) ghi.
+     * K1 (§6.1, §6.2). (1) khoá đầu truyện rồi dòng giỏ được trỏ tới (C21, thứ tự khoá: {@code CartDAO.lockFreeLines}),
+     * id tăng dần; (2)–(3) từng dòng giữ quyển đã chọn nếu không có dòng phiếu chưa huỷ nào trỏ vào, ngược lại lấy
+     * quyển trống id nhỏ nhất cùng đầu truyện; dòng khác của chính phiếu và dòng vừa ghi cũng tính là bận; (4) ghi.
      */
-    private boolean reserveCopies(int billId, List<RentedBook> rows, Map<RentedBook, Integer> rowIds,
+    private boolean reserveCopies(int billId, Client client, List<RentedBook> rows, Map<RentedBook, Integer> rowIds,
             List<Runnable> afterCommit) throws SQLException {
         Object[] requested = rows.stream().map(row -> row.getBookCopy().getId()).toArray();
         TreeSet<Integer> bookIds = new TreeSet<>();
@@ -216,6 +216,9 @@ public class RentalBillDAO extends DAO {
         String lock = LOCK_BOOKS + ",?".repeat(bookIds.size()) + ") ORDER BY id FOR UPDATE";
         try (PreparedStatement ps = prepare(lock, bookIds.toArray())) {
             ps.executeQuery(); // Connector/J đọc hết kết quả: mọi dòng đầu truyện đã bị khoá khi lệnh trả về
+        }
+        if (!CartDAO.lockFreeLines(con(), client, rows)) {
+            return false;
         }
         for (RentedBook row : rows) {
             BookCopy given = new BookCopy();

@@ -6,17 +6,21 @@
     RentalBill.MAX_EXPECTED_DAYS, kể cả quá int → EXPECTED_DAYS_TOO_LONG, C15), txtExpectedPickupAt (yyyy-MM-ddTHH:mm,
     giờ máy chủ; trống, sai dạng, không sau hiện tại → PICKUP_TIME_INVALID), txtNote (trim, NFC; trống → NULL; quá
     255 kí tự → INPUT_TOO_LONG, §10.3). Mọi lỗi đều ← ConfirmRentalBillView, giữ các ô đã nhập, ô lỗi aria-invalid.
-  - Dòng phiếu trỏ dòng giỏ không còn trong cart của session (tab khác vừa xoá) → NOT_ENOUGH_COPIES: không gửi dòng giỏ
-    đã xoá xuống DB (khoá ngoại selectedBookId).
-  - Gán expectedDays, expectedPickupAt, note, status "Chờ nhận", RentalBillDAO.addRentalBill (K1). false →
-    NOT_ENOUGH_COPIES. true → bỏ cart, rentalBill, listRentalBill (C6), RENTAL_BILL_CREATED → ClientHomeView (forward).
-  - Khoá theo session id: hai request "Xác nhận" cùng phiên chạy lần lượt, request sau thấy rentalBill đã bị bỏ.
+  - Gán expectedDays, expectedPickupAt, note, status "Chờ nhận", RentalBillDAO.addRentalBill (K1, C21: DAO tự kiểm dòng
+    giỏ của phiếu còn tự do trong transaction). true → bỏ cart, rentalBill, listRentalBill (C6), RENTAL_BILL_CREATED →
+    ClientHomeView (forward).
+  - false → đọc lại giỏ bằng CartDAO.getCart(client) (C21). Có dòng phiếu không còn là dòng tự do của giỏ mới (tab hay
+    thiết bị khác vừa xoá dòng, hoặc đã xác nhận phiếu từ cùng dòng) → W cart = giỏ mới, bỏ rentalBill (SearchBookView
+    tạo phiếu mới khi mở), SELECTED_BOOKS_CHANGED → SearchBookView (forward như doDeleteSelectedBook, để giữ câu báo).
+    Ngược lại (thiếu quyển) → NOT_ENOUGH_COPIES ← ConfirmRentalBillView.
+  - Khoá theo session id: hai request "Xác nhận" cùng phiên chạy lần lượt, request sau thấy rentalBill đã bị bỏ. Hai
+    phiên (hai thiết bị) không chung khoá này: chỉ DAO chặn (C21).
 --%>
 <%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" trimDirectiveWhitespaces="true" %>
 <%@ page import="java.text.Normalizer, java.time.LocalDateTime, java.time.format.DateTimeParseException" %>
 <%@ page import="java.math.BigInteger, java.util.HashSet, java.util.Set" %>
-<%@ page import="vn.tiemtruyen.dao.RentalBillDAO" %>
-<%@ page import="vn.tiemtruyen.model.Cart, vn.tiemtruyen.model.RentalBill, vn.tiemtruyen.model.RentedBook, vn.tiemtruyen.model.SelectedBook" %>
+<%@ page import="vn.tiemtruyen.dao.CartDAO, vn.tiemtruyen.dao.RentalBillDAO" %>
+<%@ page import="vn.tiemtruyen.model.Cart, vn.tiemtruyen.model.Client, vn.tiemtruyen.model.RentalBill, vn.tiemtruyen.model.RentedBook, vn.tiemtruyen.model.SelectedBook" %>
 <%@ page import="vn.tiemtruyen.util.Messages" %>
 <%!
     /** Độ dài cột tblRentalBill.note (docs/contracts.md §2). */
@@ -75,18 +79,6 @@
             return;
         }
 
-        Set<Integer> cartLineIds = new HashSet<>();
-        for (SelectedBook line : cart.getListSelectedBook()) {
-            cartLineIds.add(line.getId());
-        }
-        for (RentedBook row : rentalBill.getListRentedBook()) {
-            if (row.getSelectedBook() == null || !cartLineIds.contains(row.getSelectedBook().getId())) {
-                request.setAttribute("message", Messages.NOT_ENOUGH_COPIES);
-                request.getRequestDispatcher("/ConfirmRentalBillView.jsp").forward(request, response);
-                return;
-            }
-        }
-
         rentalBill.setExpectedDays(expectedDays);
         rentalBill.setExpectedPickupAt(expectedPickupAt);
         rentalBill.setNote(note.isEmpty() ? null : note);
@@ -96,6 +88,27 @@
             saved = rentalBillDAO.addRentalBill(rentalBill);
         }
         if (!saved) {
+            Cart freshCart;
+            try (CartDAO cartDAO = new CartDAO()) {
+                freshCart = cartDAO.getCart((Client) session.getAttribute("client"));
+            }
+            Set<Integer> freeLineIds = new HashSet<>();
+            for (SelectedBook line : freshCart.getListSelectedBook()) {
+                freeLineIds.add(line.getId());
+            }
+            boolean linesChanged = false;
+            for (RentedBook row : rentalBill.getListRentedBook()) {
+                if (row.getSelectedBook() == null || !freeLineIds.contains(row.getSelectedBook().getId())) {
+                    linesChanged = true;
+                }
+            }
+            if (linesChanged) {
+                session.setAttribute("cart", freshCart);
+                session.removeAttribute("rentalBill");
+                request.setAttribute("message", Messages.SELECTED_BOOKS_CHANGED);
+                request.getRequestDispatcher("/SearchBookView.jsp").forward(request, response);
+                return;
+            }
             request.setAttribute("message", Messages.NOT_ENOUGH_COPIES);
             request.getRequestDispatcher("/ConfirmRentalBillView.jsp").forward(request, response);
             return;
