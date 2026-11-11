@@ -57,6 +57,25 @@ public final class Codes {
     }
 
     /**
+     * Số thứ tự quyển trong một mã vạch D8 của đầu truyện {@code bookId}, so không phân biệt hoa thường như
+     * collation của cột mã vạch ({@code DT001-07} hay {@code dt001-07} → 7). {@code BookDAO.updateBook} dùng để đánh
+     * số quyển mới sau số lớn nhất đang có.
+     *
+     * @param bookId id đầu truyện, từ 1
+     * @param barcode mã vạch đang lưu
+     * @return số thứ tự (tối đa 9 chữ số), rỗng khi mã không theo dạng D8 của đầu truyện đó
+     */
+    public static OptionalInt copyNumber(int bookId, String barcode) {
+        Objects.requireNonNull(barcode, "barcode");
+        Matcher matcher = Pattern.compile(Pattern.quote(bookCode(bookId)) + "-(\\d{1,9})", Pattern.CASE_INSENSITIVE)
+                .matcher(barcode);
+        if (!matcher.matches()) {
+            return OptionalInt.empty();
+        }
+        return OptionalInt.of(Integer.parseInt(matcher.group(1)));
+    }
+
+    /**
      * Tách id phiếu từ từ khoá tìm kiếm dạng {@code PM} + số (C9), bỏ khoảng trắng hai đầu.
      *
      * @param keyword từ khoá người dùng nhập

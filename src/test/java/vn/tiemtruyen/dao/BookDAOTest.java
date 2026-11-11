@@ -13,6 +13,7 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
@@ -177,6 +178,33 @@ class BookDAOTest {
             missing.setId(9999);
             assertFalse(dao.updateBook(missing));
             assertEquals(0, queryInt(own, "SELECT COUNT(*) FROM tblBookCopy WHERE bookId = 9999"));
+        }
+    }
+
+    /** Số quyển mới nối tiếp hậu tố lớn nhất của mã D8 đang có, không theo số quyển (mã lạc số không sinh trùng). */
+    @Test
+    void updateBookNumbersNewCopiesAfterTheHighestExistingSuffix() throws Exception {
+        try (TestDatabase own = TestDatabase.createMigrated(); BookDAO dao = new BookDAO(own.connection())) {
+            Book book = newBook("Truyện mã lạc số", copy(null), copy("TAY-99"));
+            assertTrue(dao.addBook(book));
+            String code = Codes.bookCode(book.getId());
+            execute(own, "INSERT INTO tblBookCopy (barcode, bookId) VALUES ('" + code + "-05', " + book.getId() + ")");
+
+            // Có -01, -05 và TAY-99 (không theo D8): đếm 3 quyển sẽ sinh -04, -05 (trùng -05); đúng là -06, -07.
+            BookCopy sixth = copy(null);
+            BookCopy seventh = copy(" ");
+            book.getListBookCopy().addAll(List.of(sixth, seventh));
+            assertTrue(dao.updateBook(book));
+            assertEquals(List.of(code + "-06", code + "-07"), List.of(sixth.getBarcode(), seventh.getBarcode()));
+
+            // Mã cùng tiền tố nằm ở đầu truyện khác (nhập tay, chữ thường) vẫn được tính: không sinh trùng UNIQUE.
+            Book other = newBook("Đầu truyện khác", copy(code.toLowerCase(Locale.ROOT) + "-09"));
+            assertTrue(dao.addBook(other));
+            BookCopy next = copy(null);
+            book.getListBookCopy().add(next);
+            assertTrue(dao.updateBook(book));
+            assertEquals(code + "-10", next.getBarcode());
+            assertEquals(6, queryInt(own, "SELECT COUNT(*) FROM tblBookCopy WHERE bookId = " + book.getId()));
         }
     }
 

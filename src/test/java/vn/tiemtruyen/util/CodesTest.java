@@ -51,6 +51,19 @@ class CodesTest {
         assertEquals(OptionalInt.empty(), Codes.parseRentalBillId(keyword));
     }
 
+    @ParameterizedTest
+    @CsvSource({"DT001-07, 7", "dt001-07, 7", "DT001-100, 100", "DT001-1, 1", "DT001-999999999, 999999999"})
+    void readsCopyNumberOfTheBooksOwnBarcode(String barcode, int expected) {
+        assertEquals(OptionalInt.of(expected), Codes.copyNumber(1, barcode));
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {"DT002-07", "DT0010-07", "DT001-", "DT001-07A", "DT001-1234567890", "SHIN-TAY-01",
+        "DT001--07", " DT001-07", "DT001-ab"})
+    void otherBarcodesHaveNoCopyNumber(String barcode) {
+        assertEquals(OptionalInt.empty(), Codes.copyNumber(1, barcode));
+    }
+
     @Test
     void roundTripsFormattedRentalBillCode() {
         assertEquals(OptionalInt.of(125), Codes.parseRentalBillId(Codes.rentalBillCode(125)));

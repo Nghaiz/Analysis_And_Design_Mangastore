@@ -17,6 +17,7 @@ public final class AppConfig {
     private static final int DEFAULT_POOL_SIZE = 10;
     private static final int MAX_POOL_SIZE = 100;
     private static final String DEFAULT_COVERS_BASE_URL = "/covers";
+    private static final String DEFAULT_FLYWAY_DATA_LOCATION = "filesystem:/flyway/data";
     private static final Pattern ORIGIN_PATTERN = Pattern.compile("https?://[A-Za-z0-9.\\-]+(:\\d{1,5})?");
 
     private final UnaryOperator<String> source;
@@ -97,6 +98,14 @@ public final class AppConfig {
     /** Tiền tố URL của ảnh bìa, mặc định {@code /covers}. */
     public String coversBaseUrl() {
         return optional("APP_COVERS_BASE_URL", DEFAULT_COVERS_BASE_URL);
+    }
+
+    /**
+     * Location Flyway của dữ liệu catalog ({@code FLYWAY_DATA_LOCATION}), mặc định {@code filesystem:/flyway/data}
+     * (volume {@code catalog_data} gắn vào container app); lần chạy E2E đặt {@code classpath:db/e2e}.
+     */
+    public String flywayDataLocation() {
+        return optional("FLYWAY_DATA_LOCATION", DEFAULT_FLYWAY_DATA_LOCATION);
     }
 
     /**
