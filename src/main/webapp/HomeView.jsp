@@ -57,16 +57,31 @@
     pageContext.setAttribute("shelfPropsJson", JsonUtil.toScriptJson(shelfProps));
 %>
 <t:layout title="Trang chủ">
-  <section class="mx-auto flex max-w-5xl flex-col gap-6 px-1 py-8">
-    <h1 class="font-sign text-ink">Trang chủ</h1>
-    <p class="text-ink">Chào mừng bạn đến với cửa hàng cho thuê truyện!</p>
-    <p class="flex flex-wrap gap-4">
-      <a id="lnkLogin" href="${loginHref}" class="rounded-paper bg-primary px-4 py-2 text-primary-foreground shadow-paper">Đăng nhập</a>
-      <a id="lnkRegister" href="${registerHref}" class="rounded-paper border border-ink-soft bg-paper px-4 py-2 text-ink shadow-paper">Đăng kí</a>
-    </p>
+  <section class="mx-auto flex max-w-5xl flex-col gap-6 px-1 py-4">
+    <div class="tt-hero">
+      <div>
+        <p class="tt-hero__eyebrow">Tiệm truyện đầu ngõ, mở cửa trên mạng</p>
+        <h1 class="tt-hero__title">Trang chủ</h1>
+        <p class="m-0 mt-2 text-ink">Chào mừng bạn đến với cửa hàng cho thuê truyện!</p>
+        <p class="tt-hero__lead">Tìm truyện, chọn tập muốn đọc rồi ghé quầy nhận. Chưa có tài khoản thì đăng kí trong một phút.</p>
+        <p class="tt-hero__actions">
+          <a id="lnkLogin" href="${loginHref}" class="tt-btn tt-btn--primary">Đăng nhập</a>
+          <a id="lnkRegister" href="${registerHref}" class="tt-btn tt-btn--ghost">Đăng kí</a>
+        </p>
+      </div>
+      <img src="${pageContext.request.contextPath}/static/img/logo-tiem.svg" alt="" width="120" height="120" class="tt-hero__art">
+    </div>
     <div data-island="ShelfScene" data-props="shelf-scene-props" class="w-full overflow-hidden rounded-paper bg-wood shadow-paper">
       <div class="relative"><a href="${loginHref}" class="block"><picture class="block"><source media="(max-width: 599.98px)" srcset="${posterNarrowSrc}"><img src="${posterSrc}" alt="${posterAlt}" width="1200" height="800" class="block h-auto w-full" decoding="async" fetchpriority="high"></picture></a></div>
     </div>
     <script type="application/json" id="shelf-scene-props">${shelfPropsJson}</script>
+    <section aria-labelledby="home-steps-h">
+      <h2 id="home-steps-h" class="tt-section-title">Thuê truyện thế nào?</h2>
+      <ol class="tt-steps">
+        <li class="tt-step"><span class="tt-step__title">Đăng kí, đăng nhập</span><span class="tt-step__desc">Tạo tài khoản bằng số CCCD, số điện thoại và email.</span></li>
+        <li class="tt-step"><span class="tt-step__title">Chọn truyện, tạo phiếu</span><span class="tt-step__desc">Tìm đầu truyện, chọn các tập còn trống, xác nhận phiếu mượn.</span></li>
+        <li class="tt-step"><span class="tt-step__title">Ghé quầy nhận truyện</span><span class="tt-step__desc">Nhân viên kiểm truyện, nhận cọc và in phiếu cho bạn.</span></li>
+      </ol>
+    </section>
   </section>
 </t:layout>

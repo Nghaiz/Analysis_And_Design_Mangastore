@@ -317,6 +317,466 @@
   }
 }
 
+/* ---------- Khung trang: đầu trang, điều hướng, chân trang (layout.tag) ---------- */
+@layer components {
+  .tt-shell {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .tt-shell > .tt-main {
+    flex: 1 0 auto;
+  }
+
+  .tt-skip-link {
+    position: absolute;
+    top: calc(-1 * var(--s-8));
+    left: var(--s-4);
+    z-index: 50;
+    padding: var(--s-2) var(--s-4);
+    background-color: var(--color-ink);
+    color: var(--color-paper);
+    border-radius: var(--radius-paper);
+  }
+
+  .tt-skip-link:focus {
+    top: var(--s-2);
+  }
+
+  .tt-site-header {
+    position: sticky;
+    top: 0;
+    z-index: 40;
+    background-color: var(--color-paper-deep);
+    background-image: url("/img/paper-grain.svg");
+    background-size: 180px 180px;
+    border-bottom: 3px double var(--color-ink-soft);
+    box-shadow: var(--shadow-paper);
+  }
+
+  .tt-site-header__inner {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--s-2) var(--s-4);
+    width: 100%;
+    max-width: 72rem;
+    margin-inline: auto;
+    padding: var(--s-2) var(--s-4);
+  }
+
+  .tt-brand {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--s-2);
+    color: var(--color-ink);
+    text-decoration: none;
+  }
+
+  .tt-brand__logo {
+    flex: none;
+    display: block;
+  }
+
+  .tt-brand__text {
+    display: flex;
+    flex-direction: column;
+    line-height: 1.3;
+  }
+
+  .tt-brand__name {
+    font-family: var(--font-sign);
+    font-size: 1.25rem;
+    line-height: 1.6;
+  }
+
+  .tt-brand__tag {
+    font-family: var(--font-pen);
+    font-size: 1rem;
+    line-height: 1.85;
+    color: var(--color-pen-blue);
+  }
+
+  /* Điện thoại: logo + người dùng ở hàng đầu, điều hướng chiếm cả hàng thứ hai và cuộn ngang khi chật */
+  .tt-nav {
+    order: 3;
+    flex: 1 0 100%;
+    overflow-x: auto;
+  }
+
+  .tt-site-header__user {
+    display: flex;
+    align-items: center;
+    gap: var(--s-3);
+    margin-left: auto;
+  }
+
+  .tt-nav__list {
+    display: flex;
+    gap: var(--s-1);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .tt-nav__link {
+    display: inline-flex;
+    align-items: center;
+    min-height: 2.5rem;
+    padding: 0 var(--s-3);
+    font-family: var(--font-type);
+    white-space: nowrap;
+    color: var(--color-ink);
+    text-decoration: none;
+    border-bottom: 3px solid transparent;
+    border-radius: var(--radius-paper);
+  }
+
+  .tt-nav__link:hover {
+    background-color: var(--color-tape);
+    text-decoration: none;
+  }
+
+  .tt-nav__link--active {
+    color: var(--color-pen-blue);
+    border-bottom-color: var(--color-pen-blue);
+  }
+
+  @media (min-width: 48rem) {
+    .tt-site-header__inner {
+      flex-wrap: nowrap;
+      padding-inline: var(--s-6);
+    }
+
+    .tt-nav {
+      order: 0;
+      flex: 1 1 auto;
+      margin-left: var(--s-4);
+    }
+  }
+
+  .tt-user {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--s-2);
+  }
+
+  .tt-user__avatar {
+    display: inline-flex;
+    flex: none;
+    align-items: center;
+    justify-content: center;
+    width: 2.25rem;
+    height: 2.25rem;
+    font-family: var(--font-sign);
+    font-size: 1.125rem;
+    background-color: var(--color-pen-blue);
+    color: var(--color-paper);
+    border-radius: var(--radius-paper);
+  }
+
+  .tt-user__text {
+    display: none;
+    flex-direction: column;
+    line-height: 1.4;
+  }
+
+  .tt-user__name {
+    font-family: var(--font-type);
+    font-size: 0.9375rem;
+    color: var(--color-ink);
+  }
+
+  .tt-user__role {
+    font-size: 0.8125rem;
+    color: var(--color-ink-soft);
+  }
+
+  @media (min-width: 40rem) {
+    .tt-user__text {
+      display: flex;
+    }
+  }
+
+  .tt-logout {
+    margin: 0;
+  }
+
+  /* ---------- Nút dùng chung: .tt-btn ---------- */
+  .tt-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--s-2);
+    min-height: 2.75rem;
+    padding: 0 var(--s-5);
+    font-family: var(--font-body);
+    font-size: 1rem;
+    line-height: 1.75;
+    white-space: nowrap;
+    text-decoration: none;
+    cursor: pointer;
+    border: 1px solid var(--color-ink-soft);
+    border-radius: var(--radius-paper);
+    box-shadow: var(--shadow-paper);
+  }
+
+  .tt-btn:hover {
+    text-decoration: none;
+  }
+
+  .tt-btn--primary {
+    background-color: var(--color-pen-blue);
+    border-color: var(--color-pen-blue);
+    color: var(--color-paper);
+  }
+
+  .tt-btn--ghost {
+    background-color: var(--color-paper);
+    color: var(--color-ink);
+  }
+
+  .tt-btn--ghost:hover {
+    background-color: var(--color-tape);
+  }
+
+  .tt-btn--sm {
+    min-height: 2.5rem;
+    padding: 0 var(--s-3);
+    font-size: 0.9375rem;
+  }
+
+  /* ---------- Lời chào đầu trang chủ: .tt-hero ---------- */
+  .tt-hero {
+    display: grid;
+    gap: var(--s-4);
+    align-items: center;
+    padding: var(--s-6) var(--s-5);
+    background-color: var(--color-paper);
+    background-image: url("/img/paper-grain.svg");
+    background-size: 180px 180px;
+    border: 1px solid color-mix(in srgb, var(--color-ink-soft) 35%, transparent);
+    border-left: 6px solid var(--color-stamp-red);
+    box-shadow: var(--shadow-paper);
+  }
+
+  @media (min-width: 48rem) {
+    .tt-hero {
+      grid-template-columns: 1fr auto;
+      padding: var(--s-6);
+    }
+  }
+
+  .tt-hero__eyebrow {
+    margin: 0;
+    font-family: var(--font-pen);
+    font-size: 1.25rem;
+    line-height: 1.85;
+    color: var(--color-pen-blue);
+  }
+
+  .tt-hero__title {
+    margin: 0;
+    font-size: 2.25rem;
+  }
+
+  .tt-hero__lead {
+    margin: var(--s-2) 0 0;
+    color: var(--color-ink-soft);
+  }
+
+  .tt-hero__art {
+    display: none;
+  }
+
+  @media (min-width: 48rem) {
+    .tt-hero__art {
+      display: block;
+      width: 7.5rem;
+      height: auto;
+      transform: rotate(3deg);
+    }
+  }
+
+  .tt-hero__actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--s-3);
+    margin: var(--s-4) 0 0;
+  }
+
+  /* ---------- Thẻ chức năng: a.tt-action-card ---------- */
+  .tt-section-title {
+    margin: 0 0 var(--s-3);
+    font-size: 1.5rem;
+  }
+
+  .tt-action-grid {
+    display: grid;
+    gap: var(--s-4);
+  }
+
+  @media (min-width: 48rem) {
+    .tt-action-grid {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+
+  .tt-action-card {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--s-4);
+    padding: var(--s-5);
+    background-color: var(--color-paper);
+    background-image: url("/img/paper-grain.svg");
+    background-size: 180px 180px;
+    color: var(--color-ink);
+    text-decoration: none;
+    border: 1px solid color-mix(in srgb, var(--color-ink-soft) 45%, transparent);
+    border-radius: var(--radius-paper);
+    box-shadow: var(--shadow-paper);
+  }
+
+  .tt-action-card:hover {
+    text-decoration: none;
+    border-color: var(--color-pen-blue);
+  }
+
+  .tt-action-card__icon {
+    display: inline-flex;
+    flex: none;
+    align-items: center;
+    justify-content: center;
+    width: 3.5rem;
+    height: 3.5rem;
+    background-color: var(--color-tape);
+    color: var(--color-pen-blue);
+    border: 1px solid var(--color-ink-soft);
+    border-radius: var(--radius-paper);
+  }
+
+  .tt-action-card--red .tt-action-card__icon {
+    color: var(--color-stamp-red);
+  }
+
+  .tt-action-card--green .tt-action-card__icon {
+    color: var(--color-stamp-green);
+  }
+
+  .tt-action-card__body {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    gap: var(--s-1);
+    min-width: 0;
+  }
+
+  .tt-action-card__title {
+    font-family: var(--font-sign);
+    font-size: 1.375rem;
+    line-height: 1.6;
+    color: var(--color-ink);
+  }
+
+  .tt-action-card__desc {
+    color: var(--color-ink-soft);
+  }
+
+  .tt-action-card__go {
+    margin-top: var(--s-2);
+    font-family: var(--font-type);
+    color: var(--color-pen-blue);
+  }
+
+  /* ---------- Các bước: ol.tt-steps ---------- */
+  .tt-steps {
+    display: grid;
+    gap: var(--s-4);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    counter-reset: tt-step;
+  }
+
+  @media (min-width: 48rem) {
+    .tt-steps {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+  }
+
+  .tt-step {
+    position: relative;
+    padding: var(--s-4) var(--s-4) var(--s-4) calc(var(--s-4) + 2.75rem);
+    background-color: color-mix(in srgb, var(--color-paper-deep) 45%, var(--color-paper));
+    border: 1px dashed var(--color-ink-soft);
+    border-radius: var(--radius-paper);
+    counter-increment: tt-step;
+  }
+
+  .tt-step::before {
+    content: counter(tt-step);
+    position: absolute;
+    top: var(--s-4);
+    left: var(--s-4);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 2rem;
+    height: 2rem;
+    font-family: var(--font-num);
+    font-weight: 700;
+    background-color: var(--color-stamp-red);
+    color: var(--color-paper);
+    border-radius: var(--radius-paper);
+  }
+
+  .tt-step__title {
+    display: block;
+    font-family: var(--font-type);
+    color: var(--color-ink);
+  }
+
+  .tt-step__desc {
+    display: block;
+    font-size: 0.9375rem;
+    color: var(--color-ink-soft);
+  }
+
+  /* ---------- Chân trang ---------- */
+  .tt-site-footer {
+    margin-top: var(--s-7);
+    background-color: var(--color-paper-deep);
+    border-top: 3px double var(--color-ink-soft);
+  }
+
+  .tt-site-footer__inner {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    gap: var(--s-2) var(--s-4);
+    max-width: 72rem;
+    margin-inline: auto;
+    padding: var(--s-4);
+  }
+
+  @media (min-width: 48rem) {
+    .tt-site-footer__inner {
+      padding-inline: var(--s-6);
+    }
+  }
+
+  .tt-site-footer__brand {
+    margin: 0;
+    font-family: var(--font-sign);
+    color: var(--color-ink);
+  }
+
+  .tt-site-footer__note {
+    margin: 0;
+    color: var(--color-ink-soft);
+  }
+}
+
 /* ---------- Chuyển động trang trí (chỉ khi không giảm chuyển động) ---------- */
 @media (prefers-reduced-motion: no-preference) {
   @keyframes tt-stamp-in {
@@ -340,6 +800,20 @@
     transition:
       transform 160ms ease-out,
       box-shadow 160ms ease-out;
+  }
+
+  .tt-action-card,
+  .tt-btn {
+    transition:
+      transform 160ms ease-out,
+      box-shadow 160ms ease-out,
+      background-color 160ms ease-out;
+  }
+
+  .tt-action-card:hover,
+  .tt-btn:hover {
+    transform: translate(-1px, -2px);
+    box-shadow: var(--shadow-lift);
   }
 
   a.tt-paper-card:hover,
