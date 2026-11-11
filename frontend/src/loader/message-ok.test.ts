@@ -43,7 +43,19 @@ describe('installMessageOk', () => {
     expect(document.activeElement).toBe(document.getElementById('txtQuantity'))
   })
 
-  it('OK with no invalid field just hides the box', () => {
+  it('OK with no invalid field returns focus to the first form field (LoginView LOGIN_FAILED)', () => {
+    document.body.innerHTML = `
+      <p class="tt-message-box tt-message-box--error" role="alert">Đăng nhập thất bại, vui lòng thử lại.</p>
+      <form method="post"><input type="hidden" name="csrf" value="x">
+        <input type="text" id="txtUsername" name="txtUsername"><input type="password" id="txtPassword" name="txtPassword">
+        <button type="submit" id="btnLogin">Đăng nhập</button></form>`
+    const [ok] = installMessageOk(document)
+    ok?.click()
+    expect(box().hidden).toBe(true)
+    expect(document.activeElement?.id).toBe('txtUsername')
+  })
+
+  it('OK with no invalid field and no form field just hides the box', () => {
     document.body.innerHTML = '<p class="tt-message-box tt-message-box--success" role="status">Đăng kí tài khoản thành công!</p>'
     const [ok] = installMessageOk(document)
     ok?.click()

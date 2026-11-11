@@ -45,7 +45,7 @@
         @SuppressWarnings("unchecked")
         List<String> barcodes = (List<String>) r.get("barcodes");
         barcodes.add(row.getBookCopy().getBarcode());
-        String condition = "";
+        String condition = "(chưa ghi nhận)"; // §13: conditionNote NULL = chưa ghi nhận tình trạng
         if (row.getConditionNote() != null) {
             StringJoiner names = new StringJoiner(", ");
             for (RentedDamage damage : row.getListRentedDamage()) {

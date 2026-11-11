@@ -48,7 +48,8 @@ await step('2 frontend: lint, typecheck, test (có SelectedStack), build', () =>
   if (!existsSync(join(ROOT, 'frontend', 'node_modules'))) npm(['ci'], 'kiểm frontend/package-lock.json');
   npm(['run', 'lint'], 'sửa lỗi ESLint trong frontend/src');
   npm(['run', 'typecheck'], 'sửa lỗi TypeScript');
-  const t = npm(['run', 'test'], 'sửa test Vitest đỏ');
+  // reporter verbose: reporter mặc định (không TTY) chỉ in tổng, không in tên file test đã chạy.
+  const t = npm(['run', 'test', '--', '--reporter=verbose'], 'sửa test Vitest đỏ');
   npm(['run', 'build'], 'sửa lỗi build Vite');
   if (!existsSync(join(ROOT, 'frontend', 'src', 'islands', 'SelectedStack', 'SelectedStack.test.tsx'))) {
     throw new Error('thiếu frontend/src/islands/SelectedStack/SelectedStack.test.tsx → lane 6D');
