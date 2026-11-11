@@ -3,21 +3,41 @@
   - Mở khi session chưa có listRentedBook (từ ProcessRentalBillView): chép danh sách quyển của rentalBill
     → W listRentedBook (bản sao, §7). Quay lại từ AddRentedBookView hay doUpdateRentedBookList: hiện listRentedBook.
   - "Xoá" (lnkDeleteRentedBook, value = mã vạch): chỉ xử lí khi POST + dispatcher REQUEST
-    (phase-06-integration.md §3), bỏ dòng khỏi listRentedBook → W listRentedBook.
+    (phase-06-integration.md §3), bỏ dòng khỏi listRentedBook → W listRentedBook; mã vạch không có thì bỏ qua.
   - "Lưu" gửi tới doUpdateRentedBookList.jsp; "Thêm truyện", "Quay lại" là <a href>.
-  - Hiện NOT_ENOUGH_COPIES do doUpdateRentedBookList đặt (request attribute message).
-  Form luôn có action trỏ về chính trang: trang còn được forward tới từ doUpdateRentedBookList.jsp.
+  - Hiện NOT_ENOUGH_COPIES, NO_COPY_RECEIVED do doUpdateRentedBookList đặt (request attribute message).
+  Đầu trang (phase-07-edge-cases.md §3.1): (1) thiếu rentalBill → 302 SearchRentalBillView; (2) rentalBill không
+  còn "Chờ nhận" → forward SearchRentalBillView kèm câu D9; (3) POST thiếu hoặc sai input ẩn rentalBillId → forward
+  ProcessRentalBillView kèm RENTAL_BILL_CHANGED. Form có action trỏ về chính trang (trang còn được forward tới).
 --%>
 <%@ page contentType="text/html; charset=UTF-8" trimDirectiveWhitespaces="true" %>
-<%@ page import="jakarta.servlet.DispatcherType, java.time.temporal.ChronoUnit, java.util.ArrayList,
-                 java.util.LinkedHashMap, java.util.List, java.util.Map, java.util.StringJoiner,
+<%@ page import="jakarta.servlet.DispatcherType, jakarta.servlet.http.HttpServletRequest, java.time.temporal.ChronoUnit,
+                 java.util.ArrayList, java.util.LinkedHashMap, java.util.List, java.util.Map, java.util.StringJoiner,
                  vn.tiemtruyen.model.RentalBill, vn.tiemtruyen.model.RentedBook, vn.tiemtruyen.model.RentedDamage,
-                 vn.tiemtruyen.util.Codes, vn.tiemtruyen.util.Display" %>
+                 vn.tiemtruyen.util.Codes, vn.tiemtruyen.util.Display, vn.tiemtruyen.util.Messages" %>
 <%@ taglib prefix="t" tagdir="/WEB-INF/tags" %>
 <%@ taglib prefix="ui" tagdir="/WEB-INF/tags/ui" %>
 <%@ taglib prefix="c" uri="jakarta.tags.core" %>
 <%@ taglib prefix="fn" uri="jakarta.tags.functions" %>
 <%!
+    /**
+     * Bước (2), (3) đầu trang M3 (phase-07-edge-cases.md §3.1). Trả trang cần forward (đã đặt request attribute
+     * message) hoặc null khi được xử lí tiếp.
+     */
+    private static String billGuard(HttpServletRequest request, RentalBill bill, boolean checkFormId) {
+        if (!RentalBill.STATUS_PENDING.equals(bill.getStatus())) {
+            request.setAttribute("message", RentalBill.STATUS_CANCELLED.equals(bill.getStatus())
+                    ? Messages.RENTAL_BILL_CANCELLED : Messages.RENTAL_BILL_ALREADY_PROCESSED);
+            return "/nhan-vien/SearchRentalBillView.jsp";
+        }
+        String formId = request.getParameter("rentalBillId");
+        if (checkFormId && (formId == null || !formId.strip().equals(String.valueOf(bill.getId())))) {
+            request.setAttribute("message", Messages.RENTAL_BILL_CHANGED);
+            return "/nhan-vien/ProcessRentalBillView.jsp";
+        }
+        return null;
+    }
+
     /** Tình trạng khi giao theo §13: null = chưa ghi nhận (C7); không có lỗi = "Không có lỗi"; còn lại tên lỗi nối ", ". */
     private static String conditionText(RentedBook row) {
         if (row.getConditionNote() == null) {
@@ -48,21 +68,27 @@
         response.sendRedirect(base + "/SearchRentalBillView.jsp");
         return;
     }
+    boolean selfPost = "POST".equals(request.getMethod())
+            && request.getDispatcherType() == DispatcherType.REQUEST;
+    String guard = billGuard(request, rentalBill, selfPost);
+    if (guard != null) {
+        request.getRequestDispatcher(guard).forward(request, response);
+        return;
+    }
+
     @SuppressWarnings("unchecked")
     List<RentedBook> listRentedBook = (List<RentedBook>) session.getAttribute("listRentedBook");
     if (listRentedBook == null) {
         listRentedBook = new ArrayList<>(rentalBill.getListRentedBook());
         session.setAttribute("listRentedBook", listRentedBook);
     }
-
-    boolean selfPost = "POST".equals(request.getMethod())
-            && request.getDispatcherType() == DispatcherType.REQUEST;
     String deleteBarcode = selfPost ? request.getParameter("lnkDeleteRentedBook") : null;
     if (deleteBarcode != null) {
-        listRentedBook.removeIf(row -> deleteBarcode.equals(row.getBookCopy().getBarcode()));
+        listRentedBook.removeIf(row -> deleteBarcode.strip().equals(row.getBookCopy().getBarcode()));
         session.setAttribute("listRentedBook", listRentedBook);
     }
 
+    String message = (String) request.getAttribute("message");
     long days = rentalDays(rentalBill);
     List<Map<String, Object>> rows = new ArrayList<>();
     for (RentedBook row : listRentedBook) {
@@ -76,15 +102,18 @@
         rows.add(view);
     }
     pageContext.setAttribute("base", base);
+    pageContext.setAttribute("billId", rentalBill.getId());
     pageContext.setAttribute("billCode", Codes.rentalBillCode(rentalBill.getId()));
     pageContext.setAttribute("rows", rows);
+    pageContext.setAttribute("pageMessage", message);
 %>
 <t:layout title="Chỉnh sửa danh sách truyện">
   <section class="mx-auto flex max-w-5xl flex-col gap-6 px-4 py-8">
     <h1 class="font-sign text-ink">Chỉnh sửa danh sách truyện</h1>
-    <c:if test="${not empty message}"><ui:message-box kind="error" text="${message}"/></c:if>
+    <c:if test="${not empty pageMessage}"><ui:message-box kind="error" text="${pageMessage}"/></c:if>
     <form method="post" action="${base}/EditRentedBookListView.jsp" class="flex flex-col gap-6">
       <t:csrf/>
+      <input type="hidden" name="rentalBillId" value="${billId}">
       <div class="overflow-x-auto">
         <table id="tblRentedBook" class="tt-ledger-table">
           <caption class="tt-ledger-table__caption">Các quyển truyện của phiếu mượn <span class="font-num">${billCode}</span></caption>
