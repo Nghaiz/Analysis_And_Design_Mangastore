@@ -49,6 +49,7 @@ public final class Messages {
     public static final String SESSION_EXPIRED = "Phiên làm việc đã hết hạn, vui lòng đăng nhập lại.";
     public static final String CANCEL_REASON_REQUIRED = "Vui lòng nhập lí do huỷ.";
     public static final String EXPECTED_DAYS_TOO_LONG = "Số ngày thuê tối đa là 30 ngày.";
+    public static final String SELECTED_BOOKS_CHANGED = "Truyện đã chọn đã thay đổi, vui lòng kiểm tra lại.";
 
     /** Đoạn chứa chữ {@code N} duy nhất cần thay trong {@link #QUANTITY_EXCEEDED}. */
     private static final String QUANTITY_PLACEHOLDER = "(hiện còn N quyển)";

@@ -76,7 +76,7 @@ Tài khoản trên seed: nhân viên `hant`, quản lí `quanli`, khách `khach0
 
 ## 6. Edge case ngoài báo cáo (chủ dự án yêu cầu 11/11/2026: bao quát mọi ngoại lệ và mọi trường hợp hay gặp thực tế)
 
-Mọi ngoại lệ của ch.2 mục 2.1 (bước 6, 10) và 2.2 (bước 2, 5, 24) phải chạy và có trong smoke. Ngoài ra, mọi trang xử lí đủ các trường hợp dưới đây. **Không trường hợp nào được ra trang 500, stack trace, hay ghi DB sai.** Câu báo dùng §10.1 và §10.3 của `docs/contracts.md` (8 câu ngoài báo cáo chủ dự án duyệt 11/11/2026); luật mới ở §14 C14–C19.
+Mọi ngoại lệ của ch.2 mục 2.1 (bước 6, 10) và 2.2 (bước 2, 5, 24) phải chạy và có trong smoke. Ngoài ra, mọi trang xử lí đủ các trường hợp dưới đây. **Không trường hợp nào được ra trang 500, stack trace, hay ghi DB sai.** Câu báo dùng §10.1 và §10.3 của `docs/contracts.md` (9 câu ngoài báo cáo chủ dự án duyệt 11/11/2026); luật mới ở §14 C14–C21.
 
 ### 6.1 Làm ngay (mỗi trường hợp một test hoặc một bước kiểm trong báo cáo lane)
 
@@ -98,6 +98,7 @@ Mọi ngoại lệ của ch.2 mục 2.1 (bước 6, 10) và 2.2 (bước 2, 5, 2
 | `BookDetailView`, `doAddSelectedBook`, `doDeleteSelectedBook` khi session không có `book` hoặc `cart` | 302 về `SearchBookView.jsp` |
 | `ConfirmRentalBillView` khi không có `rentalBill` hoặc `listRentedBook` rỗng | 302 về `SearchBookView.jsp` |
 | `doAddRentalBill` khi không có `rentalBill` (bấm "Xác nhận" hai lần, F5 sau khi tạo) | 302 về `ClientHomeView.jsp`, không tạo phiếu thứ hai |
+| Hai thiết bị cùng khách: thiết bị B xoá dòng "Truyện đã chọn" hoặc đã xác nhận cùng giỏ, thiết bị A bấm "Xác nhận" (C21) | `addRentalBill` trả `false`, không phiếu thứ hai, không 500; `SELECTED_BOOKS_CHANGED` ở trang "Truyện đã chọn" với giỏ đọc lại (lane 6G) |
 | `RentalBillDetailView` khi không có `rentalBill` | 302 về `RentalBillListView.jsp` |
 | `doCancelRentalBill` khi không có `rentalBill` | 302 về trang danh sách của vai |
 | Huỷ lần hai cùng phiếu (bấm hai lần) | nhánh D9: `RENTAL_BILL_CANCELLED` |
