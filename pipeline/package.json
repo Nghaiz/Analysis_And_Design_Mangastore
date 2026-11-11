@@ -1,0 +1,22 @@
+{
+  "name": "tiemtruyen-pipeline",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Pipeline crawl, làm sạch, ảnh, quyển, giá, kiểm, xuất dữ liệu catalog cho tiệm thuê truyện (phase 4).",
+  "type": "module",
+  "engines": {
+    "node": ">=24"
+  },
+  "scripts": {
+    "test": "vitest run",
+    "cli": "node cli.mjs"
+  },
+  "dependencies": {
+    "ajv": "8.20.0",
+    "fast-xml-parser": "5.12.0",
+    "sharp": "0.35.5"
+  },
+  "devDependencies": {
+    "vitest": "5.1.0"
+  }
+}

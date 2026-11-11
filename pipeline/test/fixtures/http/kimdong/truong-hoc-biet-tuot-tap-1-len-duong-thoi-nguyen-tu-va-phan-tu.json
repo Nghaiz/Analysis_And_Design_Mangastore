@@ -1,0 +1,65 @@
+{
+ "id": 60919554,
+ "name": "Trường học Biết Tuốt - Tập 1 - Lên đường thôi - Nguyên tử và phân tử",
+ "alias": "truong-hoc-biet-tuot-tap-1-len-duong-thoi-nguyen-tu-va-phan-tu",
+ "vendor": "Khác",
+ "product_type": "Kiến thức - khoa học",
+ "price": 28000,
+ "price_max": 28000,
+ "price_min": 28000,
+ "price_varies": false,
+ "compare_at_price_max": 35000,
+ "compare_at_price_min": 35000,
+ "compare_at_price_varies": false,
+ "tags": [
+  "30",
+  "mph",
+  "2025",
+  "xemthu_https://bizweb.dktcdn.net/100/576/749/files/preview_truong_hoc_biet_tuot_tap_1_nguyen_tu_va_phan_tu.pdf?v=1785901193663",
+  "bts"
+ ],
+ "summary": null,
+ "content": "<ul>\n<li style=\"text-align: justify;\">ISBN: <strong>978-604-2-24505-0</strong></li>\n<li style=\"text-align: justify;\">Tác giả: <a href=\"https://nxbkimdong.com.vn/collections/monster-chemistry-group\">Monster Chemistry Group</a><a href=\"/collections/le-bich-thuy\"><br></a>&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <a href=\"https://nxbkimdong.com.vn/collections/guo-rurong\">Guo Rurong</a></li>\n<li style=\"text-align: justify;\">Đối tượng: <a href=\"https://nxbkimdong.com.vn/collections/nhi-dong-6-11\">Nhi đồng (6 – 11)</a></li>\n<li style=\"text-align: justify;\">Khuôn Khổ: 17x23 cm</li>\n<li style=\"text-align: justify;\">Số trang:&nbsp;32</li>\n<li style=\"text-align: justify;\">Định dạng:&nbsp;bìa&nbsp;mềm</li>\n<li style=\"text-align: justify;\">Trọng lượng:&nbsp;80 gram</li>\n<li style=\"text-align: justify;\">Bộ sách: <a href=\"https://nxbkimdong.com.vn/collections/truong-hoc-biet-tuot\">Trường học Biết Tuốt</a><hr>\n<p>Mô tả cắt ngắn cho test.</p></li>\n</ul>",
+ "featured_image": "https://bizweb.dktcdn.net/100/576/749/products/truong-hoc-biet-tuot-tap-1-nguyen-tu-va-phan-tu-bia-151e5ab11a344f4cb0c417447e1a5e72.jpg?v=1760789543643",
+ "images": [
+  "https://bizweb.dktcdn.net/100/576/749/products/truong-hoc-biet-tuot-tap-1-nguyen-tu-va-phan-tu-bia-151e5ab11a344f4cb0c417447e1a5e72.jpg?v=1760789543643"
+ ],
+ "options": [
+  {
+   "name": "Title",
+   "position": 1
+  }
+ ],
+ "variants": [
+  {
+   "id": 172055358,
+   "barcode": "5252318870001",
+   "sku": "5252318870001",
+   "unit": "Cuốn",
+   "price": 28000,
+   "compare_at_price": 35000,
+   "price_original": 35000,
+   "compare_at_price_original": 35000,
+   "options": [
+    "Default Title"
+   ],
+   "option1": "Default Title",
+   "option2": null,
+   "option3": null,
+   "title": "Default Title",
+   "inventory_management": "bizweb",
+   "inventory_policy": "deny",
+   "inventory_quantity": 13,
+   "weight": 80,
+   "weight_unit": "g",
+   "featured_image": {
+    "src": "https://bizweb.dktcdn.net/100/576/749/products/truong-hoc-biet-tuot-tap-1-nguyen-tu-va-phan-tu-bia-151e5ab11a344f4cb0c417447e1a5e72.jpg?v=1760789543643"
+   },
+   "available": true,
+   "url": "/truong-hoc-biet-tuot-tap-1-len-duong-thoi-nguyen-tu-va-phan-tu?variant=172055358",
+   "taxable": true
+  }
+ ],
+ "available": true,
+ "url": "/truong-hoc-biet-tuot-tap-1-len-duong-thoi-nguyen-tu-va-phan-tu"
+}

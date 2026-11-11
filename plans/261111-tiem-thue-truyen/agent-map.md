@@ -2,9 +2,9 @@
 
 Nguồn sự thật cho việc giao lane của mọi phiên cook. Đọc lại đầu phiên và sau mỗi lần compact (cùng `CLAUDE.md` và file phase đang làm). Giao hay nhận việc xong là cập nhật file này ngay, trước khi làm việc khác.
 
-Phase đang chạy: 4 (pipeline crawl); phase 1, 2 đã vào `main` (PR #1, #2), phase 3 xong trên `phase/03-schema-dao`
+Phase 1–4 xong: phase 1, 2, 3 đã vào `main` (PR #1, #2, #3), phase 4 vào `main` qua PR của `phase/04-pipeline`. Phase tiếp theo: 5
 Cập nhật lần cuối: 2026-11-11 (phiên cook phase 3–4)
-Nhánh phase: `phase/03-schema-dao`, `phase/04-pipeline`
+Nhánh phase: chưa có (phase 5 tạo `phase/05-...` từ `origin/main`)
 
 ## Luật (tóm tắt, bản đủ ở `plan.md` và `contract.md` §1)
 
@@ -43,11 +43,11 @@ Nhánh phase: `phase/03-schema-dao`, `phase/04-pipeline`
 | 3 | 3B `dao-user-book` | User, Client, Staff, Book, Damage, Collateral DAO | `t1k-web-core-developer` | xem `phase-03` | 3A | xong | `plans/reports/phase-03-dao-user-book-261111-0438.md` |
 | 3 | 3C `dao-cart-bill` | Cart, RentalBill DAO, K1, D9, test tranh chấp | `t1k-web-core-developer` | xem `phase-03` | 3A | xong (ae188ad) | `plans/reports/phase-03-dao-cart-bill-261111-0450.md` |
 | 3 | 3D `kiem-kien-truc` | SchemaConformanceTest, ArchitectureTest | `t1k-web-core-developer` | `src/test/.../schema,arch/**` | 3A | xong | `plans/reports/phase-03-kiem-kien-truc-261111-0442.md` |
-| 4 | 4.0 orchestrator | package, schema bản ghi, categories, Accept | phiên chính | xem `phase-04` | phase 3 | chờ | |
-| 4 | 4A `nguon` | fetch, robots, cache, nguồn, series, census | `t1k-web-core-developer` | xem `phase-04` | 4.0 | chờ | |
-| 4 | 4B `xu-li` | clean, images, copies, price, validate, export, publish | `t1k-web-core-developer` | xem `phase-04` | 4.0 | chờ | |
-| 4 | 4C `xac-minh` | Playwright MCP trang ảnh chạy thử | `t1k-web-testing-tester` | `plans/reports/` | 4.3 | chờ | |
-| 4 | 4.5 HARD STOP | chủ dự án duyệt chạy thử 10 đầu truyện | chủ dự án | | 4C | chờ | |
+| 4 | 4.0 orchestrator | package, schema bản ghi, categories, Accept, `pipeline/CONTRACT.md`, run đầy đủ, publish | phiên ab | xem `phase-04` | phase 3 (chỉ export cần) | xong | `plans/reports/phase-04-pipeline-261111-0532.md` |
+| 4 | 4A `nguon` | fetch, robots, cache, nguồn, series, census | `t1k-web-core-developer` | xem `phase-04` | 4.0 | xong | `plans/reports/phase-04-nguon-261111-0411.md` |
+| 4 | 4B `xu-li` | clean, images, copies, price, validate, export, publish | `t1k-web-core-developer` | xem `phase-04` | 4.0 | xong | `plans/reports/phase-04-xu-li-261111-0401.md` |
+| 4 | 4C `xac-minh` | Playwright MCP trang ảnh chạy thử | `t1k-web-testing-tester` | `plans/reports/` | 4.3 | xong | `plans/reports/phase-04-trial-261111-0423.md` |
+| 4 | 4.5 HARD STOP | chủ dự án duyệt chạy thử 10 đầu truyện | orchestrator thay (chủ dự án giao toàn quyền 11/11/2026) | | 4C | xong: 10/10 đạt, crawl hết | `plans/reports/phase-04-trial-261111-0423.md` |
 | 5 | 5.0 orchestrator | gói npm, shadcn add, khoá vite.config | phiên chính | xem `phase-05` | phase 3 | chờ | |
 | 5 | 5A `token-tag` | token, font, CSS, tag JSP, StyleGuide, kiểm tương phản và font | `t1k-web-ui-developer` | xem `phase-05` | 5.0 | chờ | |
 | 5 | 5B `loader-react` | loader cách B, component React, ESLint chặn fetch, ngân sách | `t1k-web-core-developer` | xem `phase-05` | 5.0 | chờ | |
