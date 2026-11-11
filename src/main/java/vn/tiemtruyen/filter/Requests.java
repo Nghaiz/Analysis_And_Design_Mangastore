@@ -21,6 +21,7 @@ final class Requests {
     static final String MESSAGE = "message";
 
     static final String CLIENT_LOGIN = "/LoginView.jsp";
+    /** Trang cũ của nhân viên, nay chỉ chuyển hướng sang {@link #CLIENT_LOGIN} (C23); vẫn mở và vẫn qua kiểm CSRF. */
     static final String STAFF_LOGIN = "/nhan-vien/LoginView.jsp";
     static final String STAFF_PREFIX = "/nhan-vien/";
     static final String METHOD_POST = "POST";

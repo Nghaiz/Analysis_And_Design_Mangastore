@@ -10,8 +10,8 @@ Trong DB chỉ có chuỗi băm Argon2id sinh sẵn bằng `util/Passwords` ([AD
 
 | Tên đăng nhập | Mật khẩu | Vai | Họ và tên | Đăng nhập ở | Nguồn |
 |---|---|---|---|---|---|
-| `hant` | `hant@123` | Staff, `Nhân viên bán hàng` | Nguyễn Thu Hà | `/nhan-vien/LoginView.jsp` | ch.2 mục 2.3, bước 1–2 |
-| `quanli` | `quanli@123` | Staff, `Quản lí` (vào được `/nhan-vien/quan-tri/*`) | Phạm Quốc Huy | `/nhan-vien/LoginView.jsp` | D6; tên và mật khẩu do lane 2B đặt 11/11/2026 theo mẫu `hant@123` (báo cáo không có) |
+| `hant` | `hant@123` | Staff, `Nhân viên bán hàng` | Nguyễn Thu Hà | `/LoginView.jsp` (C23) | ch.2 mục 2.3, bước 1–2 |
+| `quanli` | `quanli@123` | Staff, `Quản lí` (vào được `/nhan-vien/quan-tri/*`) | Phạm Quốc Huy | `/LoginView.jsp` (C23) | D6; tên và mật khẩu do lane 2B đặt 11/11/2026 theo mẫu `hant@123` (báo cáo không có) |
 | `khach01` | `khach01@123` | Client (kèm một dòng `tblCart`) | Lê Hoàng Nam | `/LoginView.jsp` | phase-03 bước V2; tên và mật khẩu do lane 2B đặt 11/11/2026 theo mẫu `hant@123` |
 | `khach02` | `khach02@123` | Client (kèm một dòng `tblCart`) | Đỗ Thị Lan | `/LoginView.jsp` | như trên |
 | `khach03` | `khach03@123` | Client (kèm một dòng `tblCart`) | Vũ Đức Long | `/LoginView.jsp` | như trên |

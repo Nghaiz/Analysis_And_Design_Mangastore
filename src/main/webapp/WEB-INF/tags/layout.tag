@@ -48,8 +48,6 @@
     } else if ("/nhan-vien/StaffHomeView.jsp".equals(path) || "/ClientHomeView.jsp".equals(path)
             || "/HomeView.jsp".equals(path)) {
         section = "home";
-    } else if ("/nhan-vien/LoginView.jsp".equals(path)) {
-        section = "staffLogin";
     } else if (path.startsWith("/nhan-vien/")) {
         section = "process";
     } else if ("/RentalBillListView.jsp".equals(path) || "/RentalBillDetailView.jsp".equals(path)) {
@@ -126,11 +124,7 @@
       </nav>
 
       <div class="tt-site-header__user">
-        <c:choose>
-          <c:when test="${navRole eq 'guest'}">
-            <a href="${ctx}/nhan-vien/LoginView.jsp" class="tt-btn tt-btn--ghost tt-btn--sm${navSection eq 'staffLogin' ? ' tt-nav__link--active' : ''}"${navSection eq 'staffLogin' ? ' aria-current="page"' : ''}>Nhân viên</a>
-          </c:when>
-          <c:otherwise>
+        <c:if test="${navRole ne 'guest'}">
             <span class="tt-user">
               <span class="tt-user__avatar" aria-hidden="true">${fn:escapeXml(fn:substring(navUserName, 0, 1))}</span>
               <span class="tt-user__text">
@@ -146,8 +140,7 @@
                 <span>Đăng xuất</span>
               </button>
             </form>
-          </c:otherwise>
-        </c:choose>
+        </c:if>
       </div>
     </div>
   </header>

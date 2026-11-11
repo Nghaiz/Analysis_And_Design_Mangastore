@@ -58,7 +58,7 @@ const LONG_255 = 'x'.repeat(256);
 const LONG_100 = 'x'.repeat(101);
 
 const PAGE = {
-  login: `${NV}/LoginView.jsp`,
+  login: '/LoginView.jsp', // C23: một trang đăng nhập chung cho khách và nhân viên
   home: `${NV}/StaffHomeView.jsp`,
   search: `${NV}/SearchRentalBillView.jsp`,
   process: `${NV}/ProcessRentalBillView.jsp`,

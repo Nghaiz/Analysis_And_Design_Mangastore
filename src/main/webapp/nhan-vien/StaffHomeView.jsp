@@ -13,7 +13,7 @@
     Staff staff = (Staff) session.getAttribute("staff");
     if (staff == null) {
         // AuthFilter đã chặn (§12); phòng khi trang được gọi thẳng lúc filter chưa có.
-        response.sendRedirect(request.getContextPath() + "/nhan-vien/LoginView.jsp");
+        response.sendRedirect(request.getContextPath() + "/LoginView.jsp");
         return;
     }
     pageContext.setAttribute("staffName", staff.getFullName());

@@ -98,8 +98,8 @@ class CsrfFilterTest {
         "/doAddSelectedBook.jsp, /LoginView.jsp?expired=1",
         "/SearchBookView.jsp, /LoginView.jsp?expired=1",
         "/doCancelRentalBill.jsp, /LoginView.jsp?expired=1",
-        "/nhan-vien/doUpdateRentalBill.jsp, /nhan-vien/LoginView.jsp?expired=1",
-        "/nhan-vien/quan-tri/doAddBook.jsp, /nhan-vien/LoginView.jsp?expired=1"
+        "/nhan-vien/doUpdateRentalBill.jsp, /LoginView.jsp?expired=1",
+        "/nhan-vien/quan-tri/doAddBook.jsp, /LoginView.jsp?expired=1"
     })
     void postWithoutSessionRedirectsToTheRoleViewAndThePageDoesNotRun(String path, String target)
             throws IOException, ServletException {

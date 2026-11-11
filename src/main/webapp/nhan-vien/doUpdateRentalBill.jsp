@@ -76,7 +76,7 @@
     String ctx = request.getContextPath();
     Staff staff = (Staff) session.getAttribute("staff");
     if (staff == null) {
-        response.sendRedirect(ctx + "/nhan-vien/LoginView.jsp");
+        response.sendRedirect(ctx + "/LoginView.jsp");
         return;
     }
     // Thứ tự kiểm đầu trang (phase-07-edge-cases.md §3.1).

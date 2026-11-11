@@ -3,7 +3,7 @@
   dòng C14, §12, §14 C14. Một trang ở gốc, khách và nhân viên dùng chung.
   - Chỉ nhận POST (CsrfFilter đã kiểm token); method khác: 405.
   - Đọc vai TRƯỚC khi huỷ session, rồi session.invalidate():
-      khách (client id > 0) → 302 HomeView.jsp; nhân viên (staff) → 302 /nhan-vien/LoginView.jsp;
+      khách (client id > 0) → 302 HomeView.jsp; nhân viên (staff) → 302 /LoginView.jsp (trang đăng nhập chung, C23);
       chưa đăng nhập (không session, hoặc chỉ có bản nháp đăng kí id = 0) → 302 HomeView.jsp.
     Session vừa có client vừa có staff (không có luồng nào tạo ra): coi là khách, vì nút ở ClientHomeView.
   - session="false": không tạo session mới chỉ để huỷ nó.
@@ -22,7 +22,7 @@
         boolean client = current.getAttribute("client") instanceof Client c && c.getId() > 0;
         boolean staff = current.getAttribute("staff") instanceof Staff;
         if (!client && staff) {
-            next = "/nhan-vien/LoginView.jsp";
+            next = "/LoginView.jsp";
         }
         current.invalidate();
     }

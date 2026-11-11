@@ -83,7 +83,7 @@ flowchart TD
 
 ```mermaid
 flowchart TD
-    SL["nhan-vien/LoginView.jsp"]
+    SL["LoginView.jsp (chung, C23)"]
     SH["StaffHomeView.jsp"]
     SR["SearchRentalBillView.jsp"]
     PR["ProcessRentalBillView.jsp"]

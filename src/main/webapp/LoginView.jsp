@@ -1,6 +1,6 @@
 <%--
   LoginView.jsp của khách, giao diện "Đăng nhập" (ch.9 tr.58; docs/contracts.md §9.2 LoginView;
-  phase-06-integration.md §2 "Đăng nhập", §6.1 M1). Bản của nhân viên ở nhan-vien/LoginView.jsp (D5).
+  phase-06-integration.md §2 "Đăng nhập", §6.1 M1). Một trang chung cho khách và nhân viên (C23, chủ dự án đổi D5 ngày 11/11/2026): ClientDAO.checkLogin trước, không khớp thì StaffDAO.checkLogin (tblUser.username là duy nhất nên một tên chỉ thuộc một vai); nhan-vien/LoginView.jsp chỉ còn chuyển hướng về đây.
   - Chỉ xử lí đăng nhập khi POST + dispatcher REQUEST + có btnLogin. Mọi trường hợp khác chỉ hiển thị, kể cả khi
     doRegister forward sang kèm REGISTER_SUCCESS (request đó mang txtUsername, txtPassword của form đăng kí) và khi
     LoginRateLimitFilter chặn (filter đặt message = LOGIN_FAILED và bọc request thành GET).
@@ -15,8 +15,8 @@
   - Form có action về chính trang vì URL trên thanh địa chỉ có thể đang là /doRegister.jsp (forward).
 --%>
 <%@ page contentType="text/html; charset=UTF-8" trimDirectiveWhitespaces="true"
-         import="java.text.Normalizer, vn.tiemtruyen.dao.ClientDAO, vn.tiemtruyen.model.Client,
-                 vn.tiemtruyen.model.User, vn.tiemtruyen.util.Messages" %>
+         import="java.text.Normalizer, vn.tiemtruyen.dao.ClientDAO, vn.tiemtruyen.dao.StaffDAO, vn.tiemtruyen.model.Client,
+                 vn.tiemtruyen.model.Staff, vn.tiemtruyen.model.User, vn.tiemtruyen.util.Messages" %>
 <%@ taglib prefix="t" tagdir="/WEB-INF/tags" %>
 <%@ taglib prefix="ui" tagdir="/WEB-INF/tags/ui" %>
 <%@ taglib prefix="c" uri="jakarta.tags.core" %>
@@ -35,21 +35,41 @@
         response.sendRedirect(request.getContextPath() + "/ClientHomeView.jsp");
         return;
     }
+    if (direct && session.getAttribute("staff") instanceof Staff) {
+        response.sendRedirect(request.getContextPath() + "/nhan-vien/StaffHomeView.jsp");
+        return;
+    }
 
     String username = direct ? text(request.getParameter("txtUsername")) : "";
     if (direct && "POST".equals(request.getMethod()) && request.getParameter("btnLogin") != null) {
         String rawPassword = request.getParameter("txtPassword");
         String password = rawPassword == null ? "" : Normalizer.normalize(rawPassword, Normalizer.Form.NFC);
         Client client = null;
+        Staff staff = null;
         if (!username.isEmpty() && !password.isEmpty() && password.length() <= PASSWORD_MAX) {
             User user = new User();
             user.setUsername(username);
             user.setPassword(password);
             try (ClientDAO clientDAO = new ClientDAO()) {
                 client = clientDAO.checkLogin(user);
+                if (client == null) {
+                    // C23: không phải khách thì thử tài khoản nhân viên trên cùng trang.
+                    user.setPassword(password);
+                    try (StaffDAO staffDAO = new StaffDAO()) {
+                        staff = staffDAO.checkLogin(user);
+                    }
+                }
             } finally {
                 user.setPassword(null);
             }
+        }
+        if (staff != null) {
+            staff.setPassword(null);
+            // Máy quầy dùng chung: không kế thừa thuộc tính của người trước, nên huỷ session cũ rồi mở session mới.
+            session.invalidate();
+            request.getSession(true).setAttribute("staff", staff);
+            response.sendRedirect(request.getContextPath() + "/nhan-vien/StaffHomeView.jsp");
+            return;
         }
         if (client != null) {
             // phase-06-integration.md §2: session mới hẳn, người đăng nhập sau không kế thừa cart, rentalBill
@@ -82,17 +102,17 @@
     <header class="flex flex-col gap-1">
       <p class="tt-hero__eyebrow">Mời bạn vào tiệm</p>
       <h1 class="m-0">Đăng nhập</h1>
-      <p class="m-0 text-ink-soft">Đăng nhập bằng tài khoản khách hàng để tìm truyện, tạo phiếu mượn và xem các phiếu của bạn.</p>
+      <p class="m-0 text-ink-soft">Khách hàng đăng nhập để tìm truyện, tạo phiếu mượn và xem các phiếu của mình; nhân viên của tiệm dùng chung trang này để vào quầy.</p>
     </header>
     <c:if test="${not empty requestScope.message}"><ui:message-box kind="${messageKind}" text="${requestScope.message}"/></c:if>
     <div class="grid gap-6 md:grid-cols-[minmax(0,3fr)_minmax(0,2fr)] md:items-start">
       <form method="post" action="${pageContext.request.contextPath}/LoginView.jsp" class="tt-paper-card tt-worn flex flex-col gap-5">
         <t:csrf/>
-        <h2 class="tt-paper-card__heading">Tài khoản khách hàng</h2>
+        <h2 class="tt-paper-card__heading">Tài khoản của bạn</h2>
         <div class="flex flex-col gap-1">
           <label for="txtUsername" class="font-type text-ink">Tên đăng nhập:</label>
           <input type="text" id="txtUsername" name="txtUsername" value="${fn:escapeXml(username)}" autocomplete="username" autocapitalize="none" spellcheck="false" aria-describedby="txtUsernameHint" class="w-full rounded-paper border border-ink-soft bg-paper px-3 py-2 text-ink focus-visible:outline-2 focus-visible:outline-pen-blue">
-          <p id="txtUsernameHint" class="m-0 text-sm text-ink-soft">Tên bạn đặt lúc đăng kí, không phân biệt chữ hoa, chữ thường.</p>
+          <p id="txtUsernameHint" class="m-0 text-sm text-ink-soft">Tên đăng nhập của tài khoản khách hàng hoặc nhân viên, không phân biệt chữ hoa, chữ thường.</p>
         </div>
         <div class="flex flex-col gap-1">
           <label for="txtPassword" class="font-type text-ink">Mật khẩu:</label>
@@ -106,7 +126,6 @@
         <h2 id="login-help-h" class="tt-paper-card__heading">Chưa có tài khoản?</h2>
         <p class="m-0 text-ink">Đăng kí bằng họ tên, số CCCD, số điện thoại và email. Xong là đăng nhập được ngay.</p>
         <p class="m-0"><a href="${pageContext.request.contextPath}/RegisterView.jsp" class="tt-btn tt-btn--ghost">Tạo tài khoản mới</a></p>
-        <p class="m-0 border-t border-dashed border-ink-soft pt-3 text-sm text-ink-soft">Nhân viên của tiệm đăng nhập ở <a href="${pageContext.request.contextPath}/nhan-vien/LoginView.jsp">trang dành cho nhân viên</a>.</p>
       </section>
     </div>
   </div>

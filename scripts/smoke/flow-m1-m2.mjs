@@ -137,10 +137,10 @@ async function main() {
     const page = await new Session(BASE_URL).get('/doRegister.jsp', { follow: false });
     expectStatus('S5', page, 405);
   });
-  await step('S6 trang nhân viên chưa đăng nhập bị chuyển về /nhan-vien/LoginView.jsp', async () => {
+  await step('S6 trang nhân viên chưa đăng nhập bị chuyển về /LoginView.jsp (C23)', async () => {
     const page = await new Session(BASE_URL).get('/nhan-vien/StaffHomeView.jsp', { follow: false });
-    if (page.status !== 302 || !/\/nhan-vien\/LoginView\.jsp$/.test(new URL(page.location ?? '', BASE_URL).pathname)) {
-      throw new StepError('S6', '/nhan-vien/StaffHomeView.jsp', '302 → /nhan-vien/LoginView.jsp', `${page.status} → ${page.location}`);
+    if (page.status !== 302 || !/^\/LoginView\.jsp$/.test(new URL(page.location ?? '', BASE_URL).pathname)) {
+      throw new StepError('S6', '/nhan-vien/StaffHomeView.jsp', '302 → /LoginView.jsp', `${page.status} → ${page.location}`);
     }
   });
 

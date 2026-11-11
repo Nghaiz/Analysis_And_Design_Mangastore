@@ -107,8 +107,8 @@ class AuthFilterTest {
     void row5StaffPagesNeedAStaffLogin(String path) throws IOException, ServletException {
         assertAllowed(path, staffSession(Staff.POSITION_SALES));
         assertAllowed(path, staffSession(Staff.POSITION_MANAGER));
-        assertRedirected(path, null, "/nhan-vien/LoginView.jsp");
-        assertRedirected(path, clientSession(5), "/nhan-vien/LoginView.jsp");
+        assertRedirected(path, null, "/LoginView.jsp");
+        assertRedirected(path, clientSession(5), "/LoginView.jsp");
     }
 
     @Test
@@ -117,8 +117,8 @@ class AuthFilterTest {
         assertAllowed(path, staffSession(Staff.POSITION_MANAGER));
         assertForbidden(path, staffSession(Staff.POSITION_SALES));
         assertForbidden(path, staffSession(null));
-        assertRedirected(path, null, "/nhan-vien/LoginView.jsp");
-        assertRedirected(path, clientSession(5), "/nhan-vien/LoginView.jsp");
+        assertRedirected(path, null, "/LoginView.jsp");
+        assertRedirected(path, clientSession(5), "/LoginView.jsp");
     }
 
     @ParameterizedTest
@@ -144,7 +144,7 @@ class AuthFilterTest {
     @Test
     void expiredSessionCookieOnAStaffPageAddsTheExpiredFlag() throws IOException, ServletException {
         run(Request.get("/nhan-vien/quan-tri/ManageBookView.jsp").staleSessionCookie());
-        assertEquals(CONTEXT + "/nhan-vien/LoginView.jsp?expired=1", response.redirect());
+        assertEquals(CONTEXT + "/LoginView.jsp?expired=1", response.redirect());
     }
 
     @Test
@@ -168,6 +168,6 @@ class AuthFilterTest {
     @Test
     void pathInfoIsPartOfThePath() throws IOException, ServletException {
         run(Request.get("/nhan-vien").pathInfo("/StaffHomeView.jsp"));
-        assertEquals(CONTEXT + "/nhan-vien/LoginView.jsp", response.redirect());
+        assertEquals(CONTEXT + "/LoginView.jsp", response.redirect());
     }
 }

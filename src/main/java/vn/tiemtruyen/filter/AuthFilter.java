@@ -20,9 +20,10 @@ import vn.tiemtruyen.model.Staff;
  *   <li>Luôn mở: Home, Register, doRegister, hai LoginView, doLogout (C14), health, {@code /static/*},
  *       {@code /error/*}, {@code /dev/*}; đường dẫn không phải trang JSP cho qua (Tomcat tự trả 404).</li>
  *   <li>{@code /doCancelRentalBill.jsp}: khách đã đăng nhập hoặc nhân viên; trang kiểm thêm {@code from} (C8).</li>
- *   <li>{@code /nhan-vien/quan-tri/*}: chưa đăng nhập nhân viên thì về LoginView của nhân viên; nhân viên không
+ *   <li>{@code /nhan-vien/quan-tri/*}: chưa đăng nhập nhân viên thì về LoginView chung (C23); nhân viên không
  *       phải "Quản lí" thì 403.</li>
- *   <li>{@code /nhan-vien/*} khác: nhân viên; không thì 302 về {@code /nhan-vien/LoginView.jsp}.</li>
+ *   <li>{@code /nhan-vien/*} khác: nhân viên; không thì 302 về {@code /LoginView.jsp} (một trang đăng nhập cho
+ *       cả khách và nhân viên, C23; {@code /nhan-vien/LoginView.jsp} chỉ còn chuyển hướng sang đó).</li>
  *   <li>Mọi trang JSP khác: khách có {@code client.id > 0}; không thì 302 về {@code /LoginView.jsp}.</li>
  * </ul>
  *
@@ -53,7 +54,7 @@ public class AuthFilter implements Filter {
         switch (decision) {
             case ALLOW -> chain.doFilter(request, response);
             case CLIENT_LOGIN -> httpResponse.sendRedirect(context + Requests.CLIENT_LOGIN + expired);
-            case STAFF_LOGIN -> httpResponse.sendRedirect(context + Requests.STAFF_LOGIN + expired);
+            case STAFF_LOGIN -> httpResponse.sendRedirect(context + Requests.CLIENT_LOGIN + expired);
             case FORBIDDEN -> httpResponse.sendError(HttpServletResponse.SC_FORBIDDEN);
             default -> throw new IllegalStateException("Quyết định phân quyền chưa xử lí: " + decision);
         }
@@ -90,9 +91,9 @@ public class AuthFilter implements Filter {
         return OPEN_PAGES.contains(path) || OPEN_PREFIXES.stream().anyMatch(path::startsWith);
     }
 
-    /** LoginView của vai sở hữu đường dẫn: {@code /nhan-vien/*} về LoginView nhân viên, còn lại về LoginView khách. */
+    /** LoginView để đăng nhập lại: một trang chung cho mọi vai (C23), đường dẫn nào cũng về đó. */
     static String loginFor(String path) {
-        return path.startsWith(Requests.STAFF_PREFIX) ? Requests.STAFF_LOGIN : Requests.CLIENT_LOGIN;
+        return Requests.CLIENT_LOGIN;
     }
 
     /** C16: request mang session id (cookie) mà session đó không còn (hết hạn, bị huỷ). */
@@ -106,7 +107,7 @@ public class AuthFilter implements Filter {
         ALLOW,
         /** 302 về LoginView của khách. */
         CLIENT_LOGIN,
-        /** 302 về LoginView của nhân viên. */
+        /** Trang nhân viên chưa đăng nhập: 302 về LoginView chung (C23). */
         STAFF_LOGIN,
         /** 403. */
         FORBIDDEN

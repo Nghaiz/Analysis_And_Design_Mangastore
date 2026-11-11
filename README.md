@@ -48,7 +48,7 @@ docker compose up --build -d --wait        # app, db, redis, nginx
 curl -fsS http://127.0.0.1:8080/health.jsp
 ```
 
-Mở `http://127.0.0.1:8080`. Trang nhân viên ở `/nhan-vien/LoginView.jsp`, trang quản trị ở `/nhan-vien/quan-tri/`.
+Mở `http://127.0.0.1:8080`. Khách và nhân viên đăng nhập chung ở `/LoginView.jsp`; trang quản trị ở `/nhan-vien/quan-tri/`.
 
 - Tài khoản mẫu (khách, nhân viên, quản lí) và mật khẩu: [`docs/dev-accounts.md`](docs/dev-accounts.md). `.env` chỉ chứa mật khẩu của DB và Redis, không bao giờ commit.
 - Dừng stack: `docker compose down`. **Không thêm `-v`**: lệnh đó xoá volume dữ liệu.

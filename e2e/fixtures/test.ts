@@ -54,9 +54,9 @@ export async function loginClient(page: Page, username: string, password: string
   await page.locator('#btnLogin').click();
 }
 
-/** Đăng nhập nhân viên ở /nhan-vien/LoginView.jsp (D5). */
+/** Đăng nhập nhân viên ở trang đăng nhập chung /LoginView.jsp (C23). */
 export async function loginStaff(page: Page, username = 'hant', password = 'hant@123') {
-  await page.goto('/nhan-vien/LoginView.jsp');
+  await page.goto('/LoginView.jsp');
   await page.locator('#txtUsername').fill(username);
   await page.locator('#txtPassword').fill(password);
   await page.locator('#btnLogin').click();

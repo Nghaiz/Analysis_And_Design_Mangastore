@@ -299,7 +299,7 @@ Chọn câu theo trạng thái mới: "Đã huỷ" → `RENTAL_BILL_CANCELLED`; 
 | Thuộc tính | Kiểu | Ghi bởi | Đọc bởi | Bỏ bởi |
 |---|---|---|---|---|
 | `client` | Client | doRegister (bản đang đăng kí, C5), LoginView (gốc) | RegisterView, ClientHomeView, SearchBookView, BookDetailView, RentalBillListView, AuthFilter | doRegister khi thành công (C5) |
-| `staff` | Staff | `/nhan-vien/LoginView.jsp` | StaffHomeView, SearchRentalBillView, ProcessRentalBillView, doUpdateRentalBill, doCancelRentalBill, AuthFilter | |
+| `staff` | Staff | `/LoginView.jsp` (C23) | StaffHomeView, SearchRentalBillView, ProcessRentalBillView, doUpdateRentalBill, doCancelRentalBill, AuthFilter | |
 | `cart` | Cart | SearchBookView (lần mở đầu, `getCart`), doAddSelectedBook, doDeleteSelectedBook | SearchBookView, doAddSelectedBook, doDeleteSelectedBook, doAddRentalBill | doAddRentalBill khi thành công |
 | `rentalBill` | RentalBill | SearchBookView (tạo mới khi chưa có `cart`; điền dòng khi "Tạo phiếu mượn"), RentalBillListView, SearchRentalBillView, ProcessRentalBillView, AddConditionView, AddRentalCollateralView, doUpdateRentedBookList, doUpdateRentalBill, doCancelRentalBill | ConfirmRentalBillView, doAddRentalBill, RentalBillDetailView, doCancelRentalBill, ProcessRentalBillView, EditRentedBookListView, doUpdateRentedBookList, AddRentalCollateralView, doUpdateRentalBill, PrintRentalBillView | doAddRentalBill khi thành công; trang D9 (mục 6.3) |
 | `listBook` | Book[] | SearchBookView, AddRentedBookView (tìm); quan-tri/doAddBook (= [đầu truyện vừa thêm]), quan-tri/doUpdateBook (thay phần tử cùng id) (D6) | SearchBookView, AddRentedBookView | |
@@ -320,7 +320,7 @@ Luật chung:
 
 ## 8. Quy ước trang
 
-- Thư mục: trang khách (M1, M2) và `doCancelRentalBill.jsp` ở gốc `src/main/webapp/`; trang nhân viên (M3) và `LoginView.jsp` của nhân viên ở `nhan-vien/` (D5); trang quản trị D6 ở `nhan-vien/quan-tri/`; trang công cụ ở `dev/`.
+- Thư mục: trang khách (M1, M2) và `doCancelRentalBill.jsp` ở gốc `src/main/webapp/`; trang nhân viên (M3) ở `nhan-vien/` (`nhan-vien/LoginView.jsp` chỉ chuyển hướng về trang đăng nhập chung, C23); trang quản trị D6 ở `nhan-vien/quan-tri/`; trang công cụ ở `dev/`.
 - Mỗi lần ghi DB đi qua một trang `doXxx.jsp` không có giao diện. Trang `XxxView.jsp` chỉ gọi hàm DAO đọc (tìm, đăng nhập, lấy danh sách) và tự gửi về chính nó khi tìm, đăng nhập, sửa bản sao trong session.
 - Mọi `<form>` là `method="post"`, có `<t:csrf/>` (input ẩn `name="csrf"`). `CsrfFilter` chặn POST tới `*.jsp` thiếu hoặc sai token bằng 403. Token đổi sau đăng nhập.
 - Tên field form đúng ch.9 (`name` và `id` trùng nhau). Nút trên từng dòng và ô trên từng dòng mà ch.9 không đặt tên: theo bảng ở C1.
@@ -342,7 +342,7 @@ Ngoài danh mục (không phải trang nghiệp vụ, không gọi DAO): trang l
 | 1 | `HomeView.jsp` | `/HomeView.jsp` | xem | mọi người | không |
 | 2 | `RegisterView.jsp` | `/RegisterView.jsp` | xem | mọi người | không |
 | 3 | `doRegister.jsp` | `/doRegister.jsp` | xử lí | mọi người | `ClientDAO.addClient` |
-| 4 | `LoginView.jsp` | `/LoginView.jsp` (khách), `/nhan-vien/LoginView.jsp` (nhân viên) | xem, tự gửi | mọi người | `ClientDAO.checkLogin` / `StaffDAO.checkLogin` |
+| 4 | `LoginView.jsp` | `/LoginView.jsp` (khách và nhân viên, C23); `/nhan-vien/LoginView.jsp` chỉ chuyển hướng về đó | xem, tự gửi | mọi người | `ClientDAO.checkLogin`, rồi `StaffDAO.checkLogin` |
 | 5 | `ClientHomeView.jsp` | `/ClientHomeView.jsp` | xem | khách | không |
 | 6 | `StaffHomeView.jsp` | `/nhan-vien/StaffHomeView.jsp` | xem | nhân viên | không |
 | 7 | `SearchBookView.jsp` | `/SearchBookView.jsp` | xem, tự gửi | khách | `CartDAO.getCart`, `BookDAO.searchBook` |
@@ -406,7 +406,7 @@ Mỗi trang: thành phần theo đúng thứ tự (ch.9 và SVG `images/svg/ui_m
 - Field: `txtUsername`, `txtPassword`, `btnLogin` (submit, gửi về chính trang).
 - Biến trang: `user: User` (tên đăng nhập và mật khẩu vừa nhập), không lưu session.
 - `/LoginView.jsp`: `ClientDAO.checkLogin(user)`; khác `null` → session W `client`, → `ClientHomeView.jsp`; `null` → `LOGIN_FAILED`, hiện lại trang.
-- `/nhan-vien/LoginView.jsp`: `StaffDAO.checkLogin(user)`; khác `null` → session W `staff`, → `/nhan-vien/StaffHomeView.jsp`; `null` → `LOGIN_FAILED`.
+- Nhân viên (C23): `/LoginView.jsp` gọi `ClientDAO.checkLogin(user)` trước; `null` thì `StaffDAO.checkLogin(user)`; khác `null` → session mới W `staff`, → `/nhan-vien/StaffHomeView.jsp`; cả hai `null` → `LOGIN_FAILED`. `/nhan-vien/LoginView.jsp` chỉ còn 302 về `/LoginView.jsp` (giữ `?expired=1`).
 - Chặn đăng nhập sai (Deferred #23): 5 lần sai trong 15 phút theo tên đăng nhập + IP thì chặn 15 phút, ngưỡng lấy từ `LOGIN_RATE_*`; câu báo vẫn là `LOGIN_FAILED`. Đăng nhập thành công thì đổi session id.
 
 #### `ClientHomeView.jsp` (ch.9 tr.59)
@@ -788,11 +788,11 @@ Input island được đổi: không có (HomeView không có form). Bấm gáy 
 | Đường dẫn | Ai được vào | Chưa đủ quyền thì |
 |---|---|---|
 | `/HomeView.jsp`, `/RegisterView.jsp`, `/doRegister.jsp`, `/LoginView.jsp` | mọi người | |
-| `/nhan-vien/LoginView.jsp` | mọi người | |
+| `/nhan-vien/LoginView.jsp` | mọi người (chỉ chuyển hướng về `/LoginView.jsp`, C23) | |
 | `/doCancelRentalBill.jsp` | khách đã đăng nhập **hoặc** nhân viên đã đăng nhập (Deferred #13) | về `/LoginView.jsp` |
 | `/doLogout.jsp` | mọi người (C14; chưa đăng nhập thì chỉ chuyển về trang chủ) | |
 | Mọi trang khác ở gốc (`/*.jsp` ngoài các dòng trên) | khách: session có `client` với `id > 0` | về `/LoginView.jsp` |
-| `/nhan-vien/*` (trừ `LoginView.jsp`) | nhân viên: session có `staff` | về `/nhan-vien/LoginView.jsp` |
+| `/nhan-vien/*` (trừ `LoginView.jsp`) | nhân viên: session có `staff` | về `/LoginView.jsp` (C23) |
 | `/nhan-vien/quan-tri/*` | nhân viên có `staff.position = "Quản lí"` | 403 |
 | `/dev/*` | luôn mở (chỉ localhost) | |
 | `/health.jsp`, `/static/*`, `/error/*` | luôn mở | |
@@ -844,3 +844,4 @@ Báo cáo và các quyết định D1–D11 không trả lời các điểm dư�
 | C20 | Trạng thái ô "Nhận" của ProcessRentalBillView khi quay về từ AddConditionView, EditRentedBookListView, AddRentalCollateralView (model không có chỗ giữ; chủ dự án chốt 11/11/2026 ở phiên phase 7, chọn thuộc tính kĩ thuật thay vì đổi model) | Thuộc tính session kĩ thuật `uncheckedBarcodes: ArrayList<String>` = mã vạch nhân viên đã bỏ tích "Nhận" của phiếu đang mở. ProcessRentalBillView ghi khi đổi ô `chkReceived`; SearchRentalBillView bỏ khi đưa phiếu "Chờ nhận" vào session; doUpdateRentalBill bỏ khi thành công. Không phải thuộc tính nghiệp vụ của §7 | phase 7 |
 | C21 | Khách mở hai thiết bị: một thiết bị xoá dòng "Truyện đã chọn" hoặc đã xác nhận phiếu từ cùng các dòng giỏ, thiết bị kia bấm "Xác nhận" với `rentalBill` cũ trong session (chủ dự án yêu cầu xử lí mọi edge case thực tế, 11/11/2026) | `RentalBillDAO.addRentalBill` trong cùng transaction K1, sau khi khoá dòng `tblBook`, khoá các dòng `tblSelectedBook` của phiếu theo id tăng dần (`FOR UPDATE`) và kiểm mỗi dòng còn tồn tại, thuộc giỏ của client của phiếu, không có `tblRentedBook` của phiếu chưa huỷ trỏ vào; sai một dòng thì rollback, trả `false` (không lỗi khoá ngoại, không 500). doAddRentalBill khi `false`: đọc lại giỏ bằng `CartDAO.getCart`; dòng của phiếu không còn là dòng tự do thì thay `cart` trong session bằng giỏ mới, bỏ `rentalBill`, báo `SELECTED_BOOKS_CHANGED` ở trang "Truyện đã chọn"; ngược lại `NOT_ENOUGH_COPIES` như cũ | phase 6 |
 | C22 | Kết quả tìm cũ còn hiện khi mở lại "Tìm truyện"; trang trống lúc mới mở (chủ dự án yêu cầu 11/11/2026) | Mở mới = `SearchBookView.jsp?moi=1` (link `lnkSearchBook` của ClientHomeView và mục "Tìm truyện" ở đầu trang): GET có `moi` thì bỏ `listBook`; ClientHomeView cũng bỏ `listBook` (trang đầu mối, C6). "Quay lại" từ BookDetailView và forward từ doAddSelectedBook giữ kết quả. Chưa có kết quả thì hiện kệ truyện cuộn ngang: đọc cả kho bằng `BookDAO.searchBook("")` (không thêm hàm DAO; ô tìm vẫn theo C9), gộp theo tên bộ (bỏ đuôi "- Tập N"), mỗi bộ một bìa và số tập; bấm một bộ gửi form `frmShelf` (`txtKeyword` = tên bộ, `btnSearch`) nên trang tìm và điền tên bộ vào ô tìm | 09-ui |
+| C23 | Một trang đăng nhập cho khách và nhân viên (chủ dự án đổi D5 ngày 11/11/2026) | `/LoginView.jsp` thử `ClientDAO.checkLogin` rồi `StaffDAO.checkLogin` (`tblUser.username` là duy nhất nên một tên chỉ thuộc một vai): khách → ClientHomeView, nhân viên → StaffHomeView, cả hai `null` → `LOGIN_FAILED`. AuthFilter, CsrfFilter (C16), doLogout và các trang nhân viên đưa về `/LoginView.jsp`. `/nhan-vien/LoginView.jsp` giữ lại, chỉ 302 về trang chung. Đầu trang không còn nút "Nhân viên" | 09-ui |
