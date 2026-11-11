@@ -6,16 +6,23 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.ServletRequest;
 import jakarta.servlet.ServletResponse;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 
 /**
- * Khung do orchestrator tạo ở bước 6.0 (cho qua) để web.xml hợp lệ trong lúc các lane chạy song song.
- * Lane 6A thay bằng bản thật (plans/261111-tiem-thue-truyen/phase-06-integration.md §2).
+ * Filter đầu chuỗi: đọc tham số form và ghi phản hồi bằng UTF-8, để chữ Việt trong form (họ tên, địa chỉ, lí do
+ * huỷ) không vỡ dù trình duyệt không gửi charset. Chạy trước mọi filter đọc tham số (CsrfFilter).
  */
 public class Utf8Filter implements Filter {
+
+    private static final String UTF_8 = StandardCharsets.UTF_8.name();
 
     @Override
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)
             throws IOException, ServletException {
+        if (request.getCharacterEncoding() == null) {
+            request.setCharacterEncoding(UTF_8);
+        }
+        response.setCharacterEncoding(UTF_8);
         chain.doFilter(request, response);
     }
 }
