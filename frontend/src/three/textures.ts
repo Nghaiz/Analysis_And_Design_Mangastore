@@ -1,19 +1,24 @@
 import { CanvasTexture, RepeatWrapping, SRGBColorSpace } from 'three'
+import { fitLabel } from './label-fit'
 import type { SpinePattern } from './shelf-layout'
 
 // Gáy truyện và vân gỗ vẽ tay bằng canvas 2D (không ảnh ngoài, không bìa crawl, không chữ của NXB).
 // Chữ nhãn vẽ bằng font của token `--font-type` (Momo Trust Sans) đã nạp trên trang, nên tiếng Việt có
 // dấu đầy đủ. Chọn `--font-type` thay vì `--font-body`: nhãn giấy trên gáy là chữ "đánh máy" của tiệm
 // (cùng vai với số phiếu, mã vạch), Momo Trust Sans đã preload nên không tải thêm file, và nét sans gọn
-// đọc rõ hơn nét bong bóng của Fuzzy Bubbles khi chữ thu nhỏ còn 18px và nhìn nghiêng trên kệ 3D.
+// đọc rõ hơn nét bong bóng của Fuzzy Bubbles khi chữ thu nhỏ và nhìn nghiêng trên kệ 3D.
 
 const PAPER = '#F3E6C8'
 const INK = '#2B2118'
-const SPINE_PX_W = 192
+/** Chiều cao texture gáy; chiều rộng theo đúng tỉ lệ rộng/cao của gáy để chữ không bị kéo méo. */
 const SPINE_PX_H = 512
-const LABEL_MAX_PX = 300
-const LABEL_MIN_FONT_PX = 18
-const LABEL_START_FONT_PX = 40
+const SPINE_PX_W_MIN = 128
+const SPINE_PX_W_MAX = 512
+/** Nhãn giấy: dọc theo gáy, chừa chỗ cho nhãn số ở chân. Khung hẹp bỏ nhãn số để chữ dài hơn. */
+const LABEL_SPAN = { regular: [56, 424], compact: [24, 488] } as const
+const LABEL_PAD = 14
+const LABEL_MIN_FONT_PX = 16
+const LABEL_MAX_FONT_PX = 76
 
 /** Họ font khi trang chưa khai `--font-type` (cùng font Momo Trust Sans, chỉ thêm dự phòng của hệ thống). */
 const TYPE_FACE_STACK = '"Momo Trust Sans", system-ui, sans-serif'
@@ -42,34 +47,40 @@ export async function loadTypeFace(doc: Document, sampleText: string): Promise<s
   const declared = getComputedStyle(doc.documentElement).getPropertyValue('--font-type').trim()
   const family = declared === '' ? TYPE_FACE_STACK : declared
   try {
-    await doc.fonts.load(`${LABEL_START_FONT_PX}px ${family}`, sampleText)
+    await doc.fonts.load(`${LABEL_MAX_FONT_PX}px ${family}`, sampleText)
   } catch (cause) {
     console.warn('[ShelfScene] Could not load the --font-type face for spine labels; the browser fallback is used.', cause)
   }
   return family
 }
 
-function paintPattern(ctx: CanvasRenderingContext2D, pattern: SpinePattern): void {
+/** Chiều rộng texture (px) cho gáy rộng `width`, cao `height` (đơn vị cảnh). */
+export function spineTextureWidth(width: number, height: number): number {
+  return Math.min(SPINE_PX_W_MAX, Math.max(SPINE_PX_W_MIN, Math.round((SPINE_PX_H * width) / height)))
+}
+
+function paintPattern(ctx: CanvasRenderingContext2D, pattern: SpinePattern, w: number): void {
+  const h = SPINE_PX_H
   ctx.save()
   ctx.strokeStyle = 'rgb(243 230 200 / 0.55)'
   ctx.fillStyle = 'rgb(243 230 200 / 0.5)'
   ctx.lineWidth = 6
   switch (pattern) {
     case 'bands':
-      for (const y of [28, 44, SPINE_PX_H - 52, SPINE_PX_H - 36]) ctx.fillRect(0, y, SPINE_PX_W, 8)
+      for (const y of [28, 44, h - 52, h - 36]) ctx.fillRect(0, y, w, 8)
       break
     case 'stripes':
       ctx.lineWidth = 10
-      for (let x = -SPINE_PX_H; x < SPINE_PX_W; x += 34) {
+      for (let x = -h; x < w; x += 34) {
         ctx.beginPath()
-        ctx.moveTo(x, SPINE_PX_H)
-        ctx.lineTo(x + SPINE_PX_H, 0)
+        ctx.moveTo(x, h)
+        ctx.lineTo(x + h, 0)
         ctx.stroke()
       }
       break
     case 'dots':
-      for (let y = 18; y < SPINE_PX_H; y += 30) {
-        for (let x = (y / 30) % 2 === 0 ? 18 : 33; x < SPINE_PX_W; x += 30) {
+      for (let y = 18; y < h; y += 30) {
+        for (let x = (y / 30) % 2 === 0 ? 18 : 33; x < w; x += 30) {
           ctx.beginPath()
           ctx.arc(x, y, 5, 0, Math.PI * 2)
           ctx.fill()
@@ -77,60 +88,72 @@ function paintPattern(ctx: CanvasRenderingContext2D, pattern: SpinePattern): voi
       }
       break
     case 'diamonds':
-      for (let y = 0; y < SPINE_PX_H; y += 48) {
+      for (let y = 0; y < h; y += 48) {
         ctx.beginPath()
-        ctx.moveTo(SPINE_PX_W / 2, y)
-        ctx.lineTo(SPINE_PX_W - 20, y + 24)
-        ctx.lineTo(SPINE_PX_W / 2, y + 48)
+        ctx.moveTo(w / 2, y)
+        ctx.lineTo(w - 20, y + 24)
+        ctx.lineTo(w / 2, y + 48)
         ctx.lineTo(20, y + 24)
         ctx.closePath()
         ctx.stroke()
       }
       break
     case 'frame':
-      ctx.strokeRect(14, 14, SPINE_PX_W - 28, SPINE_PX_H - 28)
+      ctx.strokeRect(14, 14, w - 28, h - 28)
       ctx.lineWidth = 3
-      ctx.strokeRect(26, 26, SPINE_PX_W - 52, SPINE_PX_H - 52)
+      ctx.strokeRect(26, 26, w - 52, h - 52)
       break
   }
   ctx.restore()
 }
 
-function paintLabel(ctx: CanvasRenderingContext2D, label: string, fontFamily: string): void {
-  const plateX = 46
-  const plateW = SPINE_PX_W - 2 * plateX
+/** Nhãn giấy chiếm phần lớn bề rộng gáy; chữ dọc, to nhất có thể, ngắt hai dòng khi chữ to hơn nhờ đó. */
+function paintLabel(ctx: CanvasRenderingContext2D, label: string, fontFamily: string, w: number, compact: boolean): void {
+  const [labelTop, labelBottom] = compact ? LABEL_SPAN.compact : LABEL_SPAN.regular
+  const plateX = Math.round(Math.max(16, w * (compact ? 0.09 : 0.13)))
+  const plateW = w - 2 * plateX
   ctx.fillStyle = PAPER
-  ctx.fillRect(plateX, 84, plateW, 344)
+  ctx.fillRect(plateX, labelTop, plateW, labelBottom - labelTop)
   ctx.strokeStyle = INK
   ctx.lineWidth = 2
-  ctx.strokeRect(plateX + 5, 89, plateW - 10, 334)
+  ctx.strokeRect(plateX + 5, labelTop + 5, plateW - 10, labelBottom - labelTop - 10)
 
-  let size = LABEL_START_FONT_PX
-  ctx.font = `${size}px ${fontFamily}`
-  while (size > LABEL_MIN_FONT_PX && ctx.measureText(label).width > LABEL_MAX_PX) {
-    size -= 2
-    ctx.font = `${size}px ${fontFamily}`
-  }
+  const length = labelBottom - labelTop - 2 * LABEL_PAD - 10
+  const fit = fitLabel(
+    label,
+    { length, thickness: plateW - 2 * LABEL_PAD, minSize: LABEL_MIN_FONT_PX, maxSize: LABEL_MAX_FONT_PX },
+    (text, size) => {
+      ctx.font = `${size}px ${fontFamily}`
+      return ctx.measureText(text).width
+    },
+  )
   ctx.save()
-  ctx.translate(SPINE_PX_W / 2, 256)
+  ctx.translate(w / 2, (labelTop + labelBottom) / 2)
+  // Đọc từ trên xuống như gáy sách Việt: quay 90°, dòng đầu nằm bên phải.
   ctx.rotate(Math.PI / 2)
+  ctx.font = `${fit.size}px ${fontFamily}`
   ctx.fillStyle = INK
   ctx.textAlign = 'center'
   ctx.textBaseline = 'middle'
-  ctx.fillText(label, 0, 0, LABEL_MAX_PX)
+  const pitch = fit.size * 1.12
+  fit.lines.forEach((line, k) => {
+    const offset = (k - (fit.lines.length - 1) / 2) * pitch
+    ctx.fillText(line, 0, offset, length)
+  })
   ctx.restore()
 }
 
-function paintSticker(ctx: CanvasRenderingContext2D, number: number, fontFamily: string): void {
+function paintSticker(ctx: CanvasRenderingContext2D, number: number, fontFamily: string, w: number): void {
+  const radius = Math.min(30, w * 0.16)
   ctx.fillStyle = PAPER
   ctx.beginPath()
-  ctx.arc(SPINE_PX_W / 2, 466, 24, 0, Math.PI * 2)
+  ctx.arc(w / 2, 470, radius, 0, Math.PI * 2)
   ctx.fill()
   ctx.fillStyle = INK
-  ctx.font = `22px ${fontFamily}`
+  ctx.font = `${Math.round(radius * 0.95)}px ${fontFamily}`
   ctx.textAlign = 'center'
   ctx.textBaseline = 'middle'
-  ctx.fillText(String(number).padStart(2, '0'), SPINE_PX_W / 2, 467)
+  ctx.fillText(String(number).padStart(2, '0'), w / 2, 471)
 }
 
 export interface SpineArt {
@@ -140,22 +163,30 @@ export interface SpineArt {
   /** Số dán dưới chân gáy, kiểu nhãn kệ của tiệm (vị trí + 1). */
   number: number
   fontFamily: string
+  /** Kích thước gáy (đơn vị cảnh), để texture đúng tỉ lệ. */
+  width: number
+  height: number
+  /** Khung hẹp: nhãn giấy dài gần hết gáy, không nhãn số. */
+  compact: boolean
 }
 
 /** Mặt trước gáy truyện: màu bìa, hoa văn, nhãn giấy có tên thể loại đánh máy, nhãn số ở chân. */
 export function makeSpineTexture(doc: Document, art: SpineArt): CanvasTexture {
-  const canvas = newCanvas(doc, SPINE_PX_W, SPINE_PX_H)
+  const w = spineTextureWidth(art.width, art.height)
+  const canvas = newCanvas(doc, w, SPINE_PX_H)
   const ctx = context2d(canvas)
   ctx.fillStyle = art.color
-  ctx.fillRect(0, 0, SPINE_PX_W, SPINE_PX_H)
-  paintPattern(ctx, art.pattern)
-  paintLabel(ctx, art.label, art.fontFamily)
-  paintSticker(ctx, art.number, art.fontFamily)
+  ctx.fillRect(0, 0, w, SPINE_PX_H)
+  paintPattern(ctx, art.pattern, w)
+  paintLabel(ctx, art.label, art.fontFamily, w, art.compact)
+  if (!art.compact) paintSticker(ctx, art.number, art.fontFamily, w)
   // Mép gáy sờn: viền tối mỏng hai bên.
   ctx.fillStyle = 'rgb(43 33 24 / 0.35)'
   ctx.fillRect(0, 0, 6, SPINE_PX_H)
-  ctx.fillRect(SPINE_PX_W - 6, 0, 6, SPINE_PX_H)
-  return toTexture(canvas)
+  ctx.fillRect(w - 6, 0, 6, SPINE_PX_H)
+  const texture = toTexture(canvas)
+  texture.anisotropy = 4
+  return texture
 }
 
 const WOOD_PX = 256

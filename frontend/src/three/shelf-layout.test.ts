@@ -91,3 +91,23 @@ describe('frameCamera', () => {
     expect(camera.rotation).toEqual([0, 0, 0])
   })
 })
+
+describe('compact layout (khung hẹp)', () => {
+  it('drops fillers, keeps all categories, and makes spines wider', () => {
+    const regular = layoutShelf(10)
+    const compact = layoutShelf(10, { compact: true })
+    expect(compact.compact).toBe(true)
+    expect(compact.slots.every((slot) => slot.kind === 'category')).toBe(true)
+    expect(compact.slots.map((slot) => slot.index)).toEqual([0, 1, 2, 3, 4, 5, 6, 7, 8, 9])
+    const width = (layout: typeof regular, index: number) =>
+      layout.slots.find((slot) => slot.kind === 'category' && slot.index === index)?.width ?? 0
+    for (let index = 0; index < 10; index++) expect(width(compact, index)).toBeGreaterThan(width(regular, index) * 1.4)
+    for (const slot of compact.slots) expect(slot.x + slot.width / 2).toBeLessThanOrEqual(INNER_WIDTH / 2)
+  })
+
+  it('frames the case tighter, so each spine is drawn larger', () => {
+    const regular = frameCamera(layoutShelf(10))
+    const compact = frameCamera(layoutShelf(10, { compact: true }))
+    expect(compact.position[2]).toBeLessThan(regular.position[2] * 0.85)
+  })
+})

@@ -53,6 +53,7 @@ export interface SpineSlot {
 
 export interface ShelfLayout {
   rows: number
+  compact: boolean
   /** Chiều cao tủ, đáy tủ ở y = 0. */
   caseHeight: number
   caseWidth: number
@@ -75,16 +76,26 @@ export function categoryPattern(index: number): SpinePattern {
   return pick(SPINE_PATTERNS, index)
 }
 
-function categoryWidth(index: number): number {
-  return 0.46 + (index % 3) * 0.06
+function categoryWidth(index: number, compact: boolean): number {
+  return compact ? COMPACT_SPINE_WIDTH + (index % 3) * 0.03 : 0.46 + (index % 3) * 0.06
 }
 
 function categoryHeight(index: number): number {
   return 1.28 + ((index * 5) % 4) * 0.07
 }
 
+/** Khung hẹp (điện thoại): bỏ gáy độn, gáy thể loại rộng gần gấp đôi để nhãn đủ to mà đọc. */
+export const COMPACT_MAX_WIDTH_PX = 560
+const COMPACT_SPINE_WIDTH = 0.82
+
+export interface LayoutOptions {
+  /** Khung hẹp hơn `COMPACT_MAX_WIDTH_PX`: không gáy độn, gáy rộng, máy quay sát tủ. */
+  compact: boolean
+}
+
 /** Xếp `count` gáy thể loại theo thứ tự đọc (trái sang phải, hàng trên xuống), mỗi hàng tối đa 5. */
-export function layoutShelf(count: number): ShelfLayout {
+export function layoutShelf(count: number, options: LayoutOptions = { compact: false }): ShelfLayout {
+  const { compact } = options
   if (!Number.isInteger(count) || count < 1) throw new Error(`layoutShelf() needs at least one category, got ${count}`)
   const rows = Math.ceil(count / SPINES_PER_ROW)
   const pitch = ROW_HEIGHT + BOARD_THICKNESS
@@ -122,20 +133,20 @@ export function layoutShelf(count: number): ShelfLayout {
       const placed = place({
         kind: 'category',
         index,
-        width: categoryWidth(index),
+        width: categoryWidth(index, compact),
         height: categoryHeight(index),
         color: categoryColor(index),
         pattern: categoryPattern(index),
       })
       if (!placed) throw new Error(`Category spine ${index} does not fit in row ${row}`)
-      if (FILLER_AFTER.has(index - first)) addFiller()
+      if (!compact && FILLER_AFTER.has(index - first)) addFiller()
     }
-    while (addFiller()) {
+    while (!compact && addFiller()) {
       // Lấp phần còn lại của hàng bằng gáy độn tới khi hết chỗ.
     }
   }
 
-  return { rows, caseHeight, caseWidth: INNER_WIDTH + 2 * SIDE_THICKNESS, boardTops, slots }
+  return { rows, compact, caseHeight, caseWidth: INNER_WIDTH + 2 * SIDE_THICKNESS, boardTops, slots }
 }
 
 /** Gáy nhô ra bao nhiêu khi rê chuột hoặc Tab tới. */
@@ -185,7 +196,10 @@ export const SCENE_ASPECT = 3 / 2
 export const CAMERA_FOV = 38
 /** Phần trên tủ dành cho đèn và quạt trần (quạt bị khung cắt bớt, như nhìn từ dưới lên). */
 export const HEADROOM = 1.2
+/** Khung hẹp: chỉ chừa một dải trên đầu tủ; đèn và quạt ra ngoài khung, ánh đèn vẫn rọi xuống kệ. */
+export const COMPACT_HEADROOM = 0.15
 const FRAME_MARGIN = 1.06
+const COMPACT_FRAME_MARGIN = 1.02
 
 export interface CameraFrame {
   position: [number, number, number]
@@ -194,11 +208,12 @@ export interface CameraFrame {
   fov: number
 }
 
-/** Đặt máy quay nhìn thẳng sao cho cả tủ và phần trên đầu tủ lọt khung `SCENE_ASPECT`. */
+/** Đặt máy quay nhìn thẳng sao cho cả tủ và phần trên đầu tủ (theo `layout.compact`) lọt khung `SCENE_ASPECT`. */
 export function frameCamera(layout: ShelfLayout): CameraFrame {
   const halfTan = Math.tan(((CAMERA_FOV / 2) * Math.PI) / 180)
-  const height = layout.caseHeight + HEADROOM
-  const width = layout.caseWidth + 0.4
-  const distance = Math.max(height / 2 / halfTan, width / 2 / (halfTan * SCENE_ASPECT)) * FRAME_MARGIN
+  const height = layout.caseHeight + (layout.compact ? COMPACT_HEADROOM : HEADROOM)
+  const width = layout.caseWidth + (layout.compact ? 0.1 : 0.4)
+  const margin = layout.compact ? COMPACT_FRAME_MARGIN : FRAME_MARGIN
+  const distance = Math.max(height / 2 / halfTan, width / 2 / (halfTan * SCENE_ASPECT)) * margin
   return { position: [0, height / 2, CASE_DEPTH / 2 + distance], rotation: [0, 0, 0], fov: CAMERA_FOV }
 }
