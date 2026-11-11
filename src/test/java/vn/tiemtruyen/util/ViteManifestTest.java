@@ -213,12 +213,15 @@ class ViteManifestTest {
     void devTagsLoadPreambleClientThenEntries() {
         String html = AssetTags.renderDev("http://localhost:5173", AssetTags.DEFAULT_ENTRIES);
 
-        int preamble = html.indexOf("import RefreshRuntime from 'http://localhost:5173/static/@react-refresh'");
+        int preamble = html.indexOf(
+                "src=\"http://localhost:5173/static/@id/__x00__@vitejs/plugin-react/preamble\"");
         int client = html.indexOf("src=\"http://localhost:5173/static/@vite/client\"");
         int css = html.indexOf("<link rel=\"stylesheet\" href=\"http://localhost:5173/static/src/styles/app.css\">");
         int loader = html.indexOf("src=\"http://localhost:5173/static/src/loader/island-loader.ts\"");
         assertTrue(preamble >= 0 && preamble < client && client < css && css < loader, html);
-        assertTrue(html.contains("window.__vite_plugin_react_preamble_installed__ = true"), html);
+        // Không có script inline: CSP dev của nginx không cho 'unsafe-inline' ở script-src.
+        assertEquals(4, html.lines().count(), html);
+        assertTrue(html.lines().allMatch(line -> line.contains(" src=\"") || line.contains(" href=\"")), html);
     }
 
     @Test

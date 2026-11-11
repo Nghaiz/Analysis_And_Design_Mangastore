@@ -55,3 +55,6 @@ RUN --mount=type=bind,from=builder,source=/tmp/packages,target=/tmp/packages \
 COPY nginx.conf /etc/nginx/nginx.conf
 COPY conf.d/ /etc/nginx/conf.d/
 COPY snippets/ /etc/nginx/snippets/
+# Sinh snippets/csp.conf theo APP_VITE_DEV mỗi lần khởi động. --chmod vì checkout trên Windows không giữ bit thực
+# thi, mà entrypoint gốc bỏ qua script không thực thi được.
+COPY --chmod=0755 docker-entrypoint.d/30-tiem-csp.sh /docker-entrypoint.d/30-tiem-csp.sh

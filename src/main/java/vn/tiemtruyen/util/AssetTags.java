@@ -10,6 +10,9 @@ import java.util.List;
  * <p>Chế độ build: đọc {@link ViteManifest}, in stylesheet, rồi script entry, rồi modulepreload. Chế độ dev
  * ({@code APP_VITE_DEV=true}): in preamble React Refresh, {@code @vite/client} rồi các entry, tất cả lấy từ
  * {@code APP_VITE_DEV_ORIGIN} với base {@code /static/} của Vite.
+ *
+ * <p>Không in script inline nào, kể cả ở dev: preamble là một module ngoài ({@link #DEV_PREAMBLE_PATH}) nên CSP dev
+ * của nginx không cần {@code 'unsafe-inline'} cho script (docker/nginx/docker-entrypoint.d/30-tiem-csp.sh).
  */
 public final class AssetTags {
 
@@ -18,6 +21,14 @@ public final class AssetTags {
 
     /** Base công khai của Vite ({@code base} trong vite.config.ts). */
     public static final String PUBLIC_BASE = "/static/";
+
+    /**
+     * Preamble React Refresh dạng module ngoài, tính từ base: module ảo {@code @vitejs/plugin-react/preamble} của
+     * plugin React, phục vụ theo quy ước module ảo của Vite ({@code /@id/__x00__<id>}). Nó đặt
+     * {@code window.$RefreshReg$}/{@code $RefreshSig$} như đoạn inline trong tài liệu backend integration của Vite,
+     * và phải chạy trước mọi module React (thẻ module chạy theo thứ tự xuất hiện).
+     */
+    static final String DEV_PREAMBLE_PATH = "@id/__x00__@vitejs/plugin-react/preamble";
 
     private AssetTags() {
     }
@@ -64,13 +75,7 @@ public final class AssetTags {
     static String renderDev(String origin, List<String> entries) {
         String base = origin + PUBLIC_BASE;
         StringBuilder html = new StringBuilder();
-        html.append("<script type=\"module\">\n")
-                .append("import RefreshRuntime from '").append(base).append("@react-refresh';\n")
-                .append("RefreshRuntime.injectIntoGlobalHook(window);\n")
-                .append("window.$RefreshReg$ = () => {};\n")
-                .append("window.$RefreshSig$ = () => (type) => type;\n")
-                .append("window.__vite_plugin_react_preamble_installed__ = true;\n")
-                .append("</script>\n");
+        html.append("<script type=\"module\" src=\"").append(attr(base + DEV_PREAMBLE_PATH)).append("\"></script>\n");
         html.append("<script type=\"module\" src=\"").append(attr(base + "@vite/client")).append("\"></script>\n");
         for (String entry : entries) {
             String url = attr(base + entry);
