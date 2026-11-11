@@ -108,46 +108,60 @@
     pageContext.setAttribute("pageMessage", message);
 %>
 <t:layout title="Chỉnh sửa danh sách truyện">
-  <section class="mx-auto flex max-w-5xl flex-col gap-6 px-4 py-8">
-    <h1 class="font-sign text-ink">Chỉnh sửa danh sách truyện</h1>
+  <div class="flex flex-col gap-6">
+    <header class="flex flex-col gap-2 border-b border-dashed border-ink-soft pb-4">
+      <nav aria-label="Đường dẫn" class="text-sm text-ink-soft">
+        <ol class="m-0 flex list-none flex-wrap items-center gap-x-2 gap-y-1 p-0">
+          <li><a href="${base}/StaffHomeView.jsp">Trang chủ nhân viên</a></li>
+          <li class="flex items-center gap-2"><svg aria-hidden="true" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg><a href="${base}/SearchRentalBillView.jsp">Tìm phiếu mượn</a></li>
+          <li class="flex items-center gap-2"><svg aria-hidden="true" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg><a href="${base}/ProcessRentalBillView.jsp">Xử lí phiếu mượn</a></li>
+          <li aria-current="page" class="flex items-center gap-2"><svg aria-hidden="true" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg>Chỉnh sửa danh sách truyện</li>
+        </ol>
+      </nav>
+      <h1 class="m-0">Chỉnh sửa danh sách truyện</h1>
+      <p class="m-0 max-w-3xl text-ink-soft">Bỏ quyển khách không lấy hoặc thêm quyển ngay tại quầy. Bấm Lưu để ghi danh sách mới cho phiếu; Quay lại thì bỏ các thay đổi chưa lưu.</p>
+    </header>
     <c:if test="${not empty pageMessage}"><ui:message-box kind="error" text="${pageMessage}"/></c:if>
     <form method="post" action="${base}/EditRentedBookListView.jsp" class="flex flex-col gap-6">
       <t:csrf/>
       <input type="hidden" name="rentalBillId" value="${billId}">
-      <div class="overflow-x-auto">
-        <table id="tblRentedBook" class="tt-ledger-table">
-          <caption class="tt-ledger-table__caption">Các quyển truyện của phiếu mượn <span class="font-num">${billCode}</span></caption>
-          <thead>
-            <tr>
-              <th scope="col">Mã vạch</th>
-              <th scope="col">Tên đầu truyện</th>
-              <th scope="col" class="text-right">Giá thuê theo ngày</th>
-              <th scope="col" class="text-right">Số lượng</th>
-              <th scope="col">Tình trạng khi giao</th>
-              <th scope="col" class="text-right">Tổng tiền</th>
-              <th scope="col">Thao tác</th>
-            </tr>
-          </thead>
-          <tbody>
-            <c:forEach var="row" items="${rows}">
+      <div class="flex flex-col gap-3">
+        <div class="overflow-x-auto">
+          <table id="tblRentedBook" class="tt-ledger-table">
+            <caption class="tt-ledger-table__caption">Các quyển truyện của phiếu mượn <span class="font-num">${billCode}</span></caption>
+            <thead>
               <tr>
-                <td class="font-num"><c:out value="${row.barcode}"/></td>
-                <td><c:out value="${row.name}"/></td>
-                <td class="font-num text-right">${row.price}</td>
-                <td class="font-num text-right">${row.quantity}</td>
-                <td><ui:condition-tag text="${row.condition}"/></td>
-                <td class="font-num text-right">${row.total}</td>
-                <td><button type="submit" name="lnkDeleteRentedBook" value="${fn:escapeXml(row.barcode)}" class="rounded-paper border border-ink-soft bg-paper px-2 py-1 text-sm text-ink">Xoá</button></td>
+                <th scope="col">Mã vạch</th>
+                <th scope="col">Tên đầu truyện</th>
+                <th scope="col" class="text-right">Giá thuê theo ngày</th>
+                <th scope="col" class="text-right">Số lượng</th>
+                <th scope="col">Tình trạng khi giao</th>
+                <th scope="col" class="text-right">Tổng tiền</th>
+                <th scope="col">Thao tác</th>
               </tr>
-            </c:forEach>
-          </tbody>
-        </table>
+            </thead>
+            <tbody>
+              <c:forEach var="row" items="${rows}">
+                <tr>
+                  <td class="font-num"><c:out value="${row.barcode}"/></td>
+                  <td><c:out value="${row.name}"/></td>
+                  <td class="font-num text-right">${row.price}</td>
+                  <td class="font-num text-right">${row.quantity}</td>
+                  <td><ui:condition-tag text="${row.condition}"/></td>
+                  <td class="font-num text-right">${row.total}</td>
+                  <td><button type="submit" name="lnkDeleteRentedBook" value="${fn:escapeXml(row.barcode)}" class="tt-btn tt-btn--ghost tt-btn--sm">Xoá</button></td>
+                </tr>
+              </c:forEach>
+            </tbody>
+          </table>
+        </div>
+        <c:if test="${empty rows}"><p class="m-0 border border-dashed border-ink-soft bg-paper-deep px-4 py-3 text-ink">Danh sách đang trống. Bấm Thêm truyện để thêm quyển cho khách; phiếu cần ít nhất một quyển mới lưu được.</p></c:if>
       </div>
-      <p class="m-0"><a id="lnkAddBook" href="${base}/AddRentedBookView.jsp" class="inline-block rounded-paper border border-ink-soft bg-paper px-4 py-2 text-ink shadow-paper">Thêm truyện</a></p>
-      <p class="m-0 flex flex-wrap gap-4">
-        <button type="submit" id="btnSave" name="btnSave" formaction="${base}/doUpdateRentedBookList.jsp" class="rounded-paper bg-primary px-4 py-2 text-primary-foreground shadow-paper">Lưu</button>
-        <a id="lnkBack" href="${base}/ProcessRentalBillView.jsp" class="rounded-paper border border-ink-soft bg-paper px-4 py-2 text-ink shadow-paper">Quay lại</a>
-      </p>
+      <p class="m-0"><a id="lnkAddBook" href="${base}/AddRentedBookView.jsp" class="tt-btn tt-btn--ghost"><svg aria-hidden="true" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14"/><path d="M5 12h14"/></svg><span>Thêm truyện</span></a></p>
+      <div class="flex flex-wrap gap-3 border-t border-dashed border-ink-soft pt-4">
+        <button type="submit" id="btnSave" name="btnSave" formaction="${base}/doUpdateRentedBookList.jsp" class="tt-btn tt-btn--primary"><svg aria-hidden="true" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg><span>Lưu</span></button>
+        <a id="lnkBack" href="${base}/ProcessRentalBillView.jsp" class="tt-btn tt-btn--ghost"><svg aria-hidden="true" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5"/><path d="m12 19-7-7 7-7"/></svg><span>Quay lại</span></a>
+      </div>
     </form>
-  </section>
+  </div>
 </t:layout>

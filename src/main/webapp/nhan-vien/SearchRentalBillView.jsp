@@ -115,49 +115,82 @@
     pageContext.setAttribute("messageKind", kind);
 %>
 <t:layout title="Tìm phiếu mượn">
-  <h1>Tìm phiếu mượn</h1>
-  <c:if test="${not empty message}">
-    <ui:message-box kind="${messageKind}" text="${message}"/>
-  </c:if>
-  <form method="post" action="${pageContext.request.contextPath}/nhan-vien/SearchRentalBillView.jsp">
-    <t:csrf/>
-    <div class="mb-6 flex flex-wrap items-end gap-3">
-      <label for="txtKeyword" class="sr-only">Từ khoá tìm phiếu mượn</label>
-      <input type="search" id="txtKeyword" name="txtKeyword" value="<c:out value='${keywordValue}'/>"
-             placeholder="Nhập mã phiếu mượn, tên khách hàng hoặc số CCCD…" maxlength="100"
-             class="h-10 min-w-0 flex-1 rounded-paper border border-input bg-paper px-3">
-      <button type="submit" id="btnSearch" name="btnSearch" value=""
-              class="inline-flex h-10 items-center justify-center rounded-paper bg-primary px-6 text-primary-foreground hover:bg-primary/90">Tìm</button>
-    </div>
-    <div class="overflow-x-auto">
-      <table id="tblRentalBill" class="tt-ledger-table">
-        <caption class="tt-ledger-table__caption">Danh sách phiếu mượn</caption>
-        <thead>
-          <tr>
-            <th scope="col">Mã phiếu mượn</th>
-            <th scope="col">Tên khách hàng</th>
-            <th scope="col">Số điện thoại</th>
-            <th scope="col">Ngày giờ dự kiến đến nhận</th>
-            <th scope="col">Số quyển</th>
-            <th scope="col">Trạng thái</th>
-          </tr>
-        </thead>
-        <tbody>
-          <c:forEach var="row" items="${rows}">
-            <tr>
-              <td>
-                <button type="submit" name="lnkChooseRentalBill" value="${row.id}"
-                        class="cursor-pointer border-0 bg-transparent p-0 font-num text-pen-blue underline underline-offset-[3px]">${row.code}</button>
-              </td>
-              <td><c:out value="${row.clientName}"/></td>
-              <td class="font-num"><c:out value="${row.phone}"/></td>
-              <td class="font-num">${row.pickupAt}</td>
-              <td class="font-num">${row.copyCount}</td>
-              <td><ui:stamp status="${row.status}"/></td>
-            </tr>
-          </c:forEach>
-        </tbody>
-      </table>
-    </div>
-  </form>
+  <c:set var="nv" value="${pageContext.request.contextPath}/nhan-vien"/>
+  <div class="flex flex-col gap-6">
+    <header class="flex flex-col gap-2 border-b border-dashed border-ink-soft pb-4">
+      <nav aria-label="Đường dẫn" class="text-sm text-ink-soft">
+        <ol class="m-0 flex list-none flex-wrap items-center gap-x-2 gap-y-1 p-0">
+          <li><a href="${nv}/StaffHomeView.jsp">Trang chủ nhân viên</a></li>
+          <li aria-current="page" class="flex items-center gap-2"><svg aria-hidden="true" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg>Tìm phiếu mượn</li>
+        </ol>
+      </nav>
+      <h1 class="m-0">Tìm phiếu mượn</h1>
+      <p class="m-0 max-w-3xl text-ink-soft">Tìm phiếu khách đã tạo trên mạng, rồi bấm vào mã phiếu đang chờ nhận để mở bàn quầy và giao truyện.</p>
+    </header>
+
+    <c:if test="${not empty message}">
+      <ui:message-box kind="${messageKind}" text="${message}"/>
+    </c:if>
+
+    <form method="post" action="${pageContext.request.contextPath}/nhan-vien/SearchRentalBillView.jsp" class="flex flex-col gap-6">
+      <t:csrf/>
+      <ui:paper-card>
+        <div class="grid gap-2">
+          <label for="txtKeyword">Từ khoá tìm phiếu mượn</label>
+          <div class="flex flex-col gap-3 sm:flex-row sm:items-center">
+            <input type="search" id="txtKeyword" name="txtKeyword" value="<c:out value='${keywordValue}'/>"
+                   placeholder="Nhập mã phiếu mượn, tên khách hàng hoặc số CCCD…" maxlength="100"
+                   aria-describedby="txtKeyword-hint"
+                   class="h-11 min-w-0 flex-1 rounded-paper border border-input bg-paper px-3 text-ink">
+            <button type="submit" id="btnSearch" name="btnSearch" value=""
+                    class="tt-btn tt-btn--primary">
+              <svg aria-hidden="true" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg>
+              <span>Tìm</span>
+            </button>
+          </div>
+          <p id="txtKeyword-hint" class="m-0 text-sm text-ink-soft">Mã phiếu viết PM kèm số (ví dụ PM0125); tên khách hàng gõ một phần cũng được; số CCCD phải gõ đủ cả dãy số.</p>
+        </div>
+      </ui:paper-card>
+
+      <section aria-labelledby="bill-list-h" class="flex flex-col gap-3">
+        <div class="flex flex-wrap items-baseline justify-between gap-2">
+          <h2 id="bill-list-h" class="tt-section-title m-0">Kết quả tìm</h2>
+          <p class="m-0 text-sm text-ink-soft">Chỉ phiếu CHỜ NHẬN mở được; phiếu đã huỷ hay đang cho thuê chỉ để xem.</p>
+        </div>
+        <div class="overflow-x-auto">
+          <table id="tblRentalBill" class="tt-ledger-table">
+            <caption class="tt-ledger-table__caption">Danh sách phiếu mượn</caption>
+            <thead>
+              <tr>
+                <th scope="col">Mã phiếu mượn</th>
+                <th scope="col">Tên khách hàng</th>
+                <th scope="col">Số điện thoại</th>
+                <th scope="col">Ngày giờ dự kiến đến nhận</th>
+                <th scope="col" class="text-right">Số quyển</th>
+                <th scope="col">Trạng thái</th>
+              </tr>
+            </thead>
+            <tbody>
+              <c:forEach var="row" items="${rows}">
+                <tr>
+                  <td>
+                    <button type="submit" name="lnkChooseRentalBill" value="${row.id}"
+                            class="cursor-pointer border-0 bg-transparent p-0 font-num text-pen-blue underline underline-offset-[3px]">${row.code}</button>
+                  </td>
+                  <td><c:out value="${row.clientName}"/></td>
+                  <td class="font-num"><c:out value="${row.phone}"/></td>
+                  <td class="font-num">${row.pickupAt}</td>
+                  <td class="font-num text-right">${row.copyCount}</td>
+                  <td><ui:stamp status="${row.status}"/></td>
+                </tr>
+              </c:forEach>
+            </tbody>
+          </table>
+        </div>
+        <c:if test="${empty rows}">
+          <p class="m-0 border border-dashed border-ink-soft bg-paper-deep px-4 py-3 text-ink">Chưa có phiếu nào để hiện. Nhập từ khoá ở ô trên rồi bấm Tìm.</p>
+        </c:if>
+      </section>
+    </form>
+  </div>
 </t:layout>
