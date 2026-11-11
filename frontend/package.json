@@ -17,10 +17,10 @@
     "check:budget": "node scripts/check-budget.mjs"
   },
   "dependencies": {
-    "@fontsource-variable/fraunces": "5.3.0",
-    "@fontsource/be-vietnam-pro": "5.3.0",
-    "@fontsource/patrick-hand": "5.3.0",
-    "@fontsource/xanh-mono": "5.3.0",
+    "@fontsource-variable/momo-trust-sans": "5.3.0",
+    "@fontsource/fuzzy-bubbles": "5.3.0",
+    "@fontsource/momo-signature": "5.3.0",
+    "@fontsource/momo-trust-display": "5.3.0",
     "@react-three/drei": "10.7.9",
     "@react-three/fiber": "9.8.2",
     "class-variance-authority": "0.7.1",
