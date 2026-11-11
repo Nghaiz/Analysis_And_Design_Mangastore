@@ -3,7 +3,8 @@
 //
 // const s = new Session('http://127.0.0.1:8080');
 // let page = await s.get('/LoginView.jsp');                 // { status, location, html, url }
-// page = await s.submit(page, { txtUsername: 'minhanh', txtPassword: '...', btnLogin: '' });
+// page = await s.post('/LoginView.jsp', { txtUsername: 'minhanh', txtPassword: '...', btnLogin: '' }, { page });
+// s.postParams(action, URLSearchParams, { page }) khi một tên có nhiều giá trị.
 // messageOf(page.html)  → câu trong .tt-message-box (đã gỡ thẻ, giải mã thực thể, NFC)
 // valueOf(page.html, 'txtFullName'), textOf(page.html, 'id'), hasId(page.html, 'id')
 
@@ -35,7 +36,7 @@ export class Session {
 
   async request(path, { method = 'GET', form = null, follow = true } = {}) {
     let url = new URL(path, `${this.base}/`).toString();
-    let body = form ? new URLSearchParams(form).toString() : undefined;
+    let body = form ? (form instanceof URLSearchParams ? form : new URLSearchParams(form)).toString() : undefined;
     for (let hop = 0; hop < 5; hop++) {
       const headers = { cookie: this.#cookieHeader() };
       if (body !== undefined) headers['content-type'] = 'application/x-www-form-urlencoded; charset=UTF-8';
@@ -60,11 +61,16 @@ export class Session {
 
   /** POST tới `action` (đường dẫn) kèm token csrf lấy từ `page.html`; `withCsrf: false` để thử 403. */
   post(action, fields, { page = null, withCsrf = true, follow = true } = {}) {
-    const form = { ...fields };
+    return this.postParams(action, new URLSearchParams(fields), { page, withCsrf, follow });
+  }
+
+  /** Như post() nhưng nhận URLSearchParams, để gửi nhiều giá trị cùng tên (ô tích trên nhiều dòng). */
+  postParams(action, params, { page = null, withCsrf = true, follow = true } = {}) {
+    const form = new URLSearchParams(params);
     if (withCsrf) {
       const token = page ? csrfOf(page.html) : null;
       if (!token) throw new Error(`không thấy input csrf để gửi tới ${action}`);
-      form.csrf = token;
+      form.set('csrf', token);
     }
     return this.request(action, { method: 'POST', form, follow });
   }
