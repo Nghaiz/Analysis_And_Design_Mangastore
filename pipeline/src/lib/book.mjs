@@ -58,7 +58,10 @@ export function buildBook(group, { series, seriesAuthors, spelling, categories, 
   const authorList = firstOf(raws, (raw) => (splitAuthors(raw.authors).length ? raw.authors : null)) ?? seriesAuthors;
   const titles = group.flatMap((entry) => [cleanLine(entry.raw.name), entry.name]);
   const description = firstOf(raws, (raw) => stripLeadingTitle(htmlToText(raw.descriptionHtml), titles));
-  const publishYear = firstOf(raws, (raw) => yearFromDate(raw.publishedAt)) ?? firstOf(group, (entry) => entry.nameYear);
+  // publishYear là năm của ấn bản tiệm có (CONTRACT §9, #98): năm in trong tên sản phẩm ("Tái bản 2025",
+  // "(2026)") nói đúng ấn bản đang bán nên thắng ngày của nguồn (Tiki hay để ngày mặc định của người bán);
+  // xét từng bản ghi theo thứ tự gộp, nguồn thắng trước. Không nguồn nào có năm thì null, không bịa.
+  const publishYear = firstOf(group, (entry) => entry.nameYear ?? yearFromDate(entry.raw.publishedAt));
   const publisher =
     firstOf(raws, (raw) => normalizePublisher(raw.publisher, knownPublishers)) ??
     normalizePublisher(series.publisher, knownPublishers) ??

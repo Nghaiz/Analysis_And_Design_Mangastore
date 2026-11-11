@@ -8,6 +8,8 @@ const NAMED_ENTITIES = {
 
 const COMBINING = { acute: '́', grave: '̀', tilde: '̃', circ: '̂', uml: '̈' };
 
+import { hasSetWord } from '../lib/set-word.mjs';
+
 const HTML_TAG = /<[^>]*>/g;
 const DECIMAL_RADIX = 10;
 const HEX_RADIX = 16;
@@ -38,9 +40,12 @@ export function foldText(text) {
     .trim();
 }
 
-/** Dấu hiệu combo/bộ nhiều tập (CONTRACT §5), so trên chữ đã gấp và có khoảng trắng hai đầu. */
+/**
+ * Dấu hiệu combo/bộ nhiều tập (CONTRACT §5), so trên chữ đã gấp và có khoảng trắng hai đầu.
+ * Chữ "bộ" không nằm ở đây: bỏ dấu thì trùng "bố", nên so trên chữ có dấu (`hasSetWord`).
+ */
 const COMBO_PATTERNS = [
-  / combo /, / bo /, / tron bo /, / set /, / box ?set /, / tu sach /,
+  / combo /, / tron bo /, / set /, / box ?set /, / tu sach /,
   / \d+ (cuon|quyen|tap) /, / chon tap /, / tap \d+ (den|tap) \d+ /,
 ];
 
@@ -57,7 +62,7 @@ const EXPLICIT_COMBO = [/ combo /, / tron bo /, / box ?set /];
 export function isComboName(name) {
   const folded = ` ${foldText(name)} `;
   if (SINGLE_VOLUME_LISTING.test(folded)) return EXPLICIT_COMBO.some((re) => re.test(folded));
-  return COMBO_PATTERNS.some((re) => re.test(folded)) || VOLUME_RANGE.test(name);
+  return COMBO_PATTERNS.some((re) => re.test(folded)) || hasSetWord(name) || VOLUME_RANGE.test(name);
 }
 
 /** Hàng đã qua sử dụng: "cũ", "sách cũ", "like new", "đã qua sử dụng". */

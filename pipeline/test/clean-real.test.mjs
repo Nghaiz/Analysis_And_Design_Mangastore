@@ -69,9 +69,10 @@ describe('3. nhiễu trong tên', () => {
     expect(cleanTitle('Sách giáo khoa Toán').name).toBe('Sách giáo khoa Toán');
   });
 
-  it('publishYear: nguồn trước, rồi năm trong tên', async () => {
+  it('publishYear là năm của ấn bản tiệm có: năm trong tên thắng ngày của nguồn, không có thì ngày của nguồn (#98)', async () => {
     const { of } = await realBooks();
-    expect(of('dragon-ball').publishYear).toBe(2023);
+    // Tiki: tên "(Tái Bản 2025)", publication_date "2023-12-21" là ngày mặc định của người bán.
+    expect(of('dragon-ball').publishYear).toBe(2025);
     expect(of('shin-cau-be-but-chi').publishYear).toBe(2026);
     expect(of('conan').publishYear).toBeNull();
   });

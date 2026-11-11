@@ -5,7 +5,7 @@ import { join } from 'node:path';
 import sharp from 'sharp';
 import { readJsonl } from '../src/lib/io.mjs';
 import { images } from '../src/steps/images.mjs';
-import { paddingCropBox } from '../src/lib/trim.mjs';
+import { paddingCropBox, sellerBandHeight } from '../src/lib/trim.mjs';
 import { chooseCover, meanVector, thumbVector } from '../src/lib/colour.mjs';
 import { addRaw, makeCtx, rawTemplate, runSteps } from './fixtures/records/harness.mjs';
 
@@ -173,6 +173,36 @@ describe('images', () => {
       const reference = meanVector([await thumbVector(await solid({ r: 40, g: 70, b: 190 }))]);
       expect((await chooseCover(fetched, reference)).map((e) => e.image.sourceUrl)).toEqual(['u2', 'u0', 'u1']);
       expect((await chooseCover(fetched, null)).map((e) => e.image.sourceUrl)).toEqual(['u1', 'u0', 'u2']);
+    });
+
+    describe('dải nhãn người bán phía trên bìa (#95)', () => {
+      // Dựng theo ảnh Tiki thật (Dragon Ball tập 1): khung vuông 600 trắng, nhãn chữ hẹp ở trên,
+      // khoảng trắng hết bề ngang, rồi bìa 378 × 513.
+      const rect = (width, height, background) => sharp({ create: { width, height, channels: 3, background } }).png().toBuffer();
+      async function sellerSquare({ tagWidth = 160, withTag = true } = {}) {
+        const layers = [{ input: await rect(378, 513, { r: 30, g: 60, b: 200 }), left: 111, top: 77 }];
+        if (withTag) layers.push({ input: await rect(tagWidth, 38, { r: 220, g: 30, b: 40 }), left: 300 - Math.floor(tagWidth / 2), top: 9 });
+        return sharp({ create: { width: 600, height: 600, channels: 3, background: '#ffffff' } }).composite(layers).png().toBuffer();
+      }
+      const entry = (buffer, n) => ({ image: { kind: n === 0 ? 'cover' : 'extra', n, sourceUrl: `u${n}` }, buffer });
+
+      it('nhận ra nhãn hẹp tách khỏi bìa bằng khoảng trắng; không nhầm bìa không nhãn hay dải chạy hết bề ngang', async () => {
+        expect(await sellerBandHeight(await sellerSquare())).toBeGreaterThan(0);
+        expect(await sellerBandHeight(await sellerSquare({ withTag: false }))).toBe(0);
+        expect(await sellerBandHeight(await sellerSquare({ tagWidth: 360 }))).toBe(0);
+        expect(await sellerBandHeight(await solid({ r: 30, g: 60, b: 200 }))).toBe(0);
+      });
+
+      it('có ảnh màu đúng dáng bìa không nhãn → ảnh đó làm bìa, ảnh có nhãn thành ảnh phụ', async () => {
+        const fetched = [entry(await sellerSquare(), 0), entry(await solid({ r: 90, g: 92, b: 90 }), 1), entry(await solid({ r: 200, g: 30, b: 30 }), 2)];
+        const chosen = await chooseCover(fetched, null);
+        expect(chosen.map((e) => [e.image.kind, e.image.sourceUrl])).toEqual([['cover', 'u2'], ['extra', 'u0'], ['extra', 'u1']]);
+      });
+
+      it('không có ảnh thay thế sạch → giữ bìa có nhãn (CONTRACT §9)', async () => {
+        const fetched = [entry(await sellerSquare(), 0), entry(await solid({ r: 90, g: 92, b: 90 }), 1), entry(await sellerSquare(), 2)];
+        expect(await chooseCover(fetched, null)).toBe(fetched);
+      });
     });
 
     it('mọi ảnh đều xám → giữ nguyên thứ tự', async () => {

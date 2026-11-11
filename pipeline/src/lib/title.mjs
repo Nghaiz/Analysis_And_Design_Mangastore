@@ -1,4 +1,5 @@
 // Đọc thông tin từ tên sản phẩm: số tập, biến thể, năm tái bản, dấu hiệu combo (CONTRACT §5).
+import { hasSetWord } from './set-word.mjs';
 import { fold } from './text.mjs';
 
 export const VARIANTS = Object.freeze(['thuong', 'dac-biet', 'mau', 'plus']);
@@ -24,7 +25,6 @@ const COMBO_PATTERNS = Object.freeze([
   /\bcombo\b/,
   /\btron bo\b/,
   /\bbox set\b/,
-  /\bbo\s/,
   /\bset\s/,
 ]);
 const BOOKSHELF = /\btu sach\b/;
@@ -78,9 +78,9 @@ export function yearFromDate(publishedAt) {
   return match ? validYear(match[1]) : null;
 }
 
-/** Tên còn mang dấu hiệu combo/bộ/set (CONTRACT §5). */
+/** Tên còn mang dấu hiệu combo/bộ/set (CONTRACT §5); "bộ" so trên chữ có dấu (lib/set-word.mjs). */
 export function isCombo(name) {
   const text = foldedName(name);
-  if (COMBO_PATTERNS.some((pattern) => pattern.test(text))) return true;
+  if (COMBO_PATTERNS.some((pattern) => pattern.test(text)) || hasSetWord(name)) return true;
   return BOOKSHELF.test(text) && MULTI_VOLUME.test(text);
 }
