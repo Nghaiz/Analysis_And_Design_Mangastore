@@ -4,7 +4,7 @@ Nguồn sự thật cho việc giao lane của mọi phiên cook. Đọc lại �
 
 Phase 1–5 xong: phase 1–4 vào `main` qua PR #1–#6, phase 5 qua PR #7, phase 4b (dọn mục bỏ sót của phase 1–4, `phase-04-don-no.md`) qua PR #8. Phase tiếp theo: 6
 Cập nhật lần cuối: 2026-11-11 (phiên cook phase 3–4, sau khi gộp phase 5)
-Nhánh phase: chưa có (phase 6 tạo `phase/06-...` từ `origin/main`)
+Nhánh phase: `phase/06-chuc-nang-1-2` (worktree `D:/Coding/mangastore-wt/06-orch`); phase 7 chạy song song ở phiên khác (`phase/07-chuc-nang-3`)
 
 ## Luật (tóm tắt, bản đủ ở `plan.md` và `contract.md` §1)
 
@@ -19,11 +19,17 @@ Nhánh phase: chưa có (phase 6 tạo `phase/06-...` từ `origin/main`)
 
 | Lane | Agent | Bắt đầu | Worktree / nhánh | Báo cáo |
 |---|---|---|---|---|
+| 6A `filter-chung` | `t1k-web-core-developer` | 2026-11-11 | `06-filter-chung` / `lane/06-chuc-nang-1-2/filter-chung` | |
+| 6B `trang-m1` | `t1k-web-core-developer` | 2026-11-11 | `06-trang-m1` / `lane/06-chuc-nang-1-2/trang-m1` | |
+| 6C `trang-m2` | `t1k-web-core-developer` | 2026-11-11 | `06-trang-m2` / `lane/06-chuc-nang-1-2/trang-m2` | |
 
 ## Hàng đợi
 
 | Thứ tự | Lane | Chờ gì |
 |---|---|---|
+| 1 | 6D `island-selected-stack` | chỗ trống đầu tiên trong 6A–6C |
+| 2 | 6E `xac-minh-m1` | 6A, 6B đã merge |
+| 3 | 6F `xac-minh-m2` | 6C, 6D đã merge |
 
 ## Bảng lane
 
@@ -56,10 +62,10 @@ Nhánh phase: chưa có (phase 6 tạo `phase/06-...` từ `origin/main`)
 | 5 | 5B `loader-react` | loader cách B, component React, ESLint chặn fetch, ngân sách | `t1k-web-core-developer` | xem `phase-05` | 5.0 | xong (6349b00) | `plans/reports/phase-05-loader-react-261111-0756.md` |
 | 5 | 5C `ke-3d` | ShelfScene, quạt trần, ảnh tĩnh, HomePreview | `t1k-web-core-developer` | xem `phase-05` | 5.0 | xong (b5de396) | `plans/reports/phase-05-ke-3d-261111-0801.md` |
 | 5 | 5D `xac-minh` | Playwright MCP và đo Lighthouse | `t1k-web-testing-tester` | `plans/reports/` | 5A, 5B, 5C | xong | `plans/reports/phase-05-xac-minh-261111-0828.md` |
-| 6 | 6.0 orchestrator | web.xml filter, compose e2e, smoke M1–M2, Accept | phiên chính | xem `phase-06` | phase 4, 5 | chờ | |
-| 6 | 6A `filter-chung` | 5 filter, csrf tag, trang lỗi | `t1k-web-core-developer` | xem `phase-06` | 6.0 | chờ | |
-| 6 | 6B `trang-m1` | 5 trang M1 | `t1k-web-core-developer` | xem `phase-06` | 6.0 | chờ | |
-| 6 | 6C `trang-m2` | 9 trang M2 | `t1k-web-core-developer` | xem `phase-06` | 6.0 | chờ | |
+| 6 | 6.0 orchestrator | web.xml filter, compose e2e, smoke M1–M2, Accept | phiên chính | xem `phase-06` | phase 4, 5 | đang chạy (hợp đồng a96abb6) | `phase-06-integration.md` |
+| 6 | 6A `filter-chung` | 5 filter, csrf tag, trang lỗi | `t1k-web-core-developer` | xem `phase-06` | 6.0 | đang chạy | |
+| 6 | 6B `trang-m1` | 5 trang M1 | `t1k-web-core-developer` | xem `phase-06` | 6.0 | đang chạy | |
+| 6 | 6C `trang-m2` | 9 trang M2 | `t1k-web-core-developer` | xem `phase-06` | 6.0 | đang chạy | |
 | 6 | 6D `island-selected-stack` | island SelectedStack | `t1k-web-core-developer` | `frontend/src/islands/SelectedStack/**` | 6.0, chỗ trống | chờ | |
 | 6 | 6E `xac-minh-m1` | Playwright MCP chức năng 1 | `t1k-web-testing-tester` | `plans/reports/` | 6A, 6B | chờ | |
 | 6 | 6F `xac-minh-m2` | Playwright MCP chức năng 2 | `t1k-web-testing-tester` | `plans/reports/` | 6C, 6D | chờ | |
@@ -105,3 +111,4 @@ Nhánh phase: chưa có (phase 6 tạo `phase/06-...` từ `origin/main`)
 | 2026-11-11 | 5C xong (DONE_WITH_CONCERNS: chưa soi trình duyệt, HomePreview cần layout.tag của 5A), merge (289a89e); đổi import sang `@/hooks/useReducedMotion`, xoá hook tạm (a46b254); 88 test xanh, check:budget PASS (loader 2,36 kB, ShelfCanvas 247 kB gzip chỉ ShelfScene); đề xuất `posterAvifSrcSet` trong contracts §11.4 để sau số Lighthouse |
 | 2026-11-11 | 5A dừng ở giới hạn 75 lượt, nhắn làm tiếp, xong (5660371), merge (c419293); áp đề xuất tài liệu, Accept thêm bước 4b chặn hex; loader thêm `data-island-state` (mục phiên 9b mang từ phase 1); Accept lần 1 FAIL bước 6 (HomePreviewView 500: `<%= %>` trong thân scriptless), sửa (c3af339), lần 2 ALL PASS; spawn 5D. Stack compose do phase 5 giữ tới khi xong 5.5 (đã hẹn phiên 9b) |
 | 2026-11-11 | 5D lần 1: L1 (CSS ảnh thiếu lớp JSP) sửa ở Dockerfile + Accept bước 6; chủ dự án đổi font (Fuzzy Bubbles + Momo), lane 5E và lane tài liệu làm; 5C sửa ánh sáng, chuyển mờ, nhãn 390, lọc warning THREE.Clock; 5D đo lại PASS; chủ dự án giao chọn font số → Nunito (`--font-num`); Accept ALL PASS (0908); Lighthouse HomePreview 96, StyleGuide 98; ảnh tĩnh kệ cho điện thoại ghi sang phase 6 |
+| 2026-11-11 | Phase 6: 6.0 chốt `phase-06-integration.md` (ranh giới trang ↔ filter, Display, posterNarrowSrc §11.4, stack riêng từng lane cổng 8081–8083; phase 7 dùng 8084–8089), filter khung cho qua để web.xml hợp lệ (a96abb6); spawn 6A, 6B, 6C. Phiên phase 7 chạy song song, nhận SHA 6A khi xong |
