@@ -44,6 +44,9 @@ expect(fetchSpy).not.toHaveBeenCalled()
 
 ## Gotchas
 
+- **Island không tự đặt error boundary.** Loader (`frontend/src/loader/`) bọc mỗi island và trả lại đúng các node HTML gốc khi island ném lỗi; island tự bọc thì nuốt mất lỗi và bản HTML không về.
+- **Gửi form qua `useFormBridge(ref)`** (`frontend/src/hooks/useFormBridge.ts`): hook đổi giá trị input thật, phát `input`/`change` rồi `form.requestSubmit(submitter)`; không tự viết lại.
+- **Test React cần `afterEach(cleanup)`** của `@testing-library/react`: Vitest của dự án không bật `globals`, nên cleanup tự động không chạy và DOM của test trước còn sót.
 - **Không render input có `name` trong island.** Bản HTML của JSP đã có các input đó; island thêm input cùng tên thì form gửi hai giá trị. Island đổi input thật (có thể ẩn bản HTML bằng lớp CSS sau khi mount, nhưng input vẫn nằm trong form).
 - `requestSubmit(submitter)` ném lỗi nếu `submitter` không phải nút submit **của chính form đó**. `name`/`value` của nút chỉ được gửi khi nút là submitter; `formaction` của nút cũng chỉ áp khi nó là submitter.
 - Checkbox không tích thì không được gửi; muốn bỏ chọn là đặt `checked = false`, không xoá input.

@@ -20,7 +20,6 @@ Nhánh phase: `phase/05-he-thiet-ke-giao-dien`, worktree orchestrator `D:/Coding
 | Lane | Agent | Bắt đầu | Worktree / nhánh | Báo cáo |
 |---|---|---|---|---|
 | 5A `token-tag` | `t1k-web-ui-developer` | 2026-11-11 | `D:/Coding/mangastore-wt/05-token-tag` / `lane/05-he-thiet-ke-giao-dien/token-tag` | |
-| 5B `loader-react` | `t1k-web-core-developer` | 2026-11-11 | `D:/Coding/mangastore-wt/05-loader-react` / `lane/05-he-thiet-ke-giao-dien/loader-react` | |
 | 5C `ke-3d` | `t1k-web-core-developer` | 2026-11-11 | `D:/Coding/mangastore-wt/05-ke-3d` / `lane/05-he-thiet-ke-giao-dien/ke-3d` | |
 
 ## Hàng đợi
@@ -53,7 +52,7 @@ Nhánh phase: `phase/05-he-thiet-ke-giao-dien`, worktree orchestrator `D:/Coding
 | 4 | 4.5 HARD STOP | chủ dự án duyệt chạy thử 10 đầu truyện | orchestrator thay (chủ dự án giao toàn quyền 11/11/2026) | | 4C | xong: 10/10 đạt, crawl hết | `plans/reports/phase-04-trial-261111-0423.md` |
 | 5 | 5.0 orchestrator | gói npm, shadcn add, khoá vite.config, hợp đồng giao diện, Accept | phiên chính | xem `phase-05` | phase 3 | xong | `phase-05-ui-contract.md` |
 | 5 | 5A `token-tag` | token, font, CSS, tag JSP, StyleGuide, kiểm tương phản và font | `t1k-web-ui-developer` | xem `phase-05` | 5.0 | đang chạy | |
-| 5 | 5B `loader-react` | loader cách B, component React, ESLint chặn fetch, ngân sách | `t1k-web-core-developer` | xem `phase-05` | 5.0 | đang chạy | |
+| 5 | 5B `loader-react` | loader cách B, component React, ESLint chặn fetch, ngân sách | `t1k-web-core-developer` | xem `phase-05` | 5.0 | xong (6349b00) | `plans/reports/phase-05-loader-react-261111-0756.md` |
 | 5 | 5C `ke-3d` | ShelfScene, quạt trần, ảnh tĩnh, HomePreview | `t1k-web-core-developer` | xem `phase-05` | 5.0 | đang chạy | |
 | 5 | 5D `xac-minh` | Playwright MCP và đo Lighthouse | `t1k-web-testing-tester` | `plans/reports/` | 5A, 5B, 5C | chờ | |
 | 6 | 6.0 orchestrator | web.xml filter, compose e2e, smoke M1–M2, Accept | phiên chính | xem `phase-06` | phase 4, 5 | chờ | |
@@ -101,3 +100,4 @@ Nhánh phase: `phase/05-he-thiet-ke-giao-dien`, worktree orchestrator `D:/Coding
 | 2026-11-11 | Theo phiên phase 3 (lane 3A): skill `tiem-add-dao-duplicate-check` đổi khuôn sang `con()` + `inWriteTransaction` (Checkstyle cấm trường protected); Accept phase 2 ALL PASS (`plans/reports/accept-phase-02-261111-0430.log`) |
 | 2026-11-11 | Phase 5: 5.0 xong (gói npm ghim, shadcn 7 component sửa import `cn`, vite phát `data/categories.json`, `phase-05-ui-contract.md`, Accept phase 5 bước 2 đỏ có chủ đích); phiên 9b báo phase 5 đụng cây chính → chuyển sang worktree `05-orch`, cây chính về `main` |
 | 2026-11-11 | Spawn 5A, 5B, 5C song song (phase 4 xong nên đủ 3 chỗ) |
+| 2026-11-11 | Merge PR #5, #6 của main vào nhánh phase. 5B xong (DONE_WITH_CONCERNS: thẻ HTML chưa ghim), merge (eab90f0); hợp đồng giao diện thêm §3a, nhắn 5A khớp theo; 5B đề xuất 3 gotcha, đã thêm vào skill `tiem-create-react-island`; loader 2,25 kB gzip |
