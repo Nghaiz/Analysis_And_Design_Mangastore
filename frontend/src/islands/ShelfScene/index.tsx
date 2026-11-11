@@ -45,6 +45,7 @@ export default function ShelfScene(rawProps: IslandProps) {
         loginHref={props.loginHref}
         posterSrc={props.posterSrc}
         posterSrcSet={props.posterSrcSet}
+        posterNarrowSrc={props.posterNarrowSrc}
         posterAlt={props.posterAlt}
         covered={live}
       />

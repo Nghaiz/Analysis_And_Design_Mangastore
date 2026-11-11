@@ -2,6 +2,7 @@ import { act, cleanup, render, screen } from '@testing-library/react'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import ShelfScene from './index'
 import { followLoginLink } from './login-link'
+import { POSTER_HEIGHT, POSTER_NARROW_MEDIA, POSTER_WIDTH } from './Poster'
 import { parseShelfSceneProps } from './types'
 import { IDLE_FALLBACK_DELAY_MS } from './upgrade'
 
@@ -16,6 +17,7 @@ const props = {
   loginHref: '/LoginView.jsp',
   posterSrc: '/static/img/shelf/shelf-static.webp',
   posterSrcSet: null,
+  posterNarrowSrc: '/static/img/shelf/shelf-static-narrow.webp',
   posterAlt: 'Kệ truyện gỗ dưới ánh đèn vàng: đăng nhập để thuê truyện',
   categories: ['Thiếu nhi', 'Trinh thám'],
 }
@@ -63,6 +65,36 @@ describe('ShelfScene island', () => {
     const image = screen.getByRole('img', { name: props.posterAlt })
     expect(image.getAttribute('src')).toBe(props.posterSrc)
     expect(image.closest('a')?.getAttribute('href')).toBe(props.loginHref)
+  })
+
+  it('offers the narrow cabinet-only image to narrow viewports inside one <picture>', () => {
+    setMedia([])
+    stubWebGL(false)
+    render(<ShelfScene {...props} />)
+
+    const image = screen.getByRole('img', { name: props.posterAlt })
+    const picture = image.parentElement
+    expect(picture?.tagName).toBe('PICTURE')
+    expect(picture?.parentElement?.tagName).toBe('A')
+    const sources = picture?.querySelectorAll('source') ?? []
+    expect(sources).toHaveLength(1)
+    expect(sources[0]?.getAttribute('media')).toBe('(max-width: 599.98px)')
+    expect(sources[0]?.getAttribute('srcset')).toBe(props.posterNarrowSrc)
+    expect(sources[0]?.nextElementSibling).toBe(image) // <source> phải đứng trước <img>
+    expect(POSTER_NARROW_MEDIA).toBe('(max-width: 599.98px)')
+    // Ảnh khung hẹp cùng cỡ với ảnh rộng: bố cục không xê dịch khi trình duyệt đổi ảnh hay cảnh 3D phủ lên.
+    expect(image.getAttribute('width')).toBe(String(POSTER_WIDTH))
+    expect(image.getAttribute('height')).toBe(String(POSTER_HEIGHT))
+  })
+
+  it('renders no <source> when posterNarrowSrc is null', () => {
+    setMedia([])
+    stubWebGL(false)
+    render(<ShelfScene {...props} posterNarrowSrc={null} />)
+
+    const image = screen.getByRole('img', { name: props.posterAlt })
+    expect(image.parentElement?.tagName).toBe('PICTURE')
+    expect(image.parentElement?.querySelector('source')).toBeNull()
   })
 
   it('keeps the static image under reduced motion and never loads three', async () => {
@@ -116,9 +148,16 @@ describe('parseShelfSceneProps', () => {
     expect(parseShelfSceneProps(props)).toEqual(props)
   })
 
+  it('accepts a null posterNarrowSrc', () => {
+    expect(parseShelfSceneProps({ ...props, posterNarrowSrc: null }).posterNarrowSrc).toBeNull()
+  })
+
   it.each([
     ['loginHref', { loginHref: '' }],
     ['posterSrcSet', { posterSrcSet: undefined }],
+    ['posterNarrowSrc', { posterNarrowSrc: undefined }],
+    ['posterNarrowSrc', { posterNarrowSrc: '' }],
+    ['posterNarrowSrc', { posterNarrowSrc: 42 }],
     ['categories', { categories: [] }],
     ['categories', { categories: ['Thiếu nhi', 3] }],
   ])('names the bad field %s', (field, override) => {
