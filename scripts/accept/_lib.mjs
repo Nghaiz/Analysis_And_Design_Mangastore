@@ -8,7 +8,16 @@ import { join, dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import http from 'node:http';
 
-export const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '..', '..');
+/**
+ * Viết hoa chữ ổ đĩa Windows (`d:\x` → `D:\x`). Vitest 5 chạy với cwd `d:\…` nạp hai bản của chính nó
+ * (đường dẫn thật là `D:\…`) và báo "failed to find the current suite"; Accept gọi từ một cửa sổ mở thư mục
+ * bằng `d:` sẽ đỏ dù test đúng. Đường dẫn không có chữ ổ đĩa giữ nguyên.
+ */
+export function upperDrive(p) {
+  return /^[a-z]:/.test(p) ? p[0].toUpperCase() + p.slice(1) : p;
+}
+
+export const ROOT = upperDrive(resolve(dirname(fileURLToPath(import.meta.url)), '..', '..'));
 export const IS_WIN = process.platform === 'win32';
 
 const useColor = process.stdout.isTTY && !process.env.NO_COLOR;
