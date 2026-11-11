@@ -96,6 +96,7 @@ final class FakeHttp {
         private Session session;
         private String requestedSessionId;
         private boolean requestedSessionIdValid;
+        private IllegalStateException parameterFailure;
         private final HttpServletRequest proxy = fake(HttpServletRequest.class, (p, m, a) -> switch (m.getName()) {
             case "getMethod" -> method;
             case "getServletPath" -> servletPath;
@@ -107,7 +108,8 @@ final class FakeHttp {
                 characterEncoding = (String) a[0];
                 yield null;
             }
-            case "getParameter" -> parameters.get((String) a[0]);
+            case "getParameter" -> parameter((String) a[0]);
+            case "getParameterMap" -> parameterMap();
             case "getHeader" -> headers.get((String) a[0]);
             case "getAttribute" -> attributes.get((String) a[0]);
             case "setAttribute" -> {
@@ -156,6 +158,26 @@ final class FakeHttp {
             requestedSessionId = "S-het-han";
             requestedSessionIdValid = false;
             return this;
+        }
+
+        /** Tham số hỏng như Tomcat 11: mọi {@code getParameter*} ném {@link IllegalStateException}. */
+        Request brokenParameters() {
+            parameterFailure = new IllegalStateException("giả lập InvalidParameterException của Tomcat");
+            return this;
+        }
+
+        private String parameter(String name) {
+            parameterMap();
+            return parameters.get(name);
+        }
+
+        private Map<String, String[]> parameterMap() {
+            if (parameterFailure != null) {
+                throw parameterFailure;
+            }
+            Map<String, String[]> map = new HashMap<>();
+            parameters.forEach((k, v) -> map.put(k, new String[] {v}));
+            return map;
         }
 
         Request contextPath(String value) {

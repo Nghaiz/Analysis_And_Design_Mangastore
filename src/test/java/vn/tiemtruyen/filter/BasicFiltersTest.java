@@ -47,6 +47,29 @@ class BasicFiltersTest {
     }
 
     @Test
+    void brokenQueryOrFormEncodingIs400AndThePageDoesNotRun() throws IOException, ServletException {
+        for (Request request : List.of(Request.get("/LoginView.jsp").brokenParameters(),
+                Request.post("/LoginView.jsp").brokenParameters())) {
+            Response response = new Response();
+            FakeChain chain = new FakeChain();
+            new Utf8Filter().doFilter(request.proxy(), response.proxy(), chain.proxy());
+            assertEquals(0, chain.calls(), "trang không chạy (không ra 500 ở getParameter đầu tiên)");
+            assertEquals(400, response.error(), "error.jsp hiện 400 · Yêu cầu không hợp lệ");
+        }
+    }
+
+    @Test
+    void wellFormedParametersReachThePageAlreadyParsedAsUtf8() throws IOException, ServletException {
+        Request request = Request.post("/doRegister.jsp").param("txtFullName", "Nguyễn Minh Anh");
+        Response response = new Response();
+        FakeChain chain = new FakeChain();
+        new Utf8Filter().doFilter(request.proxy(), response.proxy(), chain.proxy());
+        assertEquals(1, chain.calls());
+        assertNull(response.error());
+        assertEquals("Nguyễn Minh Anh", chain.seen().getParameter("txtFullName"));
+    }
+
+    @Test
     void securityHeadersAreSetOnJspPagesBeforeThePageRuns() throws IOException, ServletException {
         Response response = new Response();
         List<String> seenByPage = new ArrayList<>();
