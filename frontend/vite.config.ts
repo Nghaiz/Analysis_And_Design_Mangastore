@@ -33,8 +33,8 @@ const ENTRY_STYLES = 'src/styles/app.css'
 const DEV_SERVER_PORT = 5173
 const DEV_SERVER_ORIGIN = `http://localhost:${DEV_SERVER_PORT}`
 // The browser opens pages from Tomcat behind nginx (127.0.0.1:8080, contract.md §3)
-// and loads modules from the Vite dev server, so that origin needs CORS.
-const BACKEND_ORIGIN = 'http://localhost:8080'
+// and loads modules from the Vite dev server, so both spellings of that origin need CORS.
+const BACKEND_ORIGINS = ['http://localhost:8080', 'http://127.0.0.1:8080']
 
 export default defineConfig({
   root: fileURLToPath(new URL('.', import.meta.url)),
@@ -52,7 +52,7 @@ export default defineConfig({
     strictPort: true,
     origin: DEV_SERVER_ORIGIN,
     cors: {
-      origin: BACKEND_ORIGIN,
+      origin: BACKEND_ORIGINS,
     },
   },
   build: {
