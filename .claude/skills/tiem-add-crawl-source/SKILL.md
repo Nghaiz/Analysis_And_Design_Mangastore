@@ -25,7 +25,7 @@ Pipeline Node 24 ESM ở `pipeline/` lấy 300–500 đầu truyện thật. Ngu
    - đọc và tuân `robots.txt` của từng host;
    - User-Agent chung `Mozilla/5.0 (compatible; tiem-truyen-pipeline/1.0)`: **không** tên người, không email, không số điện thoại;
    - cache HTTP trên đĩa `data/cache/http/`; `--offline` ném lỗi khi cần mạng mà cache thiếu.
-4. **Lọc nhiễu ngay ở nguồn:** bỏ sản phẩm có "Combo", "Bộ", "Trọn bộ", "Set" trong tên; bỏ bản ghi lệch nhà xuất bản mong đợi của bộ (`series.json`).
+4. **Lọc nhiễu ngay ở nguồn:** bỏ sản phẩm có "Combo", "Bộ", "Trọn bộ", "Set" trong tên, dùng `isComboName` (`pipeline/src/sources/text.mjs`); chữ "bộ" so trên chữ **có dấu** bằng `hasSetWord` (`pipeline/src/lib/set-word.mjs`), không so trên chữ đã bỏ dấu vì trùng "bố", "bò", "bỏ", "bọ" (#82, #88); bỏ bản ghi lệch nhà xuất bản mong đợi của bộ (`series.json`).
 5. **Khai nguồn vào `pipeline/config/series.json`:** bí danh, nguồn ưu tiên, thể loại theo `categories.json` (không tự thêm thể loại). Thứ tự thắng khi gộp: Kim Đồng > Tiki > Wikidata; nguồn mới cần orchestrator xếp chỗ.
 6. **Manifest:** mỗi bản ghi và mỗi ảnh một dòng trong `pipeline/manifest.jsonl`, đúng bảy trường `{ "kind": "book" | "image", "bookId", "source", "sourceUrl", "fetchedAt", "winner", "sha256" }` (`contract.md` §6). Manifest **không** chứa mô tả, tên tập hay ảnh. `source` hiện chỉ nhận `kimdong` | `tiki` | `wikidata`; thêm giá trị là đổi hợp đồng.
 7. **Nội dung ở lại `data/`** (bị ignore): `data/cache`, `data/raw`, `data/clean`, `data/images`, `data/export`, `data/reports`. Repo chỉ giữ script, cấu hình và `manifest.jsonl`.

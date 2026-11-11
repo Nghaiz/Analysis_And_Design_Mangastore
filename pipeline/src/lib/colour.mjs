@@ -1,12 +1,14 @@
-// Chọn bìa, hai luật theo thứ tự, mỗi luật chỉ đổi khi có ảnh thay thế đạt:
+// Chọn bìa, ba luật theo thứ tự, mỗi luật chỉ đổi khi có ảnh thay thế đạt:
 // 1. Bìa ứng viên gần như không màu (trang ruột đen trắng) → ảnh màu đầu tiên làm bìa.
 // 2. Bìa ứng viên sau khi cắt viền đệm vẫn xa dáng bìa dọc 2:3 (ảnh ghép bìa với quà tặng, ảnh vuông)
 //    → ảnh màu đầu tiên đúng dáng bìa (sau khi cắt viền) làm bìa.
+// 3. Bìa ứng viên có dải nhãn người bán phía trên (trim.mjs `sellerBandHeight`, #95) → ảnh màu đúng dáng
+//    bìa, không có dải nhãn, làm bìa. Không có ảnh như vậy thì giữ bìa có nhãn (CONTRACT §9).
 // Có nhiều ảnh đạt thì lấy ảnh giống bìa tham chiếu của bộ nhất (trung bình bìa các tập khác của bộ đã
 // đạt cả hai luật), để không lấy nhầm bìa sau; không có tham chiếu thì lấy ảnh đạt đầu tiên.
 // Các ảnh còn lại làm ảnh phụ theo thứ tự cũ.
 import sharp from 'sharp';
-import { COVER_ASPECT, paddingCropBox } from './trim.mjs';
+import { COVER_ASPECT, paddingCropBox, sellerBandHeight } from './trim.mjs';
 
 const SAMPLE_SIZE = 64; // thu nhỏ trước khi đo cho nhanh
 export const GREY_CHROMA_MAX = 12; // độ lệch kênh trung bình (max - min của R,G,B; 0–255) dưới mức này là "không màu"
@@ -46,9 +48,12 @@ export async function chooseCover(fetched, reference = null) {
     return promote(fetched, await bestIndex(fetched, async (b) => isColour(b), reference));
   }
   const gap = await coverAspectGap(fetched[0].buffer);
-  if (gap == null || gap <= MISSHAPEN_GAP_MIN) return fetched;
+  if (gap == null) return fetched;
   const shaped = async (b) => (await isColour(b)) && (await isCoverShaped(b));
-  return promote(fetched, await bestIndex(fetched, shaped, reference));
+  if (gap > MISSHAPEN_GAP_MIN) return promote(fetched, await bestIndex(fetched, shaped, reference));
+  if (!(await hasSellerBand(fetched[0].buffer))) return fetched;
+  const clean = async (b) => (await shaped(b)) && !(await hasSellerBand(b));
+  return promote(fetched, await bestIndex(fetched, clean, reference));
 }
 
 const THUMB_W = 12;
@@ -83,12 +88,22 @@ function distance(a, b) {
   return total / a.length;
 }
 
-/** Bìa ứng viên đã đạt cả hai luật, không cần đổi (dùng làm tham chiếu cho bộ). */
+/** Bìa ứng viên đã đạt cả ba luật, không cần đổi (dùng làm tham chiếu cho bộ). */
 export async function isUsableCover(buffer) {
   if (!buffer) return false;
   const chroma = await meanChroma(buffer);
   const gap = await coverAspectGap(buffer);
-  return chroma != null && chroma >= GREY_CHROMA_MAX && gap != null && gap <= MISSHAPEN_GAP_MIN;
+  if (chroma == null || chroma < GREY_CHROMA_MAX || gap == null || gap > MISSHAPEN_GAP_MIN) return false;
+  return !(await hasSellerBand(buffer));
+}
+
+/** Ảnh có dải nhãn người bán phía trên bìa; ảnh hỏng thì false (bước images ghi nhận riêng). */
+export async function hasSellerBand(buffer) {
+  try {
+    return (await sellerBandHeight(buffer)) > 0;
+  } catch {
+    return false;
+  }
 }
 
 /** Độ lệch log giữa tỉ lệ rộng/cao (sau khi cắt viền đệm) và 2:3; 0 = đúng dáng bìa. null nếu ảnh hỏng. */

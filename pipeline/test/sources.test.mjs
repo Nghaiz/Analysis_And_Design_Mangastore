@@ -43,6 +43,12 @@ describe('text: combo, hàng cũ, số tập', () => {
     ['(Tập lẻ) Doraemon truyện ngắn - Chú mèo máy đến từ tương lai', false],
     ['(Tập lẻ) Doraemon truyện dài (24 tập)', false],
     ['Doraemon truyện dài (24 tập)', true],
+    ['Bộ Doraemon truyện ngắn', true],
+    ['bo truyen doraemon truyen ngan', true],
+    ['Shin - Cậu Bé Bút Chì - Phiên Bản Hoạt Hình Màu - Tập 30: Cu Shin Chăm Bố Ốm (Tái Bản 2023)', false],
+    ['Thần Đồng Đất Việt 164 - Bò Cái Tịt Ngòi', false],
+    ['Sách - Dragon Ball - 7 Viên Ngọc Rồng - Tập 32 - Cell Bọ Hung Hoàn Thiện (Tái Bản 2025)', false],
+    ['Chú Thuật Hồi Chiến - Tập 6 - Bản Thường - Tặng Kèm Obi Và Thẻ Bo Góc Nhựa', false],
   ])('isComboName(%s) = %s', (name, expected) => expect(isComboName(name)).toBe(expected));
 
   it('hàng cũ', () => {

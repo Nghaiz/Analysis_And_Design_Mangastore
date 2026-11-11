@@ -15,7 +15,7 @@ Kho truyện phải là dữ liệu thật, 300–500 tập (D4) của các bộ
 |---|---|
 | NXB Kim Đồng (cửa hàng Sapo): `sitemap.xml` + `/products/<alias>.json` | **Chính**: ISBN, tác giả, bộ, mô tả, ảnh lớn |
 | Tiki `/api/v2/products` | **Dự phòng**: tập Kim Đồng không bán lẻ, và Thần đồng đất Việt (NXB Phan Thị) |
-| Wikidata SPARQL | Bổ trợ cấp bộ (CC0) |
+| Wikidata `Special:EntityData/<QID>.json` (1 request mỗi bộ; không dùng SPARQL vì `robots.txt` của query.wikidata.org cấm `/sparql`, `pipeline/CONTRACT.md` §9) | Bổ trợ cấp bộ (CC0) |
 
 - Gộp trùng theo ISBN-13, rồi theo `bộ|tập|biến thể`; Kim Đồng thắng Tiki thắng Wikidata; bỏ combo, bộ, trọn bộ, set.
 - Mô tả, ảnh và file SQL dữ liệu sinh ra nằm ở `data/` (bị ignore) và volume Docker. Repo chỉ giữ script và `pipeline/manifest.jsonl` (URL nguồn, ngày tải, nguồn thắng, mã băm ảnh).

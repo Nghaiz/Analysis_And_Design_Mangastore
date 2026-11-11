@@ -16,7 +16,7 @@ Cột bảng: `tblBook(id int PK, name varchar(255), author varchar(100), publis
 | `data/images/<run>/<bookId>/cover-{160,320,640}.{webp,avif}`, `extra-{n}-{160,320,640}.webp` | 4B images | Đúng tên file của `contract.md` §6 |
 | `data/reports/<run>/validate.md`, `validate.json`, `index.html` | 4B validate | Báo cáo; `index.html` mở thẳng được từ đĩa (ảnh dẫn tương đối tới `data/images/<run>/`) |
 | `data/export/V10__catalog_data.sql`, `data/export/V11__sample_bills.sql` | 4B export, chỉ khi `run = full` | Migration dữ liệu Flyway |
-| `data/export/<run>/*.sql` | 4B export, khi `run ≠ full` | Bản xuất của lần chạy thử, không bao giờ publish |
+| `data/export/<run>/*.sql`, `data/export/<run>/manifest.jsonl` | 4B export, khi `run ≠ full` | Bản xuất của lần chạy thử (hai migration và manifest của lần đó, cùng dạng §8) để xem trước, không bao giờ publish; `pipeline/manifest.jsonl` chỉ ghi khi `run = full` |
 
 `<run>`: `--run <tên>`; mặc định `trial` khi có `--limit`, ngược lại `full`.
 
@@ -80,7 +80,7 @@ Mảng, thứ tự là thứ tự gán `id`:
 - Giá (`price`, chạy sau `copies`, Deferred #27): cơ bản 3000; `longStory`, `variant = dac-biet` hoặc `pages > 200` thì 5000; hiếm (`publishYear < 2005` hoặc `copies = 1`) thì cộng 1000.
 - Quyển (`copies`): 1–5, cố định theo seed `sha256(seriesKey|volume|variant)`; phân bố phải có đủ cảnh hết (bị V11 giữ hết), còn ít (1–2), còn nhiều (4–5). Barcode `DT{id:3}-{n:2}`, `tblBookCopy.id` gán tăng dần theo `(bookId, n)` bắt đầu từ 1.
 - Biến thể (`variant`): `thuong` mặc định; `dac-biet` khi tên có "đặc biệt"/"special"; `mau` khi "màu"/"tuyển tập màu"; `plus` khi "plus". "Tái bản YYYY" không phải biến thể (chỉ là năm).
-- Loại combo: tên chứa (không phân biệt hoa thường, đã bỏ dấu) `combo`, `bo `, `tron bo`, `set `, `box set`, `tu sach` dạng nhiều tập → bỏ ở crawl (4A) và validate báo lỗi chặn nếu còn sót.
+- Loại combo: tên chứa (không phân biệt hoa thường, đã bỏ dấu) `combo`, `tron bo`, `set `, `box set`, `tu sach` dạng nhiều tập, hoặc chữ **"bộ" so trên chữ có dấu** (`src/lib/set-word.mjs`, dùng chung cho crawl và validate) → bỏ ở crawl (4A) và validate báo lỗi chặn nếu còn sót. "Bộ" không so sau khi bỏ dấu vì trùng "bố", "bò", "bỏ", "bọ"… (#82, #88); tên không gõ dấu tiếng Việt nào (slug Kim Đồng, tên gõ không dấu) thì "bo" vẫn tính là combo vì không phân biệt được.
 
 ## 6. Export (4B)
 
@@ -125,3 +125,5 @@ Exit 1 khi `blocking` không rỗng. `book-count` (ngoài 300–500) chỉ xét 
 - Số tập (`volume`) lấy cả từ tên dạng "<tên bộ hoặc bí danh> <số>" không có chữ "Tập" (ví dụ "Thần Đồng Đất Việt 113 - ..."), trừ số là năm.
 - Sau run đầy đủ (11/11/2026), tên bỏ thêm "Sách " đứng trước chữ hoa (không gạch), "[Tái Bản YYYY]" (năm làm `publishYear`), "(Bản thường)"; "(Tập N)" thành " - Tập N". Giữ ghi chú ấn bản có nghĩa ("(Bản đặc biệt)", "(Kỉ niệm 65 năm NXB Kim Đồng)").
 - Chọn bìa (`lib/colour.mjs`), hai luật: (1) bìa ứng viên gần như không màu; (2) bìa ứng viên sau khi cắt viền đệm vẫn lệch dáng 2:3 quá `MISSHAPEN_GAP_MIN` (ảnh ghép quà tặng). Ảnh thay thế phải có màu, luật (2) còn phải đúng dáng (`COVER_SHAPED_GAP_MAX`). Nhiều ảnh đạt thì lấy ảnh gần bìa tham chiếu của bộ nhất (trung bình bìa thu nhỏ 12×18 của các tập trong bộ có bìa ứng viên đạt cả hai luật, cần ≥ `MIN_SERIES_REFERENCES` = 3), nếu không có tham chiếu thì lấy ảnh đạt đầu tiên. Lí do: Tiki xếp trang ruột xám trước, bìa sau trước bìa trước (9 tập Thần Đồng Đất Việt).
+- Luật chọn bìa thứ ba (phase 4b, #95): bìa ứng viên có **dải nhãn người bán** phía trên (ảnh Tiki khung vuông nền trắng của người bán FAHASA: nhãn chữ hẹp, khoảng trắng hết bề ngang, rồi bìa; `lib/trim.mjs` `sellerBandHeight`, ngưỡng `BAND_MIN_FRACTION`, `BAND_MAX_FRACTION`, `BAND_GUTTER_MIN_FRACTION`) thì lấy ảnh màu đúng dáng bìa không có nhãn, chọn theo bìa tham chiếu như trên; bìa có nhãn không làm bìa tham chiếu. Không có ảnh thay thế sạch thì **chấp nhận** bìa có nhãn: nhãn nằm ngoài bìa in, không che chữ hay hình của bìa, và không cắt ảnh vì cắt sai sẽ mất phần bìa thật. Lần chạy 11/11/2026: 31 bìa ứng viên có nhãn, cả 31 có ảnh thay thế sạch (đã soát bằng mắt), 0 bìa còn nhãn.
+- `publishYear` (phase 4b, #98) là **năm của ấn bản tiệm có**, tức ấn bản mà bản ghi nguồn mô tả (tên, giá, ảnh), không phải năm xuất bản lần đầu của bộ. Năm in trong tên sản phẩm ("(Tái bản 2025)", "[Tái Bản 2023]", "(2026)", biến thể Kim Đồng "(2026)") nói đúng ấn bản đó nên **thắng** ngày của nguồn; không có thì năm trong ngày xuất bản của nguồn (`publishedAt`); xét từng bản ghi theo thứ tự gộp, nguồn thắng trước; không có thì `null` (cảnh báo `no-year`), không đoán, không lấy năm ra mắt của bộ. Lí do: Tiki của người bán FAHASA ghi `publication_date` mặc định "2023-12-21" cho mọi tập, kể cả tập ghi "Tái bản 2025" trong tên (28 Book).
