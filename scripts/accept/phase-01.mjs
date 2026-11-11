@@ -106,7 +106,10 @@ await step('4 nginx: /health.jsp ok, /static br, security headers', async () => 
       throw new Error(`${name} CSP thiếu frame-ancestors 'none' → sửa security-headers.conf`);
     }
   }
-  return `br ${jsFile}`;
+  mustRun(runner, process.execPath, ['scripts/check/csp-page-check.mjs', '--mode', 'build', '--url', `${BASE}/HomeView.jsp`], {
+    fix: 'CSP phải đúng từng kí tự contract.md §10 khi APP_VITE_DEV=false → docker/nginx/docker-entrypoint.d/30-tiem-csp.sh',
+  });
+  return `br ${jsFile}, CSP đúng contract.md §10`;
 });
 
 // 5. Session Redis sống qua lần khởi động lại app

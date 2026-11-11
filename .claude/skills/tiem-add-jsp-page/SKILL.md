@@ -58,7 +58,7 @@ Khung tối thiểu của một trang xem tự gửi:
 - Đầu vào không có câu báo trong báo cáo (C10): không thêm câu mới; hiện lại trang, đánh dấu ô bằng `aria-invalid`.
 - `doXxx.jsp` trả `false` ở ba trang gọi `updateRentalBill` → xử lí D9 theo §6.3 (đọc lại bằng hàm danh sách, chọn câu theo trạng thái mới).
 - Không thêm thuộc tính session mới, kể cả "tạm"; thuộc tính kĩ thuật duy nhất được phép là token CSRF và `probeCount` của trang dev.
-- CSP `script-src 'self'; style-src 'self'`: không `<script>` nội tuyến chạy được, không `onclick=`, không thuộc tính `style=` trong JSP. Props island là `<script type="application/json">` (không chạy nên không vướng CSP).
+- CSP `script-src 'self'; style-src 'self'`: không `<script>` nội tuyến chạy được, không `onclick=`, không thuộc tính `style=` trong JSP. Props island là `<script type="application/json">` (không chạy nên không vướng CSP). CSP dev (`APP_VITE_DEV=true`) có `'unsafe-inline'` ở `style-src`, nên `style=` hay `<style>` lọt ở dev nhưng bị chặn ở build: trang chỉ tính là xong khi `node scripts/check/csp-page-check.mjs --mode build --url <trang>` qua.
 
 ## Lệnh kiểm
 

@@ -43,7 +43,8 @@ Chạy từ gốc repo. Cột "Có từ" là phase đầu tiên mà lệnh chạ
 | Test frontend (Vitest) | `npm --prefix frontend run test` | phase 1 |
 | Kiểm kiểu TypeScript | `npm --prefix frontend run typecheck` | phase 1 |
 | Build frontend (ra `src/main/webapp/static/`) | `npm --prefix frontend run build` | phase 1 |
-| Vite dev server (cổng 5173, đặt `APP_VITE_DEV=true`) | `npm --prefix frontend run dev` | phase 1 |
+| Vite dev server (cổng 5173); bật trang dev bằng `APP_VITE_DEV=true docker compose up --build -d --wait` (không sửa `.env`), mở `http://localhost:8080` | `npm --prefix frontend run dev` | phase 1 |
+| Kiểm CSP và nguồn nạp của một trang (`--mode dev` khi đang bật Vite dev) | `node scripts/check/csp-page-check.mjs --mode build` | phase 4 |
 | Build và test Java (Checkstyle, JUnit, Testcontainers) bằng JDK 25, không đổi env hệ thống | `node scripts/dev/mvnw.mjs -B verify` | phase 1 |
 | Build WAR, bỏ test | `node scripts/dev/mvnw.mjs -B package -DskipTests` | phase 1 |
 | Dựng và chạy stack (app, db, redis, nginx), chờ healthy | `docker compose up --build -d --wait` | phase 1 |
