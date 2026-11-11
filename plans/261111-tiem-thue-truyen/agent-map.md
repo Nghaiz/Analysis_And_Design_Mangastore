@@ -126,3 +126,13 @@ Nhánh phase: `phase/06-chuc-nang-1-2` (phiên 55, worktree `06-orch`) và `phas
 | 2026-11-11 | Phase 8: chủ dự án yêu cầu xong trong 1 giờ, không giới hạn 3 agent. 8.0 xong (gói e2e, config, fixture chung dùng lại `scripts/smoke/lib/e2e-db.mjs`, Accept, `phase-08-integration.md`); ảnh app tag `p8` build sẵn; 8A tách 4 lane theo file test; spawn 8A1–8A4, 8B, 8C, 8E cùng lúc (7 agent) |
 | 2026-11-11 | Phase 8: chủ dự án chỉ giữ 8A1, 8A2, 8A3; dừng 8A4, 8C, 8F (sửa Trivy), bỏ 8D; giữ 8B, 8E đã merge. Sau 8A2, 8A3: merge, chạy cả bộ Playwright, commit; không push, không PR, không chạy Accept đủ |
 | 2026-11-11 | 8A2, 8A3 merge; cả bộ Playwright 3 file trên một stack E2E (cổng 8087): 98/98 pass, 3,2 phút. Đề xuất để sau: gộp `expectMessage` (bỏ nút OK của loader trong `.tt-message-box`) vào `e2e/fixtures/test.ts`, `seedPM0125`/`seedChapter23` vào `e2e-db.mjs`, thêm gotcha vào skill `tiem-write-e2e-chapter2` |
+
+## 09-ui: làm mới giao diện (chủ dự án yêu cầu 11/11/2026)
+
+Brief: `plans/261111-tiem-thue-truyen/ui-refresh-brief.md`. Phần chung (layout.tag, CSS, ba trang chủ) orchestrator làm, commit `08ba2ee`.
+
+| Lane | Việc | Agent | Owns | Worktree | Trạng thái |
+|---|---|---|---|---|---|
+| 09-ui/khach | Trang phía khách | t1k-web-ui-developer | Login, Register, SearchBook, BookDetail, ConfirmRentalBill, RentalBillList, RentalBillDetail (gốc webapp) | `D:/Coding/mangastore-wt/09-ui-khach` | đang chạy |
+| 09-ui/quay | Trang quầy nhân viên | t1k-web-ui-developer | 10 trang `nhan-vien/*View.jsp` trừ StaffHomeView | `D:/Coding/mangastore-wt/09-ui-quay` | đang chạy |
+| 09-ui/quantri | Quản trị + trang lỗi | t1k-web-ui-developer | `nhan-vien/quan-tri/*View.jsp`, `error/*.jsp` | `D:/Coding/mangastore-wt/09-ui-quantri` | đang chạy |
