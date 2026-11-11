@@ -13,7 +13,7 @@ Brief đòi băm mật khẩu bằng Argon2 hoặc BCrypt. Không dùng Spring. 
 
 - Thư viện `com.password4j:password4j` 1.8.4 (thuần Java, không thư viện native), thuật toán **Argon2id**.
 - Gói trong một lớp `util/Passwords` (băm, kiểm); `ClientDAO.addClient` băm trước khi lưu, `UserDAO.checkLogin` kiểm chuỗi băm.
-- Cột `tblUser.password varchar(255)` ([ADR-0002](0002-password-varchar-255.md)). Tham số Argon2id (bộ nhớ, số vòng, độ dài muối) do phase 3 chốt trong `util/Passwords`, với điều kiện chuỗi băm ≤ 255 kí tự và có test kiểm độ dài.
+- Cột `tblUser.password varchar(255)` ([ADR-0002](0002-password-varchar-255.md)). Tham số Argon2id do phase 3 chốt trong `util/Passwords` (11/11/2026), theo mức tối thiểu OWASP: bộ nhớ 19 MiB (`m=19456` KiB), 2 vòng (`t=2`), 1 luồng (`p=1`), muối ngẫu nhiên 16 byte, đầu ra 32 byte. Chuỗi PHC `$argon2id$v=19$m=19456,t=2,p=1$<muối>$<băm>` dài khoảng 97 kí tự; `PasswordsTest` kiểm chuỗi băm ≤ 255 kí tự.
 
 ## Hệ quả
 
