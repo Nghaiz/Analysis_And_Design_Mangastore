@@ -38,7 +38,9 @@ Bộ font do chủ dự án chốt ngày 11/11/2026: Fuzzy Bubbles làm font ch�
 | `--font-pen` | Momo Signature | `@fontsource/momo-signature` | 400 | lười | Ghi chú tay, tình trạng truyện, chữ kí |
 | `--font-sign` | Momo Trust Display | `@fontsource/momo-trust-display` | 400 | lười | Tên tiệm, tiêu đề lớn |
 
-Momo Trust Sans không đơn cách: số và mã dùng `font-variant-numeric: tabular-nums` để cột thẳng hàng.
+Momo Trust Sans không đơn cách và **không có** tính năng OpenType `tnum` (GSUB chỉ có `ccmp`, `locl`; đo trong file woff2 ngày 11/11/2026), Fuzzy Bubbles cũng vậy: `font-variant-numeric: tabular-nums` vẫn đặt cho số và mã nhưng không có tác dụng, chữ số rộng khác nhau nên cột số không thẳng theo từng chữ số; cột tiền căn phải.
+
+Khoảng dòng (đo từ chiều cao dấu trong file woff2, để dấu chồng như ố, ặ, ẫ không bị cắt): chữ thân và cỡ `text-xs` tới `text-2xl` là 1.75; tiêu đề (`text-3xl` trở lên) 1.6; tem tình trạng và hộp thông báo 1.85. Giá trị nằm trong `frontend/src/styles/tokens.css` (`--text-*--line-height`).
 
 Nạp font: woff2 chép từng byte từ gói Fontsource đã ghim vào `frontend/public/fonts/` bằng `check-font-subsets.mjs --sync` (tên cố định, để preload), xem [ADR-0011](adr/0011-font-tu-host.md) mục Cập nhật. Đã loại: Special Elite (không có subset vietnamese); Be Vietnam Pro, Xanh Mono, Patrick Hand, Fraunces (chủ dự án đổi ngày 11/11/2026). Kiểm chữ: chụp màn hình chuỗi "Đã huỷ · Ố vàng · Nguyễn Thu Hà · Thám tử lừng danh Conan" ở cả bốn font (phase 5).
 
