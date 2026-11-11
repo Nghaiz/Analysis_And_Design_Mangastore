@@ -20,14 +20,13 @@ Nhánh phase: `phase/06-chuc-nang-1-2` (worktree `D:/Coding/mangastore-wt/06-orc
 | Lane | Agent | Bắt đầu | Worktree / nhánh | Báo cáo |
 |---|---|---|---|---|
 | 6A `filter-chung` | `t1k-web-core-developer` | 2026-11-11 | `06-filter-chung` / `lane/06-chuc-nang-1-2/filter-chung` | |
-| 6B `trang-m1` | `t1k-web-core-developer` | 2026-11-11 | `06-trang-m1` / `lane/06-chuc-nang-1-2/trang-m1` | |
+| 6D `island-selected-stack` | `t1k-web-core-developer` | 2026-11-11 | `06-island-selected-stack` / `lane/06-chuc-nang-1-2/island-selected-stack` | |
 | 6C `trang-m2` | `t1k-web-core-developer` | 2026-11-11 | `06-trang-m2` / `lane/06-chuc-nang-1-2/trang-m2` | |
 
 ## Hàng đợi
 
 | Thứ tự | Lane | Chờ gì |
 |---|---|---|
-| 1 | 6D `island-selected-stack` | chỗ trống đầu tiên trong 6A–6C |
 | 2 | 6E `xac-minh-m1` | 6A, 6B đã merge |
 | 3 | 6F `xac-minh-m2` | 6C, 6D đã merge |
 
@@ -64,9 +63,9 @@ Nhánh phase: `phase/06-chuc-nang-1-2` (worktree `D:/Coding/mangastore-wt/06-orc
 | 5 | 5D `xac-minh` | Playwright MCP và đo Lighthouse | `t1k-web-testing-tester` | `plans/reports/` | 5A, 5B, 5C | xong | `plans/reports/phase-05-xac-minh-261111-0828.md` |
 | 6 | 6.0 orchestrator | web.xml filter, compose e2e, smoke M1–M2, Accept | phiên chính | xem `phase-06` | phase 4, 5 | đang chạy (hợp đồng a96abb6) | `phase-06-integration.md` |
 | 6 | 6A `filter-chung` | 5 filter, csrf tag, trang lỗi | `t1k-web-core-developer` | xem `phase-06` | 6.0 | đang chạy | |
-| 6 | 6B `trang-m1` | 5 trang M1 | `t1k-web-core-developer` | xem `phase-06` | 6.0 | đang chạy | |
+| 6 | 6B `trang-m1` | 5 trang M1 | `t1k-web-core-developer` | xem `phase-06` | 6.0 | xong, merge (48c0823); chưa chạy trên Tomcat (Docker hỏng 10:56–11:20), smoke kiểm sau khi 6A merge | `plans/reports/phase-06-trang-m1-261111-1110.md` |
 | 6 | 6C `trang-m2` | 9 trang M2 | `t1k-web-core-developer` | xem `phase-06` | 6.0 | đang chạy | |
-| 6 | 6D `island-selected-stack` | island SelectedStack | `t1k-web-core-developer` | `frontend/src/islands/SelectedStack/**` | 6.0, chỗ trống | chờ | |
+| 6 | 6D `island-selected-stack` | island SelectedStack | `t1k-web-core-developer` | `frontend/src/islands/SelectedStack/**` | 6.0, chỗ trống | đang chạy (thêm loader submit-on-change, nút OK hộp báo) | |
 | 6 | 6E `xac-minh-m1` | Playwright MCP chức năng 1 | `t1k-web-testing-tester` | `plans/reports/` | 6A, 6B | chờ | |
 | 6 | 6F `xac-minh-m2` | Playwright MCP chức năng 2 | `t1k-web-testing-tester` | `plans/reports/` | 6C, 6D | chờ | |
 | 7 | 7.0 orchestrator | smoke M3, Accept | phiên chính | xem `phase-07` | phase 6 | chờ | |
@@ -113,3 +112,4 @@ Nhánh phase: `phase/06-chuc-nang-1-2` (worktree `D:/Coding/mangastore-wt/06-orc
 | 2026-11-11 | 5D lần 1: L1 (CSS ảnh thiếu lớp JSP) sửa ở Dockerfile + Accept bước 6; chủ dự án đổi font (Fuzzy Bubbles + Momo), lane 5E và lane tài liệu làm; 5C sửa ánh sáng, chuyển mờ, nhãn 390, lọc warning THREE.Clock; 5D đo lại PASS; chủ dự án giao chọn font số → Nunito (`--font-num`); Accept ALL PASS (0908); Lighthouse HomePreview 96, StyleGuide 98; ảnh tĩnh kệ cho điện thoại ghi sang phase 6 |
 | 2026-11-11 | Phase 6: 6.0 chốt `phase-06-integration.md` (ranh giới trang ↔ filter, Display, posterNarrowSrc §11.4, stack riêng từng lane cổng 8081–8083; phase 7 dùng 8084–8089), filter khung cho qua để web.xml hợp lệ (a96abb6); spawn 6A, 6B, 6C. Phiên phase 7 chạy song song, nhận SHA 6A khi xong |
 | 2026-11-11 | Chủ dự án yêu cầu bao quát mọi ngoại lệ ch.2 và edge case thực tế: `phase-06-integration.md` §6 (064d59b); chốt qua AskUserQuestion: thêm câu báo, đăng xuất, số ngày thuê ≤ 30, phiếu quá hạn không làm gì; gộp với 5 câu phiên phase 7 thành `docs/contracts.md` §10.3 (8 câu) + C14–C19 (612cdd3); quy ước gắn island §11 theo lane 7C, smoke thêm edge case (5703549); fixture PM0110 = DT001-01+02, PM0117 = DT020-01 (71b29a8). Đã nhắn 6A, 6B, 6C merge và làm thêm |
+| 2026-11-11 | Docker Desktop hỏng ~10:56 (API 500), chủ dự án khởi động lại ~11:20. 6B xong (DONE_WITH_CONCERNS: chưa chạy Tomcat), merge; sửa LoginView sang session mới. 6A DONE_WITH_CONCERNS (thiếu Redisson trong pom) → orchestrator thêm Redisson provided, error.jsp mặc định (a0bc269), nhắn 6A làm tiếp. Mở 6D |
