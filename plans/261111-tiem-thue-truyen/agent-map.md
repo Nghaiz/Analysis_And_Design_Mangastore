@@ -133,6 +133,8 @@ Brief: `plans/261111-tiem-thue-truyen/ui-refresh-brief.md`. Phần chung (layout
 
 | Lane | Việc | Agent | Owns | Worktree | Trạng thái |
 |---|---|---|---|---|---|
-| 09-ui/khach | Trang phía khách | t1k-web-ui-developer | Login, Register, SearchBook, BookDetail, ConfirmRentalBill, RentalBillList, RentalBillDetail (gốc webapp) | `D:/Coding/mangastore-wt/09-ui-khach` | đang chạy |
-| 09-ui/quay | Trang quầy nhân viên | t1k-web-ui-developer | 10 trang `nhan-vien/*View.jsp` trừ StaffHomeView | `D:/Coding/mangastore-wt/09-ui-quay` | đang chạy |
-| 09-ui/quantri | Quản trị + trang lỗi | t1k-web-ui-developer | `nhan-vien/quan-tri/*View.jsp`, `error/*.jsp` | `D:/Coding/mangastore-wt/09-ui-quantri` | đang chạy |
+| 09-ui/khach | Trang phía khách | t1k-web-ui-developer | Login, Register, SearchBook, BookDetail, ConfirmRentalBill, RentalBillList, RentalBillDetail (gốc webapp) | `D:/Coding/mangastore-wt/09-ui-khach` | xong, đã gộp |
+| 09-ui/quay | Trang quầy nhân viên | t1k-web-ui-developer | 10 trang `nhan-vien/*View.jsp` trừ StaffHomeView | `D:/Coding/mangastore-wt/09-ui-quay` | xong, đã gộp |
+| 09-ui/quantri | Quản trị + trang lỗi | t1k-web-ui-developer | `nhan-vien/quan-tri/*View.jsp`, `error/*.jsp` | `D:/Coding/mangastore-wt/09-ui-quantri` | xong, đã gộp |
+
+Kết quả: gộp `1eaa66b` (quantri), `b729014` (khach), `925dba7` (quay); orchestrator thêm C22 (kết quả tìm cũ, kệ truyện) ở `5da63d9`. Kiểm sau gộp: build, lint, 67 test script, tương phản, CSP; probe HTTP 100 bước trên mọi trang theo bốn vai. Chưa chạy Playwright (chủ dự án tự kiểm).
