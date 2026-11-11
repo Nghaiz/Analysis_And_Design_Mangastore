@@ -4,23 +4,17 @@
 // DT001-03, DT020-02, PM0117 "Đã huỷ", PM0110 "Đang cho thuê" của khách minhanh).
 //
 // Chạy: node scripts/smoke/flow-m3.mjs
-//   SMOKE_BASE_PORT (mặc định 8080), SMOKE_COMPOSE_PROJECT (mặc định tiemtruyen-e2e).
+//   SMOKE_BASE_URL (mặc định http://127.0.0.1:8080), SMOKE_COMPOSE_PROJECT (mặc định tiemtruyen-e2e).
 // Exit 0 khi mọi bước PASS; 1 khi một bước hỏng (in bước ch.2, trang, câu chờ, câu nhận); 2 khi thiếu Docker
 // hoặc stack chưa chạy. Không hỏi tương tác.
 //
-// Dữ liệu riêng của lượt này (SQL qua docker compose exec, chỉ trên DB E2E):
-// - Bỏ loại lỗi "Ố vàng" và loại tài sản "Thẻ sinh viên" nếu chưa được dùng, để ngoại lệ 19 và 37 ra câu
-//   "không tìm thấy" như ch.2 (V2 nạp sẵn hai dòng đó cho lần chạy thường).
+// Dữ liệu (SQL qua sql() của lib/e2e-db.mjs, chỉ trên DB E2E; không gọi lại resetChapter2):
+// - "Ố vàng", "Thẻ sinh viên" đã bị resetChapter2() của flow-m1-m2 bỏ (ngoại lệ 19, 37 ra câu "không tìm thấy").
 // - Chèn PM0126 "Chờ nhận" của khach01 (quyển DT021-01) cho ngoại lệ 11 (sửa danh sách truyện), 12 (huỷ
 //   tại quầy) và D9 "đã huỷ"; luồng chính trên PM0125 giữ đúng DT001-03, DT020-02 của ch.2.
-import { spawnSync } from 'node:child_process';
-import { dirname, join, resolve } from 'node:path';
-import { fileURLToPath } from 'node:url';
-import { Session, StepError, assertEq, buttonValues, clean, hasId, messageOf, tableRows, valueOf, csrfOf } from './lib/http.mjs';
+import { Session, StepError, assertEq, buttonValues, clean, hasId, messageOf, tableRows, valueOf } from './lib/http.mjs';
+import { BASE_URL as BASE, MissingStackError, addDays, isoDate, sql, vnToday } from './lib/e2e-db.mjs';
 
-const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '..', '..');
-const BASE = `http://127.0.0.1:${process.env.SMOKE_BASE_PORT ?? '8080'}`;
-const PROJECT = process.env.SMOKE_COMPOSE_PROJECT ?? 'tiemtruyen-e2e';
 const NV = '/nhan-vien';
 
 // Câu nguyên văn: docs/contracts.md §10.1 (MessagesTest giữ bản trong Java khớp từng kí tự).
@@ -66,23 +60,6 @@ const PAGE = {
   admin: `${NV}/quan-tri/ManageBookView.jsp`,
 };
 
-class MissingTool extends Error {}
-
-// ---------- SQL trên DB E2E ----------
-function sql(statements) {
-  const r = spawnSync(
-    'docker',
-    ['compose', '-p', PROJECT, '-f', 'compose.yaml', '-f', 'compose.e2e.yaml', 'exec', '-T', 'db',
-      'sh', '-c', 'mysql -uroot -p"$MYSQL_ROOT_PASSWORD" -N -B --default-character-set=utf8mb4 tiemtruyen'],
-    { cwd: ROOT, input: statements, encoding: 'utf8' },
-  );
-  if (r.error?.code === 'ENOENT') throw new MissingTool('không có lệnh docker → cài Docker Desktop');
-  if (r.status !== 0) {
-    throw new MissingTool(`mysql trong ${PROJECT} exit ${r.status}: ${(r.stderr ?? '').trim().split('\n').pop()} → dựng stack E2E (AGENTS.md §3) rồi chạy flow-m1-m2.mjs`);
-  }
-  return r.stdout.trim().split('\n').filter(Boolean).map((l) => l.split('\t'));
-}
-
 // ---------- tiện ích trang ----------
 const text = (page) => clean(page.html);
 const stepOf = (no, what) => `ch.2 2.3 ${no}: ${what}`;
@@ -113,18 +90,13 @@ function inputValues(html, name, { checkedOnly = false } = {}) {
   return out;
 }
 
-/** POST kèm token csrf của `page`, hỗ trợ field nhiều giá trị (mảng) bằng URLSearchParams. */
+/** POST kèm token csrf của `page`; field là mảng thì gửi nhiều giá trị cùng tên (ô trên nhiều dòng). */
 function send(s, page, action, fields, { withCsrf = true, follow = true } = {}) {
   const params = new URLSearchParams();
-  if (withCsrf) {
-    const token = csrfOf(page.html);
-    if (!token) throw new StepError('csrf', action, 'input name="csrf" trên trang trước', 'không có');
-    params.append('csrf', token);
-  }
   for (const [k, v] of Object.entries(fields)) {
     for (const item of Array.isArray(v) ? v : [v]) params.append(k, item);
   }
-  return s.request(action, { method: 'POST', form: params, follow });
+  return s.postParams(action, params, { page, withCsrf, follow });
 }
 
 /** Cột đầu (mã) của các dòng bảng. */
@@ -138,10 +110,6 @@ function rowButton(html, tableId, name, rowText) {
   const values = buttonValues(html, name);
   const i = rows.findIndex((r) => r.some((c) => c === rowText));
   return i >= 0 ? values[i] ?? null : null;
-}
-
-function isoDate(d) {
-  return new Intl.DateTimeFormat('en-CA', { timeZone: 'Asia/Ho_Chi_Minh' }).format(d);
 }
 
 async function login(s, username, password, no) {
@@ -180,8 +148,6 @@ async function main() {
     throw new StepError('tiền điều kiện 2.3', 'DB E2E', 'PM0125 "Chờ nhận" do flow-m1-m2.mjs để lại', pm125[0]?.[0] ?? 'không có PM0125');
   }
   sql([
-    "DELETE FROM tblDamage WHERE name = 'Ố vàng' AND id NOT IN (SELECT damageId FROM tblRentedDamage);",
-    "DELETE FROM tblCollateral WHERE name = 'Thẻ sinh viên' AND id NOT IN (SELECT collateralId FROM tblRentalCollateral);",
     'DELETE FROM tblRentedBook WHERE rentalBillId = 126;',
     'DELETE FROM tblRentalBill WHERE id = 126;',
     "INSERT INTO tblRentalBill (id, createdAt, expectedPickupAt, expectedDays, discount, status, clientId)" +
@@ -233,8 +199,8 @@ async function main() {
   }
   expectText('10', 'tổng tiền thuê', page, PAGE.process, /Tổng tiền thuê:? 42\.000đ/);
   assertEq(stepOf('10', 'các quyển tích sẵn "Nhận"'), PAGE.process, ['DT001-03', 'DT020-02'], deskState(page).received);
-  const today = isoDate(new Date());
-  const due = isoDate(new Date(Date.now() + 7 * 86400000));
+  const today = isoDate(vnToday());
+  const due = isoDate(addDays(vnToday(), 7));
   assertEq(stepOf('10', 'ngày mượn mặc định (C7)'), PAGE.process, today, deskState(page).borrowDate);
   assertEq(stepOf('10', 'ngày hẹn trả mặc định (C7)'), PAGE.process, due, deskState(page).dueDate);
 
@@ -431,7 +397,7 @@ try {
   console.log(`[smoke] PASS flow-m3 (${note})`);
   process.exit(0);
 } catch (err) {
-  if (err instanceof MissingTool) {
+  if (err instanceof MissingStackError) {
     console.log(`[smoke] FAIL flow-m3: ${err.message}`);
     process.exit(2);
   }

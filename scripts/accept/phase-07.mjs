@@ -14,7 +14,7 @@ const { step } = runner;
 const NPM = IS_WIN ? 'npm.cmd' : 'npm';
 const PROJECT = 'tiemtruyen-e2e';
 const COMPOSE = ['compose', '-p', PROJECT, '-f', 'compose.yaml', '-f', 'compose.e2e.yaml'];
-const PORT = process.env.SMOKE_BASE_PORT ?? '8080';
+const BASE_URL = process.env.SMOKE_BASE_URL ?? 'http://127.0.0.1:8080';
 const ISLANDS = ['ProcessBillDesk', 'CollateralDrawer'];
 
 const npm = (args, fix) => mustRun(runner, NPM, ['--prefix', 'frontend', ...args], { fix });
@@ -45,20 +45,20 @@ await step(`3 compose ${PROJECT} up --build --wait`, async () => {
   mustRun(runner, 'docker', [...COMPOSE, 'up', '--build', '-d', '--wait', '--wait-timeout', '300'], {
     fix: `docker ${COMPOSE.join(' ')} logs app`,
   });
-  const r = await httpGet(`http://127.0.0.1:${PORT}/health.jsp`);
+  const r = await httpGet(`${BASE_URL}/health.jsp`);
   if (r.status !== 200) throw new Error(`/health.jsp trả ${r.status} → docker ${COMPOSE.join(' ')} logs app`);
 });
 
 // 4. Chức năng 1, 2 vẫn xanh (tiêu chí 5) và dựng PM0125 "Chờ nhận" cho bước 5
 await step('4 smoke flow-m1-m2 (chống thoái lui phase 6)', () => {
-  const r = run(runner, process.execPath, [join(ROOT, 'scripts', 'smoke', 'flow-m1-m2.mjs')], { env: { SMOKE_BASE_PORT: PORT } });
+  const r = run(runner, process.execPath, [join(ROOT, 'scripts', 'smoke', 'flow-m1-m2.mjs')], { env: { SMOKE_BASE_URL: BASE_URL, SMOKE_COMPOSE_PROJECT: PROJECT } });
   if (r.code !== 0) throw new Error(`${r.out.trim().split('\n').pop()} → sửa trang M1/M2 theo bước bị báo`);
 });
 
 // 5. Chức năng 3
 await step('5 smoke flow-m3 (ch.2 mục 2.3, bốn điều kiện, D9, D6)', () => {
   const r = run(runner, process.execPath, [join(ROOT, 'scripts', 'smoke', 'flow-m3.mjs')], {
-    env: { SMOKE_BASE_PORT: PORT, SMOKE_COMPOSE_PROJECT: PROJECT },
+    env: { SMOKE_BASE_URL: BASE_URL, SMOKE_COMPOSE_PROJECT: PROJECT },
   });
   if (r.code === 2) throw new Error(`${r.out.trim().split('\n').pop()} → dựng stack E2E`);
   if (r.code !== 0) throw new Error(`${r.out.trim().split('\n').pop()} → sửa trang M3 theo bước bị báo`);
