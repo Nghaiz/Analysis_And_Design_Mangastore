@@ -225,6 +225,8 @@
   }
 
   .tt-ledger-table thead th {
+    /* Tiêu đề cột là chữ ngắn: không ngắt cả khi tràn ("Nhậ/n" ở cột hẹp); khung overflow-x-auto cuộn ngang. */
+    overflow-wrap: normal;
     font-family: var(--font-type);
     font-weight: 400;
     letter-spacing: 0.04em;

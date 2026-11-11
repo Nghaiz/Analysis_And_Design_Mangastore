@@ -4,7 +4,7 @@ Nguồn sự thật cho việc giao lane của mọi phiên cook. Đọc lại �
 
 Phase 1–5 xong: phase 1–4 vào `main` qua PR #1–#6, phase 5 qua PR #7, phase 4b (dọn mục bỏ sót của phase 1–4, `phase-04-don-no.md`) qua PR #8. Phase tiếp theo: 6
 Cập nhật lần cuối: 2026-11-11 (phiên cook phase 3–4, sau khi gộp phase 5)
-Nhánh phase: `phase/06-chuc-nang-1-2` (worktree `D:/Coding/mangastore-wt/06-orch`); phase 7 chạy song song ở phiên khác (`phase/07-chuc-nang-3`)
+Nhánh phase: `phase/06-chuc-nang-1-2` (phiên 55, worktree `06-orch`) và `phase/07-chuc-nang-3` (phiên 93, worktree `07-orch`) chạy song song từ 11/11/2026
 
 ## Luật (tóm tắt, bản đủ ở `plan.md` và `contract.md` §1)
 
@@ -19,6 +19,7 @@ Nhánh phase: `phase/06-chuc-nang-1-2` (worktree `D:/Coding/mangastore-wt/06-orc
 
 | Lane | Agent | Bắt đầu | Worktree / nhánh | Báo cáo |
 |---|---|---|---|---|
+| 7I `in-a5-6` (phiên 93) | `t1k-web-testing-tester` | 2026-11-11 | 07-orch (chỉ ghi `plans/reports/`), stack `tiemtruyen-7e` 8087 | |
 
 ## Hàng đợi
 
@@ -66,12 +67,12 @@ Nhánh phase: `phase/06-chuc-nang-1-2` (worktree `D:/Coding/mangastore-wt/06-orc
 | 6 | 6F `xac-minh-m2` | Playwright MCP chức năng 2 | `t1k-web-testing-tester` | `plans/reports/` | 6C, 6D | DONE_WITH_CONCERNS: 1440 JS bật PASS; phần còn lại giao 6H (`phase-06-xac-minh-m2-261111-1203.md`) |
 | 6 | 6H `xac-minh-con-lai` | Playwright: tắt JS, C21 hai tab, bước 24, 390, nút OK, reduced motion | `t1k-tester` | `plans/reports/` | 6E, 6F | xong: PASS trừ bảng 390 (sửa 79e1412) (`phase-06-xac-minh-con-lai-261111-1215.md`) | |
 | 7 | 7.0 orchestrator | smoke M3, Accept | phiên chính | xem `phase-07` | phase 6 | chờ | |
-| 7 | 7A `quay-xu-li` | đăng nhập NV, tìm, xử lí, xác nhận, in | `t1k-web-core-developer` | xem `phase-07` | 7.0 | chờ | |
-| 7 | 7B `tinh-trang-coc` | sửa danh sách, tình trạng, lỗi, cọc | `t1k-web-core-developer` | xem `phase-07` | 7.0 | chờ | |
-| 7 | 7C `islands-m3` | ProcessBillDesk, CollateralDrawer | `t1k-web-core-developer` | xem `phase-07` | 7.0 | chờ | |
-| 7 | 7D `quan-tri` | 5 trang quản trị D6 | `t1k-web-core-developer` | `nhan-vien/quan-tri/**` | 7.0, chỗ trống | chờ | |
-| 7 | 7E `xac-minh-m3` | Playwright MCP chức năng 3 | `t1k-web-testing-tester` | `plans/reports/` | 7A, 7B, 7C | chờ | |
-| 7 | 7F `xac-minh-quan-tri` | Playwright MCP quản trị | `t1k-web-testing-tester` | `plans/reports/` | 7D | chờ | |
+| 7 | 7A `quay-xu-li` | đăng nhập NV, tìm, xử lí, xác nhận, in | `t1k-web-core-developer` | xem `phase-07` | hợp đồng (chạy trước 7.0); csrf.tag, filter của 6A khi kiểm | xong (fcfb3bf, merge 836aedf; verify chưa chạy vì Docker) | `plans/reports/phase-07-quay-xu-li-261111-1110.md` |
+| 7 | 7B `tinh-trang-coc` | sửa danh sách, tình trạng, lỗi, cọc | `t1k-web-core-developer` | xem `phase-07` | hợp đồng (chạy trước 7.0); csrf.tag, filter của 6A khi kiểm | xong (07c50ca, đã merge) | `plans/reports/phase-07-tinh-trang-coc-261111-1110.md` |
+| 7 | 7C `islands-m3` | ProcessBillDesk, CollateralDrawer | `t1k-web-core-developer` | xem `phase-07` | hợp đồng §11.2, §11.3 | xong (5f42ac3, merge bfc467e) | `plans/reports/phase-07-islands-m3-261111-1057.md` | |
+| 7 | 7D `quan-tri` | 5 trang quản trị D6 | `t1k-web-core-developer` | `nhan-vien/quan-tri/**` | chỗ trống | xong, chưa chạy HTTP (5b4a3c4, merge 989791e) | `plans/reports/phase-07-quan-tri-261111-1130.md` |
+| 7 | 7E `xac-minh-m3` | Playwright MCP chức năng 3 | `t1k-web-testing-tester` | `plans/reports/` | 7A, 7B, 7C | xong (L1 in A5, L2 tiêu đề cột → sửa 33afcba, đo lại PASS) | `plans/reports/phase-07-xac-minh-m3-261111-1203.md` |
+| 7 | 7F `xac-minh-quan-tri` | Playwright MCP quản trị | `t1k-web-testing-tester` | `plans/reports/` | 7D | xong (0 lỗi) | `plans/reports/phase-07-xac-minh-quan-tri-261111-1220.md` |
 | 8 | 8.0 orchestrator | gói e2e, trình duyệt, Accept | phiên chính | xem `phase-08` | phase 7 | chờ | |
 | 8 | 8A `e2e` | Playwright 3 kịch bản, ngoại lệ, bảo mật, axe | `t1k-web-core-developer` | xem `phase-08` | 8.0 | chờ | |
 | 8 | 8B `ci` | GitHub Actions | `t1k-web-core-developer` | xem `phase-08` | 8.0 | chờ | |
@@ -108,9 +109,14 @@ Nhánh phase: `phase/06-chuc-nang-1-2` (worktree `D:/Coding/mangastore-wt/06-orc
 | 2026-11-11 | 5A dừng ở giới hạn 75 lượt, nhắn làm tiếp, xong (5660371), merge (c419293); áp đề xuất tài liệu, Accept thêm bước 4b chặn hex; loader thêm `data-island-state` (mục phiên 9b mang từ phase 1); Accept lần 1 FAIL bước 6 (HomePreviewView 500: `<%= %>` trong thân scriptless), sửa (c3af339), lần 2 ALL PASS; spawn 5D. Stack compose do phase 5 giữ tới khi xong 5.5 (đã hẹn phiên 9b) |
 | 2026-11-11 | 5D lần 1: L1 (CSS ảnh thiếu lớp JSP) sửa ở Dockerfile + Accept bước 6; chủ dự án đổi font (Fuzzy Bubbles + Momo), lane 5E và lane tài liệu làm; 5C sửa ánh sáng, chuyển mờ, nhãn 390, lọc warning THREE.Clock; 5D đo lại PASS; chủ dự án giao chọn font số → Nunito (`--font-num`); Accept ALL PASS (0908); Lighthouse HomePreview 96, StyleGuide 98; ảnh tĩnh kệ cho điện thoại ghi sang phase 6 |
 | 2026-11-11 | Phase 6: 6.0 chốt `phase-06-integration.md` (ranh giới trang ↔ filter, Display, posterNarrowSrc §11.4, stack riêng từng lane cổng 8081–8083; phase 7 dùng 8084–8089), filter khung cho qua để web.xml hợp lệ (a96abb6); spawn 6A, 6B, 6C. Phiên phase 7 chạy song song, nhận SHA 6A khi xong |
+| 2026-11-11 | Phase 7 chạy song song phase 6 (chủ dự án yêu cầu): phiên 93 tạo `phase/07-chuc-nang-3` từ `origin/main` 34879ed; mở 7A, 7B, 7C trước 7.0 vì Owns không chồng phase 6 và hợp đồng đã đủ; phụ thuộc csrf.tag và filter của 6A sẽ merge vào khi phiên 55 báo SHA; phiên 93 không chạy compose khi chưa hỏi phiên 55 |
+| 2026-11-11 | Phase 7: chủ dự án yêu cầu bao quát mọi ngoại lệ và edge case ngoài báo cáo → `phase-07-edge-cases.md`; duyệt 5 câu mới (phiên 55 ghi vào contracts §10.3 cùng 3 câu của phase 6, 612cdd3), quá giờ hẹn không xử lí, quầy không giới hạn 30 ngày. 7C xong (DONE_WITH_CONCERNS: quy ước data-island-fallback/slot, đã báo 7A, 7B và phiên 55); mở 7D. Để sau: chuyển `server-html.ts`, `motion.ts`, `props-guard.ts` của ProcessBillDesk sang `frontend/src/lib/` (CollateralDrawer đang import chéo) |
 | 2026-11-11 | Chủ dự án yêu cầu bao quát mọi ngoại lệ ch.2 và edge case thực tế: `phase-06-integration.md` §6 (064d59b); chốt qua AskUserQuestion: thêm câu báo, đăng xuất, số ngày thuê ≤ 30, phiếu quá hạn không làm gì; gộp với 5 câu phiên phase 7 thành `docs/contracts.md` §10.3 (8 câu) + C14–C19 (612cdd3); quy ước gắn island §11 theo lane 7C, smoke thêm edge case (5703549); fixture PM0110 = DT001-01+02, PM0117 = DT020-01 (71b29a8). Đã nhắn 6A, 6B, 6C merge và làm thêm |
 | 2026-11-11 | Docker Desktop hỏng ~10:56 (API 500), chủ dự án khởi động lại ~11:20. 6B xong (DONE_WITH_CONCERNS: chưa chạy Tomcat), merge; sửa LoginView sang session mới. 6A DONE_WITH_CONCERNS (thiếu Redisson trong pom) → orchestrator thêm Redisson provided, error.jsp mặc định (a0bc269), nhắn 6A làm tiếp. Mở 6D |
 | 2026-11-11 | Docker treo lần hai (hai phiên cùng chạy nhiều stack và Testcontainers). Thoả thuận với phiên phase 7: tối đa 2 stack compose trên máy (phase 6 giữ 1: 6c, rồi e2e của orchestrator), `mvnw verify` đủ chỉ orchestrator chạy và báo phiên kia "verify bắt đầu/xong", stack thường `tiemtruyen` tắt khi không ai dùng (down, không -v). 6A, 6D không dùng Docker; 6C chỉ dựng stack khi `docker info` trả lời; chủ dự án tự khởi động lại Docker. C20 `uncheckedBarcodes` (5216e6e) |
 | 2026-11-11 | 6C DONE_WITH_CONCERNS (chưa chạy stack vì Docker), merge (d5de2df); 6A DONE vòng 2 (Redisson, error.jsp, header, token mới sau đăng nhập), merge (038d316), SHA gửi phiên phase 7; verify đủ 358 test xanh. Đề xuất 4 của 6C (dòng giỏ bị xoá hoặc đã thuộc phiếu khác khi khách dùng hai thiết bị → 500 hoặc phiếu trùng) → câu §10.3 thứ 9 `SELECTED_BOOKS_CHANGED` + C21 (3e5d5fd), mở lane 6G `dao-dong-gio` (worktree `06-dao-dong-gio`, Owns RentalBillDAO, test DAO, doAddRentalBill.jsp, SearchBookView.jsp). 6D DONE_WITH_CONCERNS, merge (799d807); nút "Tạo phiếu mượn" trùng khi có JS giao 6G. Stack thường down (không -v), dựng tiemtruyen-e2e |
 | 2026-11-11 | Docker treo lần 3, 4 (VM 3 GB / 3 CPU). Chủ dự án duyệt nâng: `.wslconfig` memory=12GB, processors=8, swap=4GB (bản cũ `.wslconfig.bak-261111`), VM giờ 12,5 GB / 8 CPU; mỗi phiên một stack lại. Codec Redisson Kryo tràn stack với vòng Book↔BookCopy → SerializationCodec + test codec runtime (phiên phase 7, cherry-pick 585c504). 6G merge, §6.1 ghi khoá dòng giỏ (ab66866). verify đủ 400 xanh; smoke 49 bước ALL PASS; rate limit Redis 11/11 (stack tạm 8082); tiem-contract-guard 0 vi phạm, 4 cảnh báo (sửa 2: §9.1 trang lỗi, "(chưa ghi nhận)"). 6E: nút OK về BODY khi không có ô sai → sửa (258c6f5); hai lane Playwright dùng chung một trình duyệt MCP → mỗi lúc một lane |
 | 2026-11-11 | 6H xong; bảng 390 break-word (79e1412); kiểm lại 8080: smoke ALL PASS, nút OK, bảng 390, console sạch. Phase 6 đóng: push nhánh phase, PR vào main |
+| 2026-11-11 | Phase 7: 7A, 7B, 7D xong (Docker treo nên chưa verify, chưa chạy HTTP); merge filter thật 6A 038d316 vào phase 7 (0cef444). Từ khoá > 100 kí tự ở 4 trang M3 đổi sang INPUT_TOO_LONG cho khớp §10.3 (9448e88). Quyết định cho 7D: nháp `book` id 0 trong session, `listBook = [đầu truyện vừa lưu]` sau doAddBook, `txtPublisher` không bắt buộc, số quyển 0 nhận ở AddBook. Stack 7e (8087) dựng sau khi phiên 55 báo "verify xong" |
+| 2026-11-11 | Phase 7: Docker VM nâng lên 12,5 GB/8 CPU (chủ dự án duyệt, phiên 55 làm). Smoke M3 PASS, probe D6 ALL PASS, verify 400 test, frontend 186 test. Sửa: codec session Redisson Kryo5 → SerializationCodec + test codec runtime (fdaf8b6, 500 khi session có listBook), từ khoá > 100 kí tự (9448e88), lưu danh sách quyển xoá ghi chú khách (5dade05, contract-guard), in A5 tràn trang và tiêu đề cột vỡ (33afcba, 7E). contract-guard 0 vi phạm. 7E, 7F gộp một agent vì trình duyệt MCP dùng chung |
+| 2026-11-11 | Phase 7: phase 6 vào main (PR #10); merge origin/main. 7G gộp helper island SelectedStack vào `frontend/src/lib` (196 test). 7H làm đỏ có chủ đích điều kiện cọc: FAIL rồi PASS. Accept bước 2 sửa reporter Vitest (75d3edd). Accept phase 7 ALL PASS 5/5 (ff75cdf). 7I đo phiếu 6 đầu truyện A5 đang chạy |
