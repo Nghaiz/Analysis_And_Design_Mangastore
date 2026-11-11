@@ -32,7 +32,6 @@
     }
 %>
 <%
-    String ctx = request.getContextPath();
     boolean forwarded = request.getDispatcherType() == DispatcherType.FORWARD;
     Book draft = (Book) session.getAttribute("book");
     if (!forwarded && (draft == null || draft.getId() != 0)) {
@@ -57,7 +56,6 @@
         f.put("invalid", invalid != null && invalid.contains(name));
     }
 
-    pageContext.setAttribute("ctx", ctx);
     pageContext.setAttribute("fields", fields);
     pageContext.setAttribute("message", request.getAttribute("message"));
 %>
@@ -69,7 +67,7 @@
     <div class="mb-6"><ui:message-box kind="error" text="${message}"/></div>
   </c:if>
 
-  <form method="post" action="${ctx}/nhan-vien/quan-tri/AddBookView.jsp">
+  <form method="post" action="${pageContext.request.contextPath}/nhan-vien/quan-tri/AddBookView.jsp">
     <t:csrf/>
     <ui:paper-card heading="Thông tin đầu truyện">
       <div class="grid max-w-2xl gap-2">
@@ -89,9 +87,9 @@
       </div>
     </ui:paper-card>
     <div class="mt-6 flex flex-wrap gap-3">
-      <button type="submit" name="btnSave" id="btnSave" formaction="${ctx}/nhan-vien/quan-tri/doAddBook.jsp"
+      <button type="submit" name="btnSave" id="btnSave" formaction="${pageContext.request.contextPath}/nhan-vien/quan-tri/doAddBook.jsp"
               class="rounded-paper border-2 border-ink bg-paper-deep px-6 py-2 font-type text-ink shadow-paper hover:bg-tape focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-pen-blue">Lưu</button>
-      <a href="${ctx}/nhan-vien/quan-tri/ManageBookView.jsp" id="lnkBack"
+      <a href="${pageContext.request.contextPath}/nhan-vien/quan-tri/ManageBookView.jsp" id="lnkBack"
          class="rounded-paper border border-ink-soft bg-paper px-4 py-2 font-type text-ink no-underline hover:bg-tape focus-visible:outline-2 focus-visible:outline-pen-blue">Quay lại</a>
     </div>
   </form>

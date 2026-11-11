@@ -79,7 +79,6 @@
         }
     }
 
-    pageContext.setAttribute("ctx", ctx);
     pageContext.setAttribute("keyword", keyword);
     pageContext.setAttribute("keywordInvalid", keywordInvalid);
     pageContext.setAttribute("message", message);
@@ -94,7 +93,7 @@
     <div class="mb-6"><ui:message-box kind="${messageKind}" text="${message}"/></div>
   </c:if>
 
-  <form method="post" action="${ctx}/nhan-vien/quan-tri/ManageBookView.jsp" class="mb-8">
+  <form method="post" action="${pageContext.request.contextPath}/nhan-vien/quan-tri/ManageBookView.jsp" class="mb-8">
     <t:csrf/>
     <div class="flex flex-wrap items-stretch gap-2" role="search">
       <label for="txtKeyword" class="sr-only">Từ khoá tìm đầu truyện</label>
@@ -106,9 +105,9 @@
     </div>
 
     <div class="mt-4 flex flex-wrap gap-3">
-      <a href="${ctx}/nhan-vien/quan-tri/AddBookView.jsp" id="lnkAddBook"
+      <a href="${pageContext.request.contextPath}/nhan-vien/quan-tri/AddBookView.jsp" id="lnkAddBook"
          class="rounded-paper border-2 border-ink bg-paper-deep px-4 py-2 font-type text-ink no-underline shadow-paper hover:bg-tape focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-pen-blue">Thêm đầu truyện</a>
-      <a href="${ctx}/nhan-vien/StaffHomeView.jsp" id="lnkBack"
+      <a href="${pageContext.request.contextPath}/nhan-vien/StaffHomeView.jsp" id="lnkBack"
          class="rounded-paper border border-ink-soft bg-paper px-4 py-2 font-type text-ink no-underline hover:bg-tape focus-visible:outline-2 focus-visible:outline-pen-blue">Quay lại</a>
     </div>
 
