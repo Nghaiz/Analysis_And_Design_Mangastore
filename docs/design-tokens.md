@@ -27,16 +27,20 @@ Tương phản theo WCAG 2.x, đo trên ba nền `paper` / `paper-deep` / `tape`
 
 ## 2. Font
 
-Cả bốn có subset `vietnamese` (Google Fonts metadata, kiểm 11/11/2026). Tự host bằng Fontsource, chỉ subset latin và vietnamese, không gọi Google Fonts lúc chạy ([ADR-0011](adr/0011-font-tu-host.md)).
+<!-- updated 261111 (đổi bộ font theo chủ dự án) -->
 
-| Token | Font | Độ đậm | Nạp | Dùng cho |
-|---|---|---|---|---|
-| `--font-body` | Be Vietnam Pro | 400, 500, 600 | preload | Bảng, form, đoạn văn |
-| `--font-type` | Xanh Mono | 400 | preload | Số phiếu, mã vạch, tiêu đề phiếu, chữ trong dấu |
-| `--font-pen` | Patrick Hand | 400 | lười | Ghi chú tay, tình trạng truyện, chữ kí nhân viên |
-| `--font-sign` | Fraunces (variable, trục SOFT) | variable | lười | Tên tiệm, tiêu đề lớn |
+Bộ font do chủ dự án chốt ngày 11/11/2026: Fuzzy Bubbles làm font chính, kèm ba font Momo. Cả bốn có subset `vietnamese` (đã kiểm gói npm ngày 11/11/2026), giấy phép OFL-1.1. Tự host bằng Fontsource 5.3.0, chỉ subset latin và vietnamese, không gọi Google Fonts lúc chạy ([ADR-0011](adr/0011-font-tu-host.md)).
 
-Nạp font: woff2 chép từ gói Fontsource đã ghim vào `frontend/public/fonts/` (tên cố định, để preload), xem [ADR-0011](adr/0011-font-tu-host.md) mục Cập nhật. Đã loại: Special Elite (không có subset vietnamese). Kiểm chữ: chụp màn hình chuỗi "Đã huỷ · Ố vàng · Nguyễn Thu Hà · Thám tử lừng danh Conan" ở cả bốn font (phase 5).
+| Token | Font | Gói Fontsource 5.3.0 | Độ đậm | Nạp | Dùng cho |
+|---|---|---|---|---|---|
+| `--font-body` | Fuzzy Bubbles | `@fontsource/fuzzy-bubbles` | 400, 700 | preload 400 (latin + vietnamese) | Chữ thân: bảng, form, đoạn văn, nút |
+| `--font-type` | Momo Trust Sans | `@fontsource-variable/momo-trust-sans` (trục wght) | variable | preload (latin + vietnamese) | Số phiếu, mã vạch, chữ trong dấu, số tiền |
+| `--font-pen` | Momo Signature | `@fontsource/momo-signature` | 400 | lười | Ghi chú tay, tình trạng truyện, chữ kí |
+| `--font-sign` | Momo Trust Display | `@fontsource/momo-trust-display` | 400 | lười | Tên tiệm, tiêu đề lớn |
+
+Momo Trust Sans không đơn cách: số và mã dùng `font-variant-numeric: tabular-nums` để cột thẳng hàng.
+
+Nạp font: woff2 chép từng byte từ gói Fontsource đã ghim vào `frontend/public/fonts/` bằng `check-font-subsets.mjs --sync` (tên cố định, để preload), xem [ADR-0011](adr/0011-font-tu-host.md) mục Cập nhật. Đã loại: Special Elite (không có subset vietnamese); Be Vietnam Pro, Xanh Mono, Patrick Hand, Fraunces (chủ dự án đổi ngày 11/11/2026). Kiểm chữ: chụp màn hình chuỗi "Đã huỷ · Ố vàng · Nguyễn Thu Hà · Thám tử lừng danh Conan" ở cả bốn font (phase 5).
 
 ## 3. Khoảng cách
 

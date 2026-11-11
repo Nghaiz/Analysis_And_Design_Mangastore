@@ -19,7 +19,7 @@ Chủ đề: tiệm cho thuê truyện đầu ngõ, giấy ố, phiếu xé từ
 
 1. **Mỗi component có hai bản dùng chung một lớp CSS:** tag JSP `src/main/webapp/WEB-INF/tags/ui/<tên>.tag` (chạy không cần JS) và bản React `frontend/src/components/nostalgia/<Tên>.tsx` (cho island). Lớp CSS ở `frontend/src/styles/components.css` (chất giấy ở `paper.css`, in ở `print.css`). Bộ có sẵn từ phase 5: `ticket`, `stamp`, `condition-tag`, `paper-card`, `ledger-table`, `book-cover`.
 2. **Chỉ dùng token:** biến CSS và `@theme` của Tailwind v4 ở `frontend/src/styles/tokens.css`. Không mã màu hex, không cỡ chữ hay khoảng cách gõ tay; khoảng cách theo bậc 4px (`--s-1` … `--s-8`).
-3. **Font có subset vietnamese, tự host** (Fontsource, chỉ subset latin và vietnamese, Deferred #17): Be Vietnam Pro (chữ thân), Xanh Mono (số phiếu, mã vạch, chữ trong dấu), Patrick Hand (ghi chú tay, tình trạng), Fraunces trục SOFT (tên tiệm, tiêu đề lớn). Chỉ preload Be Vietnam Pro và Xanh Mono. Không font thiếu dấu (Special Elite đã bị loại), không gọi Google Fonts lúc chạy.
+3. **Font có subset vietnamese, tự host** (Fontsource, chỉ subset latin và vietnamese, Deferred #17): Fuzzy Bubbles (chữ thân: bảng, form, đoạn văn, nút), Momo Trust Sans (số phiếu, mã vạch, chữ trong dấu, số tiền), Momo Signature (ghi chú tay, tình trạng, chữ kí), Momo Trust Display (tên tiệm, tiêu đề lớn); bảng ở `docs/design-tokens.md` §2. Chỉ preload Fuzzy Bubbles 400 và Momo Trust Sans; Momo Signature, Momo Trust Display nạp lười. Không font thiếu dấu (Special Elite đã bị loại), không gọi Google Fonts lúc chạy.
 4. **Hình khối:** bo góc **tối đa 2px** (giấy không bo tròn); bóng đổ lệch kiểu giấy đặt trên bàn, không bóng mờ lớn; mép sờn, băng dính giấy vẽ bằng CSS/SVG.
 5. **Dấu trạng thái luôn kèm chữ:** `CHỜ NHẬN`, `ĐANG CHO THUÊ`, `ĐÃ HUỶ` (§4), màu chỉ là phụ. Tem tình trạng hiện chữ theo §13 (`Không có lỗi`, `(chưa ghi nhận)`, tên lỗi nối bằng `, `).
 6. **Tương phản AA:** chữ cỡ thường ≥ 4.5:1 trên nền nó thực sự nằm (`paper`, `paper-deep`, `tape`); tra cột tương phản trong `docs/design-tokens.md`. Màu chỉ để trang trí (ví dụ ánh đèn) không dùng cho chữ.
@@ -33,6 +33,7 @@ Chủ đề: tiệm cho thuê truyện đầu ngõ, giấy ố, phiếu xé từ
 
 - **Cây thẻ cố định** (`plans/261111-tiem-thue-truyen/phase-05-ui-contract.md` §3a): bìa là `span.tt-book-cover` bọc `img` (lớp ở thẻ bọc); chữ trong dấu viết sẵn chữ hoa trong DOM, không `text-transform`. Tag JSP và component React phải in cùng cây.
 - **Giá trị ngoài hợp đồng thì ném lỗi**, không lặng lẽ rơi về mặc định: `stamp` nhận đúng ba trạng thái (cả "Đã hủy" sai dấu cũng là lỗi), `message-box` đúng ba `kind`.
+- **Momo Trust Sans không đơn cách**: số phiếu, mã vạch, số tiền, cột số trong bảng đặt `font-variant-numeric: tabular-nums`, nếu không cột lệch nhau.
 - **Font không `@import "@fontsource/..."`**: tên file có hash nên không preload được. Woff2 chép vào `frontend/public/fonts/` bằng `node frontend/scripts/check-font-subsets.mjs --sync` (ADR-0011 mục Cập nhật).
 - **Màu cảnh 3D** nằm trong `frontend/src/three/` dưới dạng số (WebGL không đọc biến CSS); đó là chỗ duy nhất được có hex ngoài `tokens.css` (Accept phase 5 bước 4b).
 - shadcn/ui mặc định `rounded-md`/`rounded-lg`: đặt `--radius` và các `--radius-*` của `@theme` ≤ 2px để component shadcn không lọt góc tròn; soát lại sau mỗi lần `shadcn add`.

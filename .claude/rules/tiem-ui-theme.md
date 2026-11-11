@@ -9,7 +9,7 @@ SSOT: token ở `docs/design-tokens.md` (nguồn: brainstorm §7); thành phần
 
 - **Chủ đề**: tiệm truyện đầu ngõ Việt Nam cuối thập niên 90, đầu 2000 (brief §5): giấy ố, mép sờn, chữ đánh máy, bút bi xanh, con dấu đỏ, băng dính giấy. Cấm giao diện AI rập khuôn (gradient tím, thẻ bo tròn giống nhau); bo góc tối đa 2px.
 - **Token**: chỉ dùng biến CSS của `docs/design-tokens.md` (màu, font, spacing bậc 4px); không viết thẳng mã màu, cỡ chữ hay khoảng cách.
-- **Font**: Be Vietnam Pro, Xanh Mono, Patrick Hand, Fraunces, tự host woff2 subset `latin` và `vietnamese`; không gọi Google Fonts lúc chạy; chỉ preload Be Vietnam Pro và Xanh Mono. Font mới phải có subset `vietnamese` (Special Elite bị loại vì không có).
+- **Font**: Fuzzy Bubbles (chữ thân), Momo Trust Sans (số phiếu, mã, số tiền), Momo Signature (ghi chú tay), Momo Trust Display (tên tiệm, tiêu đề lớn), tự host woff2 subset `latin` và `vietnamese`; không gọi Google Fonts lúc chạy; chỉ preload Fuzzy Bubbles 400 và Momo Trust Sans. Momo Trust Sans không đơn cách: số và mã dùng `font-variant-numeric: tabular-nums`. Font mới phải có subset `vietnamese` (Special Elite bị loại vì không có).
 - **Giữ thành phần và thứ tự** từng màn hình theo §9 (SVG ch.2, ch.9); chỉ làm mới hình thức. Chữ toàn tiếng Việt; tiền, ngày, mã `DT`/`PM` theo §13.
 - **Giảm chuyển động**: mọi hoạt cảnh tôn trọng `prefers-reduced-motion`; cảnh 3D có ảnh tĩnh dự phòng (không WebGL, giảm chuyển động, máy yếu).
 - **Bìa thật chỉ ở chỗ hiển thị dữ liệu** (kết quả tìm, chi tiết đầu truyện, phiếu mượn; §8). Trang trí (logo tiệm, minh hoạ, gáy truyện 3D) tự vẽ; cấm bìa crawl, logo NXB, nhân vật có bản quyền.

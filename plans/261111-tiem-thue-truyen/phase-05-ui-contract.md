@@ -9,7 +9,7 @@ Tailwind v4 `@theme`, nên tiện ích sinh ra theo tên:
 | Nhóm | Biến CSS | Tiện ích |
 |---|---|---|
 | Màu | `--color-paper`, `--color-paper-deep`, `--color-tape`, `--color-ink`, `--color-ink-soft`, `--color-pen-blue`, `--color-stamp-red`, `--color-stamp-green`, `--color-stamp-amber`, `--color-wood`, `--color-lamp` | `bg-paper`, `text-ink`, `border-wood`… |
-| Font | `--font-body`, `--font-type`, `--font-pen`, `--font-sign` | `font-body`, `font-type`, `font-pen`, `font-sign` |
+| Font | `--font-body` (Fuzzy Bubbles), `--font-type` (Momo Trust Sans, số dùng `tabular-nums`), `--font-pen` (Momo Signature), `--font-sign` (Momo Trust Display); bảng đủ ở `docs/design-tokens.md` §2 | `font-body`, `font-type`, `font-pen`, `font-sign` |
 | Khoảng cách | `--s-1` … `--s-8` (4, 8, 12, 16, 24, 32, 48, 64px); `--spacing: 4px` để `p-4` = 16px | `p-4`, `gap-6`… |
 | Bo góc | `--radius-none: 0`, `--radius-paper: 2px`; mọi `--radius-*` khác của Tailwind đặt ≤ 2px | `rounded-paper` |
 | Bóng | `--shadow-paper`, `--shadow-lift` | `shadow-paper`, `shadow-lift` |
@@ -62,7 +62,7 @@ Lớp chất liệu dùng tự do (5A định nghĩa trong `paper.css`): `.tt-pa
 </t:layout>
 ```
 
-`layout.tag`: thuộc tính `title` (bắt buộc, tiếng Việt; thẻ `<title>` = `title · Tiệm thuê truyện tuổi thơ`), `bodyClass` (không bắt buộc). In `<!doctype html>`, `<html lang="vi">`, `<meta charset>`, viewport, `<t:assets/>`, preload Be Vietnam Pro và Xanh Mono, `<body class="tt-paper ...">`, thân trang trong `<main>`. Không `<style>` nội tuyến, không `style=` (CSP `style-src 'self'`).
+`layout.tag`: thuộc tính `title` (bắt buộc, tiếng Việt; thẻ `<title>` = `title · Tiệm thuê truyện tuổi thơ`), `bodyClass` (không bắt buộc). In `<!doctype html>`, `<html lang="vi">`, `<meta charset>`, viewport, `<t:assets/>`, preload Fuzzy Bubbles 400 và Momo Trust Sans (mỗi font subset latin và vietnamese), `<body class="tt-paper ...">`, thân trang trong `<main>`. Không `<style>` nội tuyến, không `style=` (CSP `style-src 'self'`).
 
 ## 5. Island
 
