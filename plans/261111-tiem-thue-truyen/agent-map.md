@@ -2,9 +2,9 @@
 
 Nguồn sự thật cho việc giao lane của mọi phiên cook. Đọc lại đầu phiên và sau mỗi lần compact (cùng `CLAUDE.md` và file phase đang làm). Giao hay nhận việc xong là cập nhật file này ngay, trước khi làm việc khác.
 
-Phase 1–4 xong: phase 1, 2, 3 đã vào `main` (PR #1, #2, #3), phase 4 vào `main` qua PR của `phase/04-pipeline`. Phase tiếp theo: 5
+Phase 1–4 xong: phase 1, 2, 3, 4 đã vào `main` (PR #1–#4, sửa thêm PR #5, #6). Phase 4b (dọn mục bỏ sót của phase 1–4, `phase-04-don-no.md`) đang chạy trên `phase/04-don-no`. Phase 5 do phiên khác làm trên `phase/05-he-thiet-ke-giao-dien`
 Cập nhật lần cuối: 2026-11-11 (phiên cook phase 3–4)
-Nhánh phase: chưa có (phase 5 tạo `phase/05-...` từ `origin/main`)
+Nhánh phase: `phase/04-don-no` (phiên cook phase 3–4), `phase/05-he-thiet-ke-giao-dien` (phiên phase 5)
 
 ## Luật (tóm tắt, bản đủ ở `plan.md` và `contract.md` §1)
 
@@ -48,6 +48,9 @@ Nhánh phase: chưa có (phase 5 tạo `phase/05-...` từ `origin/main`)
 | 4 | 4B `xu-li` | clean, images, copies, price, validate, export, publish | `t1k-web-core-developer` | xem `phase-04` | 4.0 | xong | `plans/reports/phase-04-xu-li-261111-0401.md` |
 | 4 | 4C `xac-minh` | Playwright MCP trang ảnh chạy thử | `t1k-web-testing-tester` | `plans/reports/` | 4.3 | xong | `plans/reports/phase-04-trial-261111-0423.md` |
 | 4 | 4.5 HARD STOP | chủ dự án duyệt chạy thử 10 đầu truyện | orchestrator thay (chủ dự án giao toàn quyền 11/11/2026) | | 4C | xong: 10/10 đạt, crawl hết | `plans/reports/phase-04-trial-261111-0423.md` |
+| 4b | J `java` | JsonReader giữ, flywayDataLocation, updateBook đánh số, gộp ánh xạ Book, ghim maven -noble | `t1k-web-core-developer` | xem `phase-04-don-no` | soát 11/11 | xong (b81736b) | `plans/reports/phase-04-don-no-java-261111-0818.md` |
+| 4b | P `pipeline` | combo "Bố", bìa có dải người bán, publishYear theo ấn bản, crawl bù Thần Đồng Đất Việt 164 | `t1k-web-core-developer` | xem `phase-04-don-no` | soát 11/11 | xong (ff4e2af) | `plans/reports/phase-04-don-no-pipeline-261111-0830.md` |
+| 4b | D `dev-mode` | CSP nginx theo APP_VITE_DEV, preamble module ngoài, csp-page-check | `t1k-web-core-developer` | xem `phase-04-don-no` | soát 11/11 | code xong (a6b5178), chờ compose để chạy thử | `plans/reports/phase-04-don-no-dev-261111-0819.md` |
 | 5 | 5.0 orchestrator | gói npm, shadcn add, khoá vite.config | phiên chính | xem `phase-05` | phase 3 | chờ | |
 | 5 | 5A `token-tag` | token, font, CSS, tag JSP, StyleGuide, kiểm tương phản và font | `t1k-web-ui-developer` | xem `phase-05` | 5.0 | chờ | |
 | 5 | 5B `loader-react` | loader cách B, component React, ESLint chặn fetch, ngân sách | `t1k-web-core-developer` | xem `phase-05` | 5.0 | chờ | |

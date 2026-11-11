@@ -125,4 +125,30 @@ Tổng: 101 mục · a=65 · b=8 · b⚠=2 · c=11 · d=14 · d′=1. Cách xử
 
 ## Sau xử lí
 
-(orchestrator điền khi phase 4b xong)
+Nhánh `phase/04-don-no`. Báo cáo lane: `phase-04-don-no-java-261111-0818.md`, `phase-04-don-no-pipeline-261111-0830.md`, `phase-04-don-no-dev-261111-0819.md`.
+
+| # | Nhãn mới | Xử lí |
+|---|---|---|
+| 5, bất nhất 2 | a | CSP nginx sinh theo `APP_VITE_DEV` (`docker/nginx/docker-entrypoint.d/30-tiem-csp.sh`); mặc định đúng từng kí tự §10; preamble React Refresh là module ngoài; `scripts/check/csp-page-check.mjs` (Accept phase 1 bước 4 gọi `--mode build`); `contract.md` §10 sửa câu "không đi qua nginx" |
+| 6 | b | Phase 5 thêm `http://127.0.0.1:8080` vào `server.cors.origin` (d82554a trên `phase/05-he-thiet-ke-giao-dien`) |
+| 7, 8 | b | Phase 5 ghi vào phase-05 bước 5.0 (d82554a) |
+| 10 | b | Phase 5 làm (c3af339); `phase-06` ghi 6D chỉ kiểm |
+| 24 | c | Giữ `JsonReader`: phase 5 dùng `JsonReader.parse` đọc `categories.json` (hợp đồng giao diện phase 5 §5); `docs/architecture.md`, `phase-01` sửa câu hứa thay |
+| 32 | a | `maven:3.9.16-eclipse-temurin-25-noble`, ADR-0003 |
+| 49 | c | Khối nguyên văn brief §3 bị khoá từng byte (`section10-sync.mjs`); `AGENTS.md:141` đã nói khối là nguyên văn |
+| 57 | a | `AppConfig.flywayDataLocation()`, `MigrationListener` dùng |
+| 61 | a | `updateBook` đánh số theo hậu tố lớn nhất + 1 (`Codes.copyNumber`); test đỏ trên code cũ; `contracts.md` §5.3 |
+| 64 | a | Gotcha `p++` trong skill `tiem-add-dao-duplicate-check` |
+| 66 | a | `DAO.readBook`, `bookColumns`, `bookJson` dùng chung cho 3 DAO |
+| 69 | c | `contracts.md` §5.3: id lỗi/khoản cọc đổi sau mỗi lần lưu, không khoá ngoại tới chúng, trang không giữ qua lần lưu |
+| 82, 88 | a | `pipeline/src/lib/set-word.mjs`: "bộ" so trên chữ có dấu; Thần Đồng Đất Việt 164 vào kho (Book 71, các Book 71–84 cũ dịch +1, tập 209 ra) |
+| 95 | a | Luật bìa (3) bỏ dải chữ người bán: 32 bìa đổi, soát bằng mắt |
+| 98 | a | `publishYear` = năm của ấn bản tiệm có (CONTRACT §9); 28 Book đổi năm |
+| 100 | a | `AGENTS.md` §3 ghi compose project dùng chung |
+| Bất nhất 1 | a | `contracts.md:10`, `:589`, `AGENTS.md:23` |
+| Bất nhất 3, 4 | a | Báo cáo phase 3 sửa trạng thái 3A, 3B và cách đọc lại D9 |
+| Bất nhất 5 | c | Báo cáo lane lịch sử; trạng thái DONE của 4B ghi ở báo cáo phase 4 |
+| Bất nhất 6, 7 | a | ADR-0010 `Special:EntityData`; CONTRACT §1 có `manifest.jsonl` của chạy thử |
+| Mới (phiên phase 5 phát hiện) | a | `docker/app/Dockerfile` tầng frontend chép `src/main/webapp` cho Tailwind `@source` (d4d05a5; JSP thử: cũ 0 lớp, mới 1 lớp) |
+
+Dữ liệu sau phase 4b: 396 Book, 1164 quyển, 0 lỗi chặn, 146 cảnh báo `no-year`; V10 `38f090234fb1`, V11 `ff6fb1b87a9a` (không đổi); 11 request mạng (1 trang sản phẩm, 10 ảnh của tập 164).

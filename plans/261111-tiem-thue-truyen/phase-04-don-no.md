@@ -21,8 +21,9 @@ Lane chỉ commit tại máy (pathspec), không push, không đổi nhánh, ghi 
 
 ## Tiến độ
 
-- [ ] Lane J
-- [ ] Lane P
-- [ ] Lane D
-- [ ] Phần orchestrator
+- [x] Lane J (b81736b; #24 đổi thành giữ `JsonReader` vì phase 5 dùng)
+- [x] Lane P (ff4e2af; thêm crawl bù Thần Đồng Đất Việt 164)
+- [ ] Lane D (code a6b5178; còn chạy thử trên compose khi phase 5 trả stack)
+- [x] Phần orchestrator (1f636a0, 479e1d2, bf83876, 1e9685c, d4d05a5)
+- [ ] Nạp lại DB: `mysqldump` sao lưu, DROP + CREATE database `tiemtruyen` (không xoá volume), publish V10 mới
 - [ ] Merge, Accept 1–4 trên `main`
