@@ -12,8 +12,10 @@
   - "Lưu": còn dòng chưa có giá trị → COLLATERAL_VALUE_REQUIRED (aria-invalid), hiện lại trang; đủ → thêm các khoản
     cọc vào rentalBill → W rentalBill, bỏ listRentalCollateral (C6), sendRedirect ProcessRentalBillView (PRG).
   - "Thêm loại tài sản mới", "Quay lại" là <a href>; ProcessRentalBillView bỏ listRentalCollateral khi hiển thị (C6).
-  - Bảng "Các khoản cọc" là bản HTML đầy đủ (chạy khi tắt JS); island CollateralDrawer gắn ngay sau, props
-    collateral-drawer-props (§11.3) sinh bằng JsonUtil.toScriptJson từ DTO.
+  - Bảng "Các khoản cọc", "Lưu", "Quay lại" là bản HTML đầy đủ (chạy khi tắt JS) trong khối
+    data-island-fallback="CollateralDrawer"; "Quay lại" mang data-island-slot="CollateralDrawer:back"; div
+    data-island đứng sau khối đó, trong form (quy ước gắn island, plans/reports/phase-07-islands-m3-261111-1057.md §4).
+    Props collateral-drawer-props (§11.3) sinh bằng JsonUtil.toScriptJson từ DTO.
   Đầu trang (phase-07-edge-cases.md §3.1): (1) thiếu rentalBill → 302 SearchRentalBillView; (2) rentalBill không còn
   "Chờ nhận" → forward SearchRentalBillView kèm câu D9; (3) POST thiếu hoặc sai input ẩn rentalBillId → forward
   ProcessRentalBillView kèm RENTAL_BILL_CHANGED. Form có action trỏ về chính trang (doAddCollateral forward tới).
@@ -234,6 +236,7 @@
         </table>
       </div>
       <p class="m-0"><a id="lnkAddCollateral" href="${base}/AddCollateralView.jsp" class="inline-block rounded-paper border border-ink-soft bg-paper px-4 py-2 text-ink shadow-paper">Thêm loại tài sản mới</a></p>
+      <div data-island-fallback="CollateralDrawer">
       <div class="overflow-x-auto">
         <table id="tblRentalCollateral" class="tt-ledger-table">
           <caption class="tt-ledger-table__caption">Các khoản cọc</caption>
@@ -253,12 +256,13 @@
           </tbody>
         </table>
       </div>
+      <p class="m-0 mt-6 flex flex-wrap gap-4">
+        <button type="submit" id="btnSave" name="btnSave" class="rounded-paper bg-primary px-4 py-2 text-primary-foreground shadow-paper">Lưu</button>
+        <a id="lnkBack" href="${base}/ProcessRentalBillView.jsp" data-island-slot="CollateralDrawer:back" class="rounded-paper border border-ink-soft bg-paper px-4 py-2 text-ink shadow-paper">Quay lại</a>
+      </p>
+      </div>
       <div data-island="CollateralDrawer" data-props="collateral-drawer-props"></div>
       <script type="application/json" id="collateral-drawer-props">${drawerPropsJson}</script>
-      <p class="m-0 flex flex-wrap gap-4">
-        <button type="submit" id="btnSave" name="btnSave" class="rounded-paper bg-primary px-4 py-2 text-primary-foreground shadow-paper">Lưu</button>
-        <a id="lnkBack" href="${base}/ProcessRentalBillView.jsp" class="rounded-paper border border-ink-soft bg-paper px-4 py-2 text-ink shadow-paper">Quay lại</a>
-      </p>
     </form>
   </section>
 </t:layout>
