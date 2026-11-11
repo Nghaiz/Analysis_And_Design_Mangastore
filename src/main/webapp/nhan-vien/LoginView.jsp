@@ -7,6 +7,7 @@
   giữ txtUsername, để trống txtPassword. GET có expired=1 (C16): hiện SESSION_EXPIRED (kind info).
 --%>
 <%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" trimDirectiveWhitespaces="true" %>
+<%@ page import="java.text.Normalizer" %>
 <%@ page import="jakarta.servlet.DispatcherType" %>
 <%@ page import="vn.tiemtruyen.dao.StaffDAO" %>
 <%@ page import="vn.tiemtruyen.model.Staff" %>
@@ -23,7 +24,8 @@
     String username = request.getParameter("txtUsername");
     if (ownPost) {
         User user = new User();
-        user.setUsername(username == null ? null : username.strip());
+        user.setUsername(username == null ? null
+                : Normalizer.normalize(username.strip(), Normalizer.Form.NFC));
         user.setPassword(request.getParameter("txtPassword"));
         Staff staff;
         try (StaffDAO dao = new StaffDAO()) {
