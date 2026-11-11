@@ -22,7 +22,7 @@ Nhánh phase: `phase/06-chuc-nang-1-2` (phiên 55, worktree `06-orch`) và `phas
 | 6A `filter-chung` | `t1k-web-core-developer` | 2026-11-11 | `06-filter-chung` / `lane/06-chuc-nang-1-2/filter-chung` | |
 | 6B `trang-m1` | `t1k-web-core-developer` | 2026-11-11 | `06-trang-m1` / `lane/06-chuc-nang-1-2/trang-m1` | |
 | 6C `trang-m2` | `t1k-web-core-developer` | 2026-11-11 | `06-trang-m2` / `lane/06-chuc-nang-1-2/trang-m2` | |
-| 7C `islands-m3` (phiên 93) | `t1k-web-core-developer` | 2026-11-11 | `07-islands-m3` / `lane/07-chuc-nang-3/islands-m3` | |
+| 7D `quan-tri` (phiên 93) | `t1k-web-core-developer` | 2026-11-11 | `07-quan-tri` / `lane/07-chuc-nang-3/quan-tri` | |
 | 7A `quay-xu-li` (phiên 93) | `t1k-web-core-developer` | 2026-11-11 | `07-quay-xu-li` / `lane/07-chuc-nang-3/quay-xu-li` | |
 | 7B `tinh-trang-coc` (phiên 93) | `t1k-web-core-developer` | 2026-11-11 | `07-tinh-trang-coc` / `lane/07-chuc-nang-3/tinh-trang-coc` | |
 
@@ -33,7 +33,6 @@ Nhánh phase: `phase/06-chuc-nang-1-2` (phiên 55, worktree `06-orch`) và `phas
 | 1 | 6D `island-selected-stack` | chỗ trống đầu tiên trong 6A–6C |
 | 2 | 6E `xac-minh-m1` | 6A, 6B đã merge |
 | 3 | 6F `xac-minh-m2` | 6C, 6D đã merge |
-| 1 | 7D `quan-tri` (phiên 93) | chỗ trống đầu tiên của phiên 93 |
 
 ## Bảng lane
 
@@ -76,8 +75,8 @@ Nhánh phase: `phase/06-chuc-nang-1-2` (phiên 55, worktree `06-orch`) và `phas
 | 7 | 7.0 orchestrator | smoke M3, Accept | phiên chính | xem `phase-07` | phase 6 | chờ | |
 | 7 | 7A `quay-xu-li` | đăng nhập NV, tìm, xử lí, xác nhận, in | `t1k-web-core-developer` | xem `phase-07` | hợp đồng (chạy trước 7.0); csrf.tag, filter của 6A khi kiểm | đang chạy | |
 | 7 | 7B `tinh-trang-coc` | sửa danh sách, tình trạng, lỗi, cọc | `t1k-web-core-developer` | xem `phase-07` | hợp đồng (chạy trước 7.0); csrf.tag, filter của 6A khi kiểm | đang chạy | |
-| 7 | 7C `islands-m3` | ProcessBillDesk, CollateralDrawer | `t1k-web-core-developer` | xem `phase-07` | hợp đồng §11.2, §11.3 | đang chạy | |
-| 7 | 7D `quan-tri` | 5 trang quản trị D6 | `t1k-web-core-developer` | `nhan-vien/quan-tri/**` | chỗ trống | xếp hàng | |
+| 7 | 7C `islands-m3` | ProcessBillDesk, CollateralDrawer | `t1k-web-core-developer` | xem `phase-07` | hợp đồng §11.2, §11.3 | xong (5f42ac3, merge bfc467e) | `plans/reports/phase-07-islands-m3-261111-1057.md` | |
+| 7 | 7D `quan-tri` | 5 trang quản trị D6 | `t1k-web-core-developer` | `nhan-vien/quan-tri/**` | chỗ trống | đang chạy | |
 | 7 | 7E `xac-minh-m3` | Playwright MCP chức năng 3 | `t1k-web-testing-tester` | `plans/reports/` | 7A, 7B, 7C | chờ | |
 | 7 | 7F `xac-minh-quan-tri` | Playwright MCP quản trị | `t1k-web-testing-tester` | `plans/reports/` | 7D | chờ | |
 | 8 | 8.0 orchestrator | gói e2e, trình duyệt, Accept | phiên chính | xem `phase-08` | phase 7 | chờ | |
@@ -117,3 +116,4 @@ Nhánh phase: `phase/06-chuc-nang-1-2` (phiên 55, worktree `06-orch`) và `phas
 | 2026-11-11 | 5D lần 1: L1 (CSS ảnh thiếu lớp JSP) sửa ở Dockerfile + Accept bước 6; chủ dự án đổi font (Fuzzy Bubbles + Momo), lane 5E và lane tài liệu làm; 5C sửa ánh sáng, chuyển mờ, nhãn 390, lọc warning THREE.Clock; 5D đo lại PASS; chủ dự án giao chọn font số → Nunito (`--font-num`); Accept ALL PASS (0908); Lighthouse HomePreview 96, StyleGuide 98; ảnh tĩnh kệ cho điện thoại ghi sang phase 6 |
 | 2026-11-11 | Phase 6: 6.0 chốt `phase-06-integration.md` (ranh giới trang ↔ filter, Display, posterNarrowSrc §11.4, stack riêng từng lane cổng 8081–8083; phase 7 dùng 8084–8089), filter khung cho qua để web.xml hợp lệ (a96abb6); spawn 6A, 6B, 6C. Phiên phase 7 chạy song song, nhận SHA 6A khi xong |
 | 2026-11-11 | Phase 7 chạy song song phase 6 (chủ dự án yêu cầu): phiên 93 tạo `phase/07-chuc-nang-3` từ `origin/main` 34879ed; mở 7A, 7B, 7C trước 7.0 vì Owns không chồng phase 6 và hợp đồng đã đủ; phụ thuộc csrf.tag và filter của 6A sẽ merge vào khi phiên 55 báo SHA; phiên 93 không chạy compose khi chưa hỏi phiên 55 |
+| 2026-11-11 | Phase 7: chủ dự án yêu cầu bao quát mọi ngoại lệ và edge case ngoài báo cáo → `phase-07-edge-cases.md`; duyệt 5 câu mới (phiên 55 ghi vào contracts §10.3 cùng 3 câu của phase 6, 612cdd3), quá giờ hẹn không xử lí, quầy không giới hạn 30 ngày. 7C xong (DONE_WITH_CONCERNS: quy ước data-island-fallback/slot, đã báo 7A, 7B và phiên 55); mở 7D. Để sau: chuyển `server-html.ts`, `motion.ts`, `props-guard.ts` của ProcessBillDesk sang `frontend/src/lib/` (CollateralDrawer đang import chéo) |
