@@ -96,7 +96,7 @@ await step('6 .github/workflows: actionlint, timeout-minutes, concurrency, khôn
   if (!existsSync(CI_YML)) throw new Error('thiếu .github/workflows/ci.yml → lane 8B');
   const yml = readFileSync(CI_YML, 'utf8');
   const ver = ciVersion('ACTIONLINT_VERSION');
-  mustRun(runner, 'docker', ['run', '--rm', '-v', `${ROOT}:/repo`, '-w', '/repo', `rhysd/actionlint:${ver}`, '-color=never'], {
+  mustRun(runner, 'docker', ['run', '--rm', '-v', `${ROOT}:/repo`, '-w', '/repo', `rhysd/actionlint:${ver}`, '-no-color'], {
     fix: 'sửa lỗi actionlint trong .github/workflows/',
   });
   if (/^\s*paths(-ignore)?:/m.test(yml)) throw new Error('ci.yml có paths: → check bắt buộc không được lọc theo đường dẫn');
