@@ -742,6 +742,95 @@
     color: var(--color-ink-soft);
   }
 
+  /* ---------- Kệ truyện cuộn ngang của SearchBookView: .tt-shelf (C22) ---------- */
+  .tt-shelf {
+    display: flex;
+    flex-direction: column;
+    gap: var(--s-3);
+    padding: var(--s-5) var(--s-4) var(--s-4);
+    background-color: var(--color-paper-deep);
+    background-image: url("/img/paper-grain.svg");
+    background-size: 180px 180px;
+    border: 1px solid var(--color-ink-soft);
+    border-bottom: 10px solid var(--color-wood);
+    border-radius: var(--radius-paper);
+    box-shadow: var(--shadow-paper);
+  }
+
+  .tt-shelf__head {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: var(--s-1) var(--s-4);
+  }
+
+  .tt-shelf__track {
+    display: flex;
+    gap: var(--s-4);
+    margin: 0;
+    padding: var(--s-2) var(--s-1) var(--s-4);
+    list-style: none;
+    overflow-x: auto;
+    overscroll-behavior-x: contain;
+    scroll-snap-type: x mandatory;
+    scrollbar-color: var(--color-wood) transparent;
+  }
+
+  .tt-shelf__item {
+    flex: none;
+    width: 9rem;
+    scroll-snap-align: start;
+  }
+
+  .tt-shelf__book {
+    display: flex;
+    flex-direction: column;
+    gap: var(--s-2);
+    width: 100%;
+    padding: 0;
+    text-align: left;
+    color: var(--color-ink);
+    cursor: pointer;
+    background: none;
+    border: 0;
+  }
+
+  .tt-shelf__book .tt-book-cover {
+    max-width: none;
+  }
+
+  .tt-shelf__title {
+    display: -webkit-box;
+    overflow: hidden;
+    font-family: var(--font-type);
+    font-size: 0.9375rem;
+    line-height: 1.6;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+  }
+
+  .tt-shelf__book:hover .tt-shelf__title,
+  .tt-shelf__book:focus-visible .tt-shelf__title {
+    color: var(--color-pen-blue);
+    text-decoration: underline;
+  }
+
+  .tt-shelf__meta {
+    font-size: 0.8125rem;
+    color: var(--color-ink-soft);
+  }
+
+  @media (min-width: 48rem) {
+    .tt-shelf {
+      padding-inline: var(--s-5);
+    }
+
+    .tt-shelf__item {
+      width: 10rem;
+    }
+  }
+
   /* ---------- Chân trang ---------- */
   .tt-site-footer {
     margin-top: var(--s-7);
@@ -813,6 +902,16 @@
   .tt-action-card:hover,
   .tt-btn:hover {
     transform: translate(-1px, -2px);
+    box-shadow: var(--shadow-lift);
+  }
+
+  .tt-shelf__book .tt-book-cover {
+    transition: transform 160ms ease-out, box-shadow 160ms ease-out;
+  }
+
+  .tt-shelf__book:hover .tt-book-cover,
+  .tt-shelf__book:focus-visible .tt-book-cover {
+    transform: translateY(-6px) rotate(-1deg);
     box-shadow: var(--shadow-lift);
   }
 

@@ -106,7 +106,7 @@
           <c:choose>
             <c:when test="${navRole eq 'client'}">
               <li><a href="${ctx}/ClientHomeView.jsp" class="tt-nav__link${navSection eq 'home' ? ' tt-nav__link--active' : ''}"${navSection eq 'home' ? ' aria-current="page"' : ''}>Trang chủ</a></li>
-              <li><a href="${ctx}/SearchBookView.jsp" class="tt-nav__link${navSection eq 'search' ? ' tt-nav__link--active' : ''}"${navSection eq 'search' ? ' aria-current="page"' : ''}>Tìm truyện</a></li>
+              <li><a href="${ctx}/SearchBookView.jsp?moi=1" class="tt-nav__link${navSection eq 'search' ? ' tt-nav__link--active' : ''}"${navSection eq 'search' ? ' aria-current="page"' : ''}>Tìm truyện</a></li>
               <li><a href="${ctx}/RentalBillListView.jsp" class="tt-nav__link${navSection eq 'bills' ? ' tt-nav__link--active' : ''}"${navSection eq 'bills' ? ' aria-current="page"' : ''}>Phiếu mượn</a></li>
             </c:when>
             <c:when test="${navRole eq 'staff' or navRole eq 'manager'}">

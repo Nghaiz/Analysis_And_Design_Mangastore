@@ -27,6 +27,11 @@
 <%!
     /** Từ khoá dài hơn thì INPUT_TOO_LONG, không gọi DAO (phase-06-integration.md §6.1, bảng M2; §10.3). */
     private static final int KEYWORD_MAX = 100;
+
+    /** Đuôi số tập của tên đầu truyện ("… - Tập 12"), bỏ đi để gộp các tập thành một bộ trên kệ (C22). */
+    private static final java.util.regex.Pattern SERIES_SUFFIX = java.util.regex.Pattern.compile(
+            "\\s*[-–:]?\\s*Tập\\s*\\d+\\s*$",
+            java.util.regex.Pattern.CASE_INSENSITIVE | java.util.regex.Pattern.UNICODE_CASE);
 %>
 <%
     String ctx = request.getContextPath();
@@ -44,6 +49,13 @@
         rentalBill = new RentalBill();
         rentalBill.setClient(client);
         session.setAttribute("rentalBill", rentalBill);
+    }
+
+    // C22: mở trang từ trang chủ khách hay thanh điều hướng (?moi=1) là mở mới, bỏ kết quả tìm của lần trước;
+    // "Quay lại" từ BookDetailView và forward từ doAddSelectedBook không có tham số này nên vẫn giữ kết quả (C6).
+    if ("GET".equals(request.getMethod()) && request.getDispatcherType() == DispatcherType.REQUEST
+            && request.getParameter("moi") != null) {
+        session.removeAttribute("listBook");
     }
 
     @SuppressWarnings("unchecked")
@@ -165,6 +177,36 @@
     selectedStackProps.put("rows", selectedRows);
     selectedStackProps.put("focusBookId", focusBook == null ? null : focusBook.getId());
 
+    // C22: chưa có kết quả thì hiện kệ truyện cuộn ngang: các bộ truyện tiệm đang có, gộp theo tên bộ (bỏ đuôi
+    // "- Tập N"), bìa của tập có id nhỏ nhất. Đọc cả kho bằng searchBook("") (không thêm hàm DAO); ô tìm vẫn giữ C9.
+    // Bấm một bộ = tìm với từ khoá là tên bộ (form frmShelf), ô tìm hiện lại đúng từ khoá đó.
+    List<Map<String, Object>> shelfRows = new ArrayList<>();
+    if (bookRows.isEmpty()) {
+        List<Book> catalog;
+        try (BookDAO bookDAO = new BookDAO()) {
+            catalog = bookDAO.searchBook("");
+        }
+        Map<String, Map<String, Object>> series = new LinkedHashMap<>();
+        for (Book b : catalog) {
+            String title = SERIES_SUFFIX.matcher(b.getName()).replaceFirst("").strip();
+            if (title.isEmpty() || title.codePointCount(0, title.length()) > KEYWORD_MAX) {
+                title = b.getName();
+            }
+            Map<String, Object> s = series.get(title);
+            if (s == null) {
+                s = new LinkedHashMap<>();
+                s.put("title", title);
+                s.put("bookId", b.getId());
+                s.put("author", b.getAuthor());
+                s.put("volumes", 0);
+                series.put(title, s);
+            }
+            s.put("volumes", (Integer) s.get("volumes") + 1);
+        }
+        shelfRows.addAll(series.values());
+    }
+    pageContext.setAttribute("shelfRows", shelfRows);
+
     pageContext.setAttribute("ctx", ctx);
     pageContext.setAttribute("keyword", keyword);
     pageContext.setAttribute("keywordInvalid", keywordInvalid);
@@ -209,7 +251,7 @@
             <p class="m-0 text-sm text-ink-soft"><span class="font-num">${fn:length(bookRows)}</span> đầu truyện. Bấm tên truyện để xem chi tiết.</p>
           </c:if>
         </div>
-        <div class="overflow-x-auto">
+        <div class="overflow-x-auto"${empty bookRows ? ' hidden' : ''}>
           <table class="tt-ledger-table" id="tblBook">
             <caption class="tt-ledger-table__caption sr-only">Danh sách đầu truyện</caption>
             <thead>
@@ -243,10 +285,36 @@
           </table>
         </div>
         <c:if test="${empty bookRows}">
-          <p class="m-0 border border-dashed border-ink-soft px-4 py-3 text-ink-soft">Chưa có kết quả. Gõ tên truyện hoặc tên tác giả vào ô phía trên rồi bấm "Tìm".</p>
+          <p class="m-0 border border-dashed border-ink-soft px-4 py-3 text-ink-soft">Chưa có kết quả. Gõ tên truyện hoặc tên tác giả vào ô phía trên rồi bấm "Tìm", hoặc chọn một bộ trên kệ bên dưới.</p>
         </c:if>
       </section>
     </form>
+
+    <c:if test="${not empty shelfRows}">
+      <%-- C22: kệ truyện cuộn ngang. Nút dùng form frmShelf (ngoài form tìm vì form không được lồng nhau), gửi
+           txtKeyword = tên bộ cùng btnSearch: trang tìm và điền lại tên bộ vào ô tìm. --%>
+      <form method="post" action="${ctx}/SearchBookView.jsp" id="frmShelf">
+        <t:csrf/>
+        <input type="hidden" name="btnSearch" value="">
+      </form>
+      <section class="tt-shelf" aria-labelledby="shelf-h">
+        <div class="tt-shelf__head">
+          <h2 id="shelf-h" class="m-0">Trên kệ của tiệm</h2>
+          <p class="m-0 text-sm text-ink-soft"><span class="font-num">${fn:length(shelfRows)}</span> bộ truyện. Kéo ngang để xem thêm, bấm một bộ để tìm các tập.</p>
+        </div>
+        <ul class="tt-shelf__track">
+          <c:forEach var="s" items="${shelfRows}" varStatus="st">
+            <li class="tt-shelf__item">
+              <button type="submit" form="frmShelf" name="txtKeyword" value="${fn:escapeXml(s.title)}" class="tt-shelf__book">
+                <ui:book-cover bookId="${s.bookId}" name="${s.title}" size="sm" eager="${st.index lt 6}"/>
+                <span class="tt-shelf__title"><c:out value="${s.title}"/></span>
+                <span class="tt-shelf__meta"><span class="font-num">${s.volumes}</span> tập<c:if test="${not empty s.author}"> · <c:out value="${s.author}"/></c:if></span>
+              </button>
+            </li>
+          </c:forEach>
+        </ul>
+      </section>
+    </c:if>
 
     <form method="post" action="${ctx}/SearchBookView.jsp" id="frmSelectedBook">
       <t:csrf/>

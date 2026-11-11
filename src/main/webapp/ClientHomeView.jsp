@@ -21,6 +21,7 @@
         return;
     }
     session.removeAttribute("listRentalBill");
+    session.removeAttribute("listBook"); // C22: kết quả tìm cũ không theo khách sang lần mở "Tìm truyện" sau.
     pageContext.setAttribute("fullName", client.getFullName());
     pageContext.setAttribute("messageKind",
             Messages.RENTAL_BILL_CREATED.equals(request.getAttribute("message")) ? "success" : "error");
@@ -42,7 +43,7 @@
     <section aria-labelledby="client-actions-h">
       <h2 id="client-actions-h" class="tt-section-title">Bạn muốn làm gì?</h2>
       <div class="tt-action-grid">
-        <a id="lnkSearchBook" href="${pageContext.request.contextPath}/SearchBookView.jsp" class="tt-action-card">
+        <a id="lnkSearchBook" href="${pageContext.request.contextPath}/SearchBookView.jsp?moi=1"class="tt-action-card">
           <span class="tt-action-card__icon" aria-hidden="true">
             <svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg>
           </span>
