@@ -21,7 +21,7 @@ Hợp đồng: `docs/contracts.md` (tên trang, field, session, DAO, props `Sele
 - [x] **6.4 Lane 6D `island-selected-stack`** xếp hàng, mở khi lane đầu tiên trong 6A–6C xong. *Xong 799d807; nút OK về ô nhập đầu khi không có ô sai (258c6f5).*
 - [x] **6.5 Orchestrator:** merge 6A, 6B; chạy nền compose e2e; mở **6.6 Lane 6E `xac-minh-m1`**. *Sửa tích hợp: codec Redisson Kryo → SerializationCodec + test codec runtime (585c504), ClientHomeView hiện câu tạo phiếu (71165d9). 6E: `plans/reports/phase-06-xac-minh-m1-261111-1158.md`.*
 - [x] **6.7 Orchestrator:** merge 6C, 6D; mở **6.8 Lane 6F `xac-minh-m2`**. *6F: `plans/reports/phase-06-xac-minh-m2-261111-1203.md`; phần 6E, 6F chưa kịp (390, tắt JS, C21 hai tab, bước 24) giao lane 6H `xac-minh-con-lai`.*
-- [ ] **6.9 Orchestrator:** chạy `tiem-contract-guard` trên diff của phase (agent dự án, chỉ đọc); sửa vi phạm bằng cách brief lại lane sở hữu; chạy Accept, đánh dấu, push nhánh phase, mở PR vào `main` và merge bằng merge commit (`contract.md` §9).
+- [x] **6.9 Orchestrator:** chạy `tiem-contract-guard` trên diff của phase (agent dự án, chỉ đọc); sửa vi phạm bằng cách brief lại lane sở hữu; chạy Accept, đánh dấu, push nhánh phase, mở PR vào `main` và merge bằng merge commit (`contract.md` §9). *Xong 11/11/2026: tiem-contract-guard 0 vi phạm (`plans/reports/phase-06-contract-guard-261111-1200.md`); Accept phase-06 ALL PASS 5/5 tại 258c6f5; lane 6H (`phase-06-xac-minh-con-lai-261111-1215.md`) → bảng 390 dùng break-word (79e1412); kiểm lại trên 8080 tại 79e1412: smoke 49 bước ALL PASS, nút OK về ô nhập đầu, bảng 390 không vỡ mã/tiền, console sạch.*
 
 ## Lane trong phase
 
