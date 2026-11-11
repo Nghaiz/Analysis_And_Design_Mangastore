@@ -18,7 +18,7 @@ class MessagesTest {
 
     private static final int EXPECTED_COUNT = 28;
     /** §10.3: câu ngoài báo cáo, chủ dự án duyệt 11/11/2026. */
-    private static final int EXTRA_COUNT = 8;
+    private static final int EXTRA_COUNT = 9;
     private static final String EXTRA_HEADING = "### 10.3 Câu ngoài báo cáo (chủ dự án duyệt 11/11/2026)";
 
     @Test
