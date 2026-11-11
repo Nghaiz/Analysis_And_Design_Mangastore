@@ -335,6 +335,8 @@ Luật chung:
 
 28 trang ch.9 (tên đúng brief §3), cộng bản `LoginView.jsp` thứ hai của nhân viên (D5) và 5 trang quản trị D6 (Deferred #14).
 
+Ngoài danh mục (không phải trang nghiệp vụ, không gọi DAO): trang lỗi `/error/403.jsp`, `404.jsp`, `405.jsp`, `500.jsp`, `error.jsp` (web.xml `<error-page>`, mở cho mọi người theo §12), trang lỗi tĩnh 400/413/414 của nginx (`docker/nginx/errors/`), `health.jsp` và các trang `/dev/*`.
+
 | # | Trang | Đường dẫn | Loại | Vai | DAO gọi |
 |---|---|---|---|---|---|
 | 1 | `HomeView.jsp` | `/HomeView.jsp` | xem | mọi người | không |
