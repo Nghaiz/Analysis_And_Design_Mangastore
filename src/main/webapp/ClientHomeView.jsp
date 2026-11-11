@@ -3,13 +3,16 @@
   ClientHomeView, §14 C6). Thứ tự theo images/svg/ui_m1_ClientHomeView.svg: tiêu đề, "Họ và tên: …", nút
   "Tìm và thuê truyện" (lnkSearchBook), nút "Phiếu mượn của tôi" (lnkViewRentalBill).
   - Session R client (lấy fullName, in ra có escape). DAO: không. Dọn listRentalBill (C6).
+  - doAddRentalBill forward về đây kèm request message = RENTAL_BILL_CREATED (ch.2 2.2 bước 22): hiện hộp thông báo
+    kind success; câu khác (nếu có) kind error.
   - Nút "Đăng xuất" (btnLogout → doLogout.jsp) là phần ngoài báo cáo (docs/contracts.md §14 C14).
   - AuthFilter chặn khách chưa đăng nhập (§12); trang vẫn tự về LoginView khi không có client id > 0, để không bao
     giờ ra 500 vì thiếu client.
 --%>
 <%@ page contentType="text/html; charset=UTF-8" trimDirectiveWhitespaces="true"
-         import="vn.tiemtruyen.model.Client" %>
+         import="vn.tiemtruyen.model.Client, vn.tiemtruyen.util.Messages" %>
 <%@ taglib prefix="t" tagdir="/WEB-INF/tags" %>
+<%@ taglib prefix="ui" tagdir="/WEB-INF/tags/ui" %>
 <%@ taglib prefix="c" uri="jakarta.tags.core" %>
 <%
     if (!(session.getAttribute("client") instanceof Client client) || client.getId() <= 0) {
@@ -18,10 +21,13 @@
     }
     session.removeAttribute("listRentalBill");
     pageContext.setAttribute("fullName", client.getFullName());
+    pageContext.setAttribute("messageKind",
+            Messages.RENTAL_BILL_CREATED.equals(request.getAttribute("message")) ? "success" : "error");
 %>
 <t:layout title="Trang chủ khách hàng">
   <section class="mx-auto flex max-w-2xl flex-col gap-6 py-8">
     <h1 class="font-sign text-ink">Trang chủ khách hàng</h1>
+    <c:if test="${not empty requestScope.message}"><ui:message-box kind="${messageKind}" text="${requestScope.message}"/></c:if>
     <p class="text-ink">Họ và tên: <span class="tt-typed"><c:out value="${fullName}"/></span></p>
     <p class="flex flex-wrap gap-4">
       <a id="lnkSearchBook" href="${pageContext.request.contextPath}/SearchBookView.jsp" class="rounded-paper bg-primary px-4 py-2 text-primary-foreground shadow-paper">Tìm và thuê truyện</a>
