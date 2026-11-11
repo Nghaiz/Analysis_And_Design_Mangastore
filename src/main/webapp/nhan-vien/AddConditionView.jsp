@@ -194,64 +194,85 @@
     pageContext.setAttribute("keywordValue", selfPost ? keyword : "");
 %>
 <t:layout title="Thêm tình trạng truyện">
-  <section class="mx-auto flex max-w-5xl flex-col gap-6 px-4 py-8">
-    <h1 class="font-sign text-ink">Thêm tình trạng truyện</h1>
+  <div class="flex flex-col gap-6">
+    <header class="flex flex-col gap-2 border-b border-dashed border-ink-soft pb-4">
+      <nav aria-label="Đường dẫn" class="text-sm text-ink-soft">
+        <ol class="m-0 flex list-none flex-wrap items-center gap-x-2 gap-y-1 p-0">
+          <li><a href="${base}/StaffHomeView.jsp">Trang chủ nhân viên</a></li>
+          <li class="flex items-center gap-2"><svg aria-hidden="true" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg><a href="${base}/SearchRentalBillView.jsp">Tìm phiếu mượn</a></li>
+          <li class="flex items-center gap-2"><svg aria-hidden="true" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg><a href="${base}/ProcessRentalBillView.jsp">Xử lí phiếu mượn</a></li>
+          <li aria-current="page" class="flex items-center gap-2"><svg aria-hidden="true" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg>Thêm tình trạng truyện</li>
+        </ol>
+      </nav>
+      <h1 class="m-0">Thêm tình trạng truyện</h1>
+      <p class="m-0 max-w-3xl text-ink-soft">Ghi tình trạng quyển trước khi giao: chọn các lỗi nhìn thấy, ghi chú nếu cần rồi bấm Lưu tình trạng. Quyển không có lỗi thì để trống danh sách lỗi và bấm Lưu tình trạng.</p>
+    </header>
     <c:if test="${not empty pageMessage}"><ui:message-box kind="${messageKind}" text="${pageMessage}"/></c:if>
-    <dl class="m-0 grid grid-cols-[auto_1fr] gap-x-4 gap-y-1">
+    <dl class="tt-paper-card m-0 grid grid-cols-[auto_1fr] gap-x-4 gap-y-1">
       <dt>Mã vạch:</dt><dd id="barcode" class="m-0 font-num"><c:out value="${barcode}"/></dd>
       <dt>Tên đầu truyện:</dt><dd id="bookName" class="m-0"><c:out value="${bookName}"/></dd>
     </dl>
     <form method="post" action="${base}/AddConditionView.jsp" class="flex flex-col gap-6">
       <t:csrf/>
       <input type="hidden" name="rentalBillId" value="${billId}">
-      <p class="m-0 flex flex-wrap items-center gap-4">
-        <label for="txtKeyword" class="sr-only">Từ khoá</label>
-        <input type="text" id="txtKeyword" name="txtKeyword" value="${fn:escapeXml(keywordValue)}" maxlength="100" placeholder="Nhập tên lỗi…" class="h-9 min-w-0 flex-1 rounded-paper border border-input bg-paper px-3 py-1 text-ink">
-        <button type="submit" id="btnSearch" name="btnSearch" class="rounded-paper bg-primary px-4 py-2 text-primary-foreground shadow-paper">Tìm</button>
-      </p>
-      <div class="overflow-x-auto">
-        <table id="tblDamage" class="tt-ledger-table">
-          <caption class="tt-ledger-table__caption">Danh sách loại lỗi</caption>
-          <thead>
-            <tr><th scope="col">Tên lỗi</th><th scope="col">Mô tả</th></tr>
-          </thead>
-          <tbody>
-            <c:forEach var="damage" items="${damageList}">
-              <tr>
-                <td><button type="submit" name="lnkChooseDamage" value="${damage.id}" class="text-left text-pen-blue underline"><c:out value="${damage.name}"/></button></td>
-                <td><c:out value="${damage.description}"/></td>
-              </tr>
-            </c:forEach>
-          </tbody>
-        </table>
+      <div class="tt-paper-card grid gap-2">
+        <label for="txtKeyword">Từ khoá</label>
+        <div class="flex flex-col gap-3 sm:flex-row sm:items-center">
+          <input type="text" id="txtKeyword" name="txtKeyword" value="${fn:escapeXml(keywordValue)}" maxlength="100" placeholder="Nhập tên lỗi…" aria-describedby="txtKeyword-hint" class="h-11 min-w-0 flex-1 rounded-paper border border-input bg-paper px-3 text-ink">
+          <button type="submit" id="btnSearch" name="btnSearch" class="tt-btn tt-btn--primary"><svg aria-hidden="true" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg><span>Tìm</span></button>
+        </div>
+        <p id="txtKeyword-hint" class="m-0 text-sm text-ink-soft">Tìm theo tên lỗi, rồi bấm tên lỗi trong bảng để ghi nhận cho quyển này.</p>
       </div>
-      <p class="m-0"><a id="lnkAddDamage" href="${base}/AddDamageView.jsp" class="inline-block rounded-paper border border-ink-soft bg-paper px-4 py-2 text-ink shadow-paper">Thêm lỗi mới</a></p>
-      <div class="overflow-x-auto">
-        <table id="tblRentedDamage" class="tt-ledger-table">
-          <caption class="tt-ledger-table__caption">Các lỗi đã ghi nhận</caption>
-          <thead>
-            <tr><th scope="col">Tên lỗi</th><th scope="col">Mô tả</th><th scope="col">Ghi chú</th><th scope="col">Thao tác</th></tr>
-          </thead>
-          <tbody>
-            <c:forEach var="item" items="${recordedRows}">
-              <tr>
-                <td><c:out value="${item.name}"/></td>
-                <td><c:out value="${item.description}"/></td>
-                <td><input type="text" name="txtDamageNote" value="${fn:escapeXml(item.note)}" maxlength="255" placeholder="nhập ghi chú" aria-label="Ghi chú cho lỗi ${fn:escapeXml(item.name)}" class="h-9 w-full min-w-0 rounded-paper border border-input bg-paper px-3 py-1 text-ink aria-invalid:border-destructive"${item.invalid ? ' aria-invalid="true"' : ''}></td>
-                <td><button type="submit" name="lnkDeleteRentedDamage" value="${item.damageId}" class="rounded-paper border border-ink-soft bg-paper px-2 py-1 text-sm text-ink">Xoá</button></td>
-              </tr>
-            </c:forEach>
-          </tbody>
-        </table>
+      <div class="flex flex-col gap-3">
+        <div class="overflow-x-auto">
+          <table id="tblDamage" class="tt-ledger-table">
+            <caption class="tt-ledger-table__caption">Danh sách loại lỗi</caption>
+            <thead>
+              <tr><th scope="col">Tên lỗi</th><th scope="col">Mô tả</th></tr>
+            </thead>
+            <tbody>
+              <c:forEach var="damage" items="${damageList}">
+                <tr>
+                  <td><button type="submit" name="lnkChooseDamage" value="${damage.id}" class="cursor-pointer border-0 bg-transparent p-0 text-left text-pen-blue underline underline-offset-[3px]"><c:out value="${damage.name}"/></button></td>
+                  <td><c:out value="${damage.description}"/></td>
+                </tr>
+              </c:forEach>
+            </tbody>
+          </table>
+        </div>
+        <c:if test="${empty damageList}"><p class="m-0 border border-dashed border-ink-soft bg-paper-deep px-4 py-3 text-ink">Chưa có loại lỗi nào trong bảng. Nhập từ khoá ở ô trên rồi bấm Tìm.</p></c:if>
+        <p class="m-0 flex flex-wrap items-center gap-3 text-ink-soft">Không thấy lỗi phù hợp? <a id="lnkAddDamage" href="${base}/AddDamageView.jsp" class="tt-btn tt-btn--ghost tt-btn--sm"><svg aria-hidden="true" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14"/><path d="M5 12h14"/></svg><span>Thêm lỗi mới</span></a></p>
       </div>
-      <p class="m-0 flex flex-wrap items-center gap-4">
+      <div class="flex flex-col gap-3">
+        <div class="overflow-x-auto">
+          <table id="tblRentedDamage" class="tt-ledger-table">
+            <caption class="tt-ledger-table__caption">Các lỗi đã ghi nhận</caption>
+            <thead>
+              <tr><th scope="col">Tên lỗi</th><th scope="col">Mô tả</th><th scope="col">Ghi chú</th><th scope="col">Thao tác</th></tr>
+            </thead>
+            <tbody>
+              <c:forEach var="item" items="${recordedRows}">
+                <tr>
+                  <td><c:out value="${item.name}"/></td>
+                  <td><c:out value="${item.description}"/></td>
+                  <td><input type="text" name="txtDamageNote" value="${fn:escapeXml(item.note)}" maxlength="255" placeholder="nhập ghi chú" aria-label="Ghi chú cho lỗi ${fn:escapeXml(item.name)}" class="h-11 w-full min-w-0 rounded-paper border border-input bg-paper px-3 text-ink aria-invalid:border-destructive"${item.invalid ? ' aria-invalid="true"' : ''}></td>
+                  <td><button type="submit" name="lnkDeleteRentedDamage" value="${item.damageId}" class="tt-btn tt-btn--ghost tt-btn--sm">Xoá</button></td>
+                </tr>
+              </c:forEach>
+            </tbody>
+          </table>
+        </div>
+        <c:if test="${empty recordedRows}"><p class="m-0 border border-dashed border-ink-soft bg-paper-deep px-4 py-3 text-ink">Chưa ghi nhận lỗi nào. Quyển lành lặn thì cứ bấm Lưu tình trạng, phiếu sẽ ghi là không có lỗi.</p></c:if>
+      </div>
+      <div class="tt-paper-card grid gap-2">
         <label for="txtConditionNote">Ghi chú tình trạng:</label>
-        <input type="text" id="txtConditionNote" name="txtConditionNote" value="${fn:escapeXml(conditionNote)}" maxlength="255" class="h-9 min-w-0 flex-1 rounded-paper border border-input bg-paper px-3 py-1 text-ink aria-invalid:border-destructive"${conditionTooLong ? ' aria-invalid="true"' : ''}>
-      </p>
-      <p class="m-0 flex flex-wrap gap-4">
-        <button type="submit" id="btnSave" name="btnSave" class="rounded-paper bg-primary px-4 py-2 text-primary-foreground shadow-paper">Lưu tình trạng</button>
-        <a id="lnkBack" href="${base}/ProcessRentalBillView.jsp" class="rounded-paper border border-ink-soft bg-paper px-4 py-2 text-ink shadow-paper">Quay lại</a>
-      </p>
+        <input type="text" id="txtConditionNote" name="txtConditionNote" value="${fn:escapeXml(conditionNote)}" maxlength="255" aria-describedby="txtConditionNote-hint" class="h-11 w-full min-w-0 rounded-paper border border-input bg-paper px-3 text-ink aria-invalid:border-destructive"${conditionTooLong ? ' aria-invalid="true"' : ''}>
+        <p id="txtConditionNote-hint" class="m-0 text-sm text-ink-soft">Không bắt buộc, tối đa 255 kí tự. Ví dụ: còn mới, gáy hơi lỏng.</p>
+      </div>
+      <div class="flex flex-wrap gap-3 border-t border-dashed border-ink-soft pt-4">
+        <button type="submit" id="btnSave" name="btnSave" class="tt-btn tt-btn--primary"><svg aria-hidden="true" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg><span>Lưu tình trạng</span></button>
+        <a id="lnkBack" href="${base}/ProcessRentalBillView.jsp" class="tt-btn tt-btn--ghost"><svg aria-hidden="true" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5"/><path d="m12 19-7-7 7-7"/></svg><span>Quay lại</span></a>
+      </div>
     </form>
-  </section>
+  </div>
 </t:layout>

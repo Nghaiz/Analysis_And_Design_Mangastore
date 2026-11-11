@@ -54,28 +54,52 @@
     pageContext.setAttribute("usernameValue", username == null ? "" : username);
 %>
 <t:layout title="Đăng nhập">
-  <h1>Đăng nhập</h1>
-  <c:if test="${not empty message}">
-    <ui:message-box kind="${messageKind}" text="${message}"/>
-  </c:if>
-  <ui:paper-card heading="" taped="true">
-    <form method="post" action="${pageContext.request.contextPath}/nhan-vien/LoginView.jsp" class="grid max-w-md gap-4">
-      <t:csrf/>
-      <label for="txtUsername" class="grid gap-1">
-        <span>Tên đăng nhập:</span>
-        <input type="text" id="txtUsername" name="txtUsername" value="<c:out value='${usernameValue}'/>"
-               autocomplete="username" maxlength="50"
-               class="h-10 rounded-paper border border-input bg-paper px-3">
-      </label>
-      <label for="txtPassword" class="grid gap-1">
-        <span>Mật khẩu:</span>
-        <input type="password" id="txtPassword" name="txtPassword" value="" autocomplete="current-password"
-               class="h-10 rounded-paper border border-input bg-paper px-3">
-      </label>
+  <div class="mx-auto grid max-w-4xl gap-6 md:grid-cols-2 md:items-start">
+    <section class="tt-hero md:col-span-2" aria-labelledby="staff-login-h">
       <div>
-        <button type="submit" id="btnLogin" name="btnLogin" value=""
-                class="inline-flex h-10 items-center justify-center rounded-paper bg-primary px-6 text-primary-foreground hover:bg-primary/90">Đăng nhập</button>
+        <p class="tt-hero__eyebrow">Quầy nhân viên</p>
+        <h1 id="staff-login-h" class="tt-hero__title">Đăng nhập</h1>
+        <p class="tt-hero__lead">Đăng nhập bằng tài khoản nhân viên của tiệm để tìm phiếu khách đã đặt và giao truyện tại quầy.</p>
       </div>
-    </form>
-  </ui:paper-card>
+      <img src="${pageContext.request.contextPath}/static/img/logo-tiem.svg" alt="" width="96" height="96" class="tt-hero__art">
+    </section>
+
+    <div class="flex flex-col gap-4">
+      <c:if test="${not empty message}">
+        <ui:message-box kind="${messageKind}" text="${message}"/>
+      </c:if>
+      <ui:paper-card heading="" taped="true">
+        <form method="post" action="${pageContext.request.contextPath}/nhan-vien/LoginView.jsp" class="grid gap-5">
+          <t:csrf/>
+          <div class="grid gap-1">
+            <label for="txtUsername">Tên đăng nhập:</label>
+            <input type="text" id="txtUsername" name="txtUsername" value="<c:out value='${usernameValue}'/>"
+                   autocomplete="username" maxlength="50" autocapitalize="none" spellcheck="false"
+                   aria-describedby="txtUsername-hint"
+                   class="h-11 w-full rounded-paper border border-input bg-paper px-3 text-ink">
+            <p id="txtUsername-hint" class="m-0 text-sm text-ink-soft">Tên đăng nhập do tiệm cấp cho nhân viên.</p>
+          </div>
+          <div class="grid gap-1">
+            <label for="txtPassword">Mật khẩu:</label>
+            <input type="password" id="txtPassword" name="txtPassword" value="" autocomplete="current-password"
+                   class="h-11 w-full rounded-paper border border-input bg-paper px-3 text-ink">
+          </div>
+          <div>
+            <button type="submit" id="btnLogin" name="btnLogin" value=""
+                    class="tt-btn tt-btn--primary w-full sm:w-auto">Đăng nhập</button>
+          </div>
+        </form>
+      </ui:paper-card>
+    </div>
+
+    <aside aria-labelledby="staff-login-note-h" class="flex flex-col gap-3">
+      <h2 id="staff-login-note-h" class="tt-section-title">Sau khi đăng nhập</h2>
+      <ol class="tt-steps">
+        <li class="tt-step"><span class="tt-step__title">Tìm phiếu</span><span class="tt-step__desc">Tìm theo mã phiếu, tên khách hàng hoặc số CCCD.</span></li>
+        <li class="tt-step"><span class="tt-step__title">Kiểm truyện</span><span class="tt-step__desc">Tích quyển giao, ghi tình trạng từng quyển, nhận đồ cọc.</span></li>
+        <li class="tt-step"><span class="tt-step__title">Xác nhận và in</span><span class="tt-step__desc">Lưu phiếu rồi in phiếu mượn đưa khách.</span></li>
+      </ol>
+      <p class="m-0 text-sm text-ink-soft">Máy quầy dùng chung: đăng nhập sẽ kết thúc phiên của người dùng trước trên trình duyệt này. Xong ca thì bấm Đăng xuất ở đầu trang.</p>
+    </aside>
+  </div>
 </t:layout>

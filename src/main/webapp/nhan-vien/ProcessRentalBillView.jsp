@@ -380,28 +380,53 @@
     pageContext.setAttribute("cancelConfirm", Messages.CANCEL_CONFIRM);
 %>
 <t:layout title="Xử lí phiếu mượn">
-  <h1>Xử lí phiếu mượn</h1>
+  <c:set var="nv" value="${pageContext.request.contextPath}/nhan-vien"/>
+  <div class="flex flex-col gap-6">
+  <header class="flex flex-col gap-2 border-b border-dashed border-ink-soft pb-4">
+    <nav aria-label="Đường dẫn" class="text-sm text-ink-soft">
+      <ol class="m-0 flex list-none flex-wrap items-center gap-x-2 gap-y-1 p-0">
+        <li><a href="${nv}/StaffHomeView.jsp">Trang chủ nhân viên</a></li>
+        <li class="flex items-center gap-2"><svg aria-hidden="true" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg><a href="${nv}/SearchRentalBillView.jsp">Tìm phiếu mượn</a></li>
+        <li aria-current="page" class="flex items-center gap-2"><svg aria-hidden="true" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg>Xử lí phiếu mượn <span class="font-num">${billCode}</span></li>
+      </ol>
+    </nav>
+    <h1 class="m-0">Xử lí phiếu mượn</h1>
+    <p class="m-0 max-w-3xl text-ink-soft">Đối chiếu từng quyển với khách: tích quyển giao, ghi tình trạng, nhận đồ cọc, đặt ngày hẹn trả rồi xác nhận để in phiếu.</p>
+  </header>
   <c:if test="${not empty message}">
     <ui:message-box kind="error" text="${message}"/>
   </c:if>
-  <form method="post" action="${pageContext.request.contextPath}/nhan-vien/ProcessRentalBillView.jsp">
+  <form method="post" action="${pageContext.request.contextPath}/nhan-vien/ProcessRentalBillView.jsp" class="flex flex-col gap-6">
     <t:csrf/>
     <%-- Chống hai thẻ (phase-07-edge-cases.md §3.1): trang và doUpdateRentalBill so với id của rentalBill trong session. --%>
     <input type="hidden" id="rentalBillId" name="rentalBillId" value="${billId}">
     <%-- Nút mặc định (không tên) đứng đầu form: Enter trong một ô chỉ gửi về trang để tính lại, không bấm nhầm
          nút trên dòng ("Thêm tình trạng"). --%>
     <button type="submit" class="sr-only" tabindex="-1" aria-hidden="true">Tính lại</button>
+    <div class="grid gap-6 lg:grid-cols-2 lg:items-start">
     <ui:ticket title="PHIẾU MƯỢN" code="${billCode}">
-      <dl class="m-0 mb-4 grid gap-x-6 sm:grid-cols-3">
+      <dl class="m-0 grid gap-x-6 sm:grid-cols-3 lg:grid-cols-1">
         <div><dt class="inline">Họ và tên:</dt> <dd class="m-0 inline"><c:out value="${clientName}"/></dd></div>
         <div><dt class="inline">Số CCCD:</dt> <dd class="m-0 inline font-num"><c:out value="${clientIdCard}"/></dd></div>
         <div><dt class="inline">Số điện thoại:</dt> <dd class="m-0 inline font-num"><c:out value="${clientPhone}"/></dd></div>
       </dl>
     </ui:ticket>
+    <aside aria-labelledby="confirm-rules-h" class="border border-dashed border-ink-soft bg-paper-deep px-5 py-4">
+      <h2 id="confirm-rules-h" class="m-0 text-xl">Trước khi xác nhận</h2>
+      <p class="m-0 mt-1 text-sm text-ink-soft">Phiếu chỉ lưu được khi đủ cả bốn điều kiện:</p>
+      <ol class="m-0 mt-2 grid gap-1 pl-5">
+        <li>Có ít nhất một quyển được tích "Nhận".</li>
+        <li>Mọi quyển được tích đã ghi tình trạng khi giao.</li>
+        <li>Phiếu đã có ít nhất một khoản đặt cọc.</li>
+        <li>Ngày hẹn trả sau ngày mượn.</li>
+      </ol>
+      <p class="m-0 mt-2 text-sm text-ink-soft">Quyển bỏ tích không tính vào tổng tiền và được bỏ khỏi phiếu khi lưu.</p>
+    </aside>
+    </div>
 
     <%-- Bàn quầy: bản HTML chạy không cần JS (data-island-fallback, island ẩn khi gắn; input vẫn nằm trong form và
          vẫn được gửi). Quy ước gắn: plans/reports/phase-07-islands-m3-261111-1057.md §4. --%>
-    <div data-island-fallback="ProcessBillDesk" class="mt-6">
+    <div data-island-fallback="ProcessBillDesk" class="tt-paper-card">
         <p class="m-0 mb-2">Danh sách các quyển truyện khách hàng muốn thuê:</p>
         <div class="overflow-x-auto">
           <table id="tblRentedBook" class="tt-ledger-table">
@@ -457,13 +482,13 @@
           <label for="txtBorrowDate" class="grid gap-1">
             <span>Ngày mượn:</span>
             <input type="date" id="txtBorrowDate" name="txtBorrowDate" value="${borrowDateValue}" readonly
-                   class="h-10 rounded-paper border border-input bg-paper-deep px-3 font-num">
+                   class="h-11 rounded-paper border border-input bg-paper-deep px-3 font-num">
           </label>
           <label for="txtDueDate" class="grid gap-1">
             <span>Ngày hẹn trả:</span>
             <input type="date" id="txtDueDate" name="txtDueDate" value="${dueDateValue}"
                    data-submit-on-change${dueInvalid ? ' aria-invalid="true"' : ''}
-                   class="h-10 rounded-paper border border-input bg-paper px-3 font-num aria-invalid:border-destructive">
+                   class="h-11 rounded-paper border border-input bg-paper px-3 font-num aria-invalid:border-destructive">
           </label>
         </div>
 
@@ -504,7 +529,7 @@
             <span>Giảm giá:</span>
             <input type="text" id="txtDiscount" name="txtDiscount" value="${discountValue}" inputmode="numeric" maxlength="20"
                    data-submit-on-change${discountInvalid ? ' aria-invalid="true"' : ''}
-                   class="h-10 rounded-paper border border-input bg-paper px-3 font-num aria-invalid:border-destructive">
+                   class="h-11 rounded-paper border border-input bg-paper px-3 font-num aria-invalid:border-destructive">
           </label>
           <label for="txtNote" class="grid gap-1" data-island-slot="ProcessBillDesk:note">
             <span>Ghi chú:</span>
@@ -513,19 +538,21 @@
           </label>
         </div>
 
-        <p class="m-0">Tổng số quyển thuê: <span class="font-num">${totalCopies}</span></p>
-        <p class="m-0">Tổng tiền thuê: <span class="font-num">${totalMoney}</span></p>
+        <div class="border-t border-dashed border-ink-soft pt-3">
+          <p class="m-0">Tổng số quyển thuê: <span class="font-num">${totalCopies}</span></p>
+          <p class="m-0">Tổng tiền thuê: <span class="font-num">${totalMoney}</span></p>
+        </div>
         <noscript>
           <p class="mt-2"><button type="submit"
-                  class="inline-flex h-9 items-center justify-center rounded-paper border border-ink-soft bg-paper px-4 shadow-paper hover:bg-accent">Tính lại</button></p>
+                  class="tt-btn tt-btn--ghost tt-btn--sm">Tính lại</button></p>
         </noscript>
 
-    <div class="mt-6 flex flex-wrap gap-3">
+    <div class="mt-6 flex flex-col gap-3 sm:flex-row sm:flex-wrap">
       <button type="submit" id="btnConfirm" name="btnConfirm" value=""
               formaction="${pageContext.request.contextPath}/nhan-vien/doUpdateRentalBill.jsp"
-              class="inline-flex h-10 items-center justify-center rounded-paper bg-primary px-6 text-primary-foreground hover:bg-primary/90">Xác nhận và in phiếu mượn</button>
+              class="tt-btn tt-btn--primary">Xác nhận và in phiếu mượn</button>
       <button type="submit" id="btnCancel" name="btnCancel" value=""
-              class="inline-flex h-10 items-center justify-center rounded-paper border border-stamp-red bg-paper px-6 text-stamp-red shadow-paper hover:bg-accent">Huỷ phiếu mượn</button>
+              class="tt-btn tt-btn--ghost border-stamp-red text-stamp-red">Huỷ phiếu mượn</button>
     </div>
     </div>
     <div data-island="ProcessBillDesk" data-props="process-bill-props"></div>
@@ -533,7 +560,7 @@
 
     <c:if test="${showCancel}">
       <div role="alertdialog" aria-modal="false" aria-labelledby="cancelDialogTitle" aria-describedby="cancelDialogText"
-           class="mt-6 max-w-xl">
+           class="max-w-xl">
         <ui:paper-card heading="" taped="true">
           <h2 id="cancelDialogTitle" class="m-0 text-xl">Xác nhận huỷ phiếu mượn</h2>
           <p id="cancelDialogText"><c:out value="${cancelConfirm}"/></p>
@@ -541,17 +568,20 @@
           <label for="txtCancelReason" class="grid gap-1">
             <span>Lí do huỷ:</span>
             <input type="text" id="txtCancelReason" name="txtCancelReason" value="<c:out value='${reasonValue}'/>" maxlength="255" autofocus${reasonInvalid ? ' aria-invalid="true"' : ''}
-                   class="h-10 rounded-paper border border-input bg-paper px-3 aria-invalid:border-destructive">
+                   aria-describedby="txtCancelReason-hint"
+                   class="h-11 rounded-paper border border-input bg-paper px-3 aria-invalid:border-destructive">
           </label>
+          <p id="txtCancelReason-hint" class="m-0 mt-1 text-sm text-ink-soft">Bắt buộc ghi lí do, tối đa 255 kí tự.</p>
           <div class="mt-4 flex flex-wrap gap-3">
             <button type="submit" id="btnConfirmCancel" name="btnConfirmCancel" value=""
                     formaction="${pageContext.request.contextPath}/doCancelRentalBill.jsp"
-                    class="inline-flex h-10 items-center justify-center rounded-paper bg-destructive px-6 text-primary-foreground hover:bg-destructive/90">Xác nhận</button>
+                    class="tt-btn border-stamp-red bg-stamp-red text-paper">Xác nhận</button>
             <button type="submit" id="btnCloseCancel" name="btnCloseCancel" value=""
-                    class="inline-flex h-10 items-center justify-center rounded-paper border border-ink-soft bg-paper px-6 shadow-paper hover:bg-accent">Huỷ</button>
+                    class="tt-btn tt-btn--ghost">Huỷ</button>
           </div>
         </ui:paper-card>
       </div>
     </c:if>
   </form>
+  </div>
 </t:layout>

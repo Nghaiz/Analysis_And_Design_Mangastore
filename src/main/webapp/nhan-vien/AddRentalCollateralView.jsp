@@ -209,34 +209,51 @@
     pageContext.setAttribute("keywordValue", selfPost ? keyword : "");
 %>
 <t:layout title="Thêm khoản đặt cọc">
-  <section class="mx-auto flex max-w-5xl flex-col gap-6 px-4 py-8">
-    <h1 class="font-sign text-ink">Thêm khoản đặt cọc</h1>
+  <div class="flex flex-col gap-6">
+    <header class="flex flex-col gap-2 border-b border-dashed border-ink-soft pb-4">
+      <nav aria-label="Đường dẫn" class="text-sm text-ink-soft">
+        <ol class="m-0 flex list-none flex-wrap items-center gap-x-2 gap-y-1 p-0">
+          <li><a href="${base}/StaffHomeView.jsp">Trang chủ nhân viên</a></li>
+          <li class="flex items-center gap-2"><svg aria-hidden="true" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg><a href="${base}/SearchRentalBillView.jsp">Tìm phiếu mượn</a></li>
+          <li class="flex items-center gap-2"><svg aria-hidden="true" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg><a href="${base}/ProcessRentalBillView.jsp">Xử lí phiếu mượn</a></li>
+          <li aria-current="page" class="flex items-center gap-2"><svg aria-hidden="true" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg>Thêm khoản đặt cọc</li>
+        </ol>
+      </nav>
+      <h1 class="m-0">Thêm khoản đặt cọc</h1>
+      <p class="m-0 max-w-3xl text-ink-soft">Tìm loại tài sản khách để lại, bấm tên để thêm một dòng, nhập giá trị và ghi chú rồi bấm Lưu để gắn các khoản cọc vào phiếu.</p>
+    </header>
     <c:if test="${not empty pageMessage}"><ui:message-box kind="${messageKind}" text="${pageMessage}"/></c:if>
     <form method="post" action="${base}/AddRentalCollateralView.jsp" class="flex flex-col gap-6">
       <t:csrf/>
       <input type="hidden" name="rentalBillId" value="${billId}">
-      <p class="m-0 flex flex-wrap items-center gap-4">
-        <label for="txtKeyword" class="sr-only">Từ khoá</label>
-        <input type="text" id="txtKeyword" name="txtKeyword" value="${fn:escapeXml(keywordValue)}" maxlength="100" placeholder="Nhập tên loại tài sản thế chấp…" class="h-9 min-w-0 flex-1 rounded-paper border border-input bg-paper px-3 py-1 text-ink">
-        <button type="submit" id="btnSearch" name="btnSearch" class="rounded-paper bg-primary px-4 py-2 text-primary-foreground shadow-paper">Tìm</button>
-      </p>
-      <div class="overflow-x-auto">
-        <table id="tblCollateral" class="tt-ledger-table">
-          <caption class="tt-ledger-table__caption">Danh sách loại tài sản thế chấp</caption>
-          <thead>
-            <tr><th scope="col">Tên loại tài sản</th><th scope="col">Mô tả</th></tr>
-          </thead>
-          <tbody>
-            <c:forEach var="collateral" items="${collateralList}">
-              <tr>
-                <td><button type="submit" name="lnkChooseCollateral" value="${collateral.id}" class="text-left text-pen-blue underline"><c:out value="${collateral.name}"/></button></td>
-                <td><c:out value="${collateral.description}"/></td>
-              </tr>
-            </c:forEach>
-          </tbody>
-        </table>
+      <div class="tt-paper-card grid gap-2">
+        <label for="txtKeyword">Từ khoá</label>
+        <div class="flex flex-col gap-3 sm:flex-row sm:items-center">
+          <input type="text" id="txtKeyword" name="txtKeyword" value="${fn:escapeXml(keywordValue)}" maxlength="100" placeholder="Nhập tên loại tài sản thế chấp…" aria-describedby="txtKeyword-hint" class="h-11 min-w-0 flex-1 rounded-paper border border-input bg-paper px-3 text-ink">
+          <button type="submit" id="btnSearch" name="btnSearch" class="tt-btn tt-btn--primary"><svg aria-hidden="true" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg><span>Tìm</span></button>
+        </div>
+        <p id="txtKeyword-hint" class="m-0 text-sm text-ink-soft">Tìm theo tên loại tài sản, rồi bấm tên trong bảng để thêm một khoản cọc. Cùng một loại có thể thêm nhiều lần.</p>
       </div>
-      <p class="m-0"><a id="lnkAddCollateral" href="${base}/AddCollateralView.jsp" class="inline-block rounded-paper border border-ink-soft bg-paper px-4 py-2 text-ink shadow-paper">Thêm loại tài sản mới</a></p>
+      <div class="flex flex-col gap-3">
+        <div class="overflow-x-auto">
+          <table id="tblCollateral" class="tt-ledger-table">
+            <caption class="tt-ledger-table__caption">Danh sách loại tài sản thế chấp</caption>
+            <thead>
+              <tr><th scope="col">Tên loại tài sản</th><th scope="col">Mô tả</th></tr>
+            </thead>
+            <tbody>
+              <c:forEach var="collateral" items="${collateralList}">
+                <tr>
+                  <td><button type="submit" name="lnkChooseCollateral" value="${collateral.id}" class="cursor-pointer border-0 bg-transparent p-0 text-left text-pen-blue underline underline-offset-[3px]"><c:out value="${collateral.name}"/></button></td>
+                  <td><c:out value="${collateral.description}"/></td>
+                </tr>
+              </c:forEach>
+            </tbody>
+          </table>
+        </div>
+        <c:if test="${empty collateralList}"><p class="m-0 border border-dashed border-ink-soft bg-paper-deep px-4 py-3 text-ink">Chưa có loại tài sản nào trong bảng. Nhập từ khoá ở ô trên rồi bấm Tìm.</p></c:if>
+        <p class="m-0 flex flex-wrap items-center gap-3 text-ink-soft">Không thấy loại phù hợp? <a id="lnkAddCollateral" href="${base}/AddCollateralView.jsp" class="tt-btn tt-btn--ghost tt-btn--sm"><svg aria-hidden="true" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14"/><path d="M5 12h14"/></svg><span>Thêm loại tài sản mới</span></a></p>
+      </div>
       <div data-island-fallback="CollateralDrawer">
       <div class="overflow-x-auto">
         <table id="tblRentalCollateral" class="tt-ledger-table">
@@ -249,21 +266,22 @@
               <tr>
                 <td class="font-num text-right">${row.index}</td>
                 <td><c:out value="${row.name}"/></td>
-                <td><input type="text" name="txtCollateralValue" value="${fn:escapeXml(row.value)}" maxlength="100" placeholder="nhập giá trị" aria-label="Giá trị khoản cọc ${row.index}" class="h-9 w-full min-w-0 rounded-paper border border-input bg-paper px-3 py-1 font-num text-ink aria-invalid:border-destructive"${row.valueInvalid ? ' aria-invalid="true"' : ''}></td>
-                <td><input type="text" name="txtCollateralNote" value="${fn:escapeXml(row.note)}" maxlength="255" placeholder="nhập ghi chú" aria-label="Ghi chú khoản cọc ${row.index}" class="h-9 w-full min-w-0 rounded-paper border border-input bg-paper px-3 py-1 text-ink aria-invalid:border-destructive"${row.noteInvalid ? ' aria-invalid="true"' : ''}></td>
-                <td><button type="submit" name="lnkDeleteRentalCollateral" value="${row.index}" class="rounded-paper border border-ink-soft bg-paper px-2 py-1 text-sm text-ink">Xoá</button></td>
+                <td><input type="text" name="txtCollateralValue" value="${fn:escapeXml(row.value)}" maxlength="100" placeholder="nhập giá trị" aria-label="Giá trị khoản cọc ${row.index}" class="h-11 w-full min-w-0 rounded-paper border border-input bg-paper px-3 font-num text-ink aria-invalid:border-destructive"${row.valueInvalid ? ' aria-invalid="true"' : ''}></td>
+                <td><input type="text" name="txtCollateralNote" value="${fn:escapeXml(row.note)}" maxlength="255" placeholder="nhập ghi chú" aria-label="Ghi chú khoản cọc ${row.index}" class="h-11 w-full min-w-0 rounded-paper border border-input bg-paper px-3 text-ink aria-invalid:border-destructive"${row.noteInvalid ? ' aria-invalid="true"' : ''}></td>
+                <td><button type="submit" name="lnkDeleteRentalCollateral" value="${row.index}" class="tt-btn tt-btn--ghost tt-btn--sm">Xoá</button></td>
               </tr>
             </c:forEach>
           </tbody>
         </table>
       </div>
-      <p class="m-0 mt-6 flex flex-wrap gap-4">
-        <button type="submit" id="btnSave" name="btnSave" class="rounded-paper bg-primary px-4 py-2 text-primary-foreground shadow-paper">Lưu</button>
+      <c:if test="${empty rows}"><p class="m-0 mt-3 border border-dashed border-ink-soft bg-paper-deep px-4 py-3 text-ink">Chưa có khoản cọc nào. Tìm loại tài sản ở trên rồi bấm tên để thêm; mỗi khoản cần có giá trị.</p></c:if>
+      <p class="m-0 mt-6 flex flex-wrap gap-3 border-t border-dashed border-ink-soft pt-4">
+        <button type="submit" id="btnSave" name="btnSave" class="tt-btn tt-btn--primary"><svg aria-hidden="true" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg><span>Lưu</span></button>
         <a id="lnkBack" href="${base}/ProcessRentalBillView.jsp" data-island-slot="CollateralDrawer:back" class="rounded-paper border border-ink-soft bg-paper px-4 py-2 text-ink shadow-paper">Quay lại</a>
       </p>
       </div>
       <div data-island="CollateralDrawer" data-props="collateral-drawer-props"></div>
       <script type="application/json" id="collateral-drawer-props">${drawerPropsJson}</script>
     </form>
-  </section>
+  </div>
 </t:layout>

@@ -120,7 +120,19 @@
     pageContext.setAttribute("totalMoney", Display.money(subtotal - bill.getDiscount()));
 %>
 <t:layout title="Xác nhận phiếu mượn">
-  <h1>Xác nhận phiếu mượn</h1>
+  <div class="flex flex-col gap-6">
+  <header class="flex flex-col gap-2 border-b border-dashed border-ink-soft pb-4">
+    <nav aria-label="Đường dẫn" class="text-sm text-ink-soft">
+      <ol class="m-0 flex list-none flex-wrap items-center gap-x-2 gap-y-1 p-0">
+        <li><a href="${pageContext.request.contextPath}/nhan-vien/StaffHomeView.jsp">Trang chủ nhân viên</a></li>
+        <li aria-current="page" class="flex items-center gap-2"><svg aria-hidden="true" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg>Xác nhận phiếu mượn</li>
+      </ol>
+    </nav>
+    <h1 class="m-0">Xác nhận phiếu mượn</h1>
+    <p class="m-0 max-w-3xl text-ink-soft">Phiếu đã lưu và chuyển sang trạng thái Đang cho thuê. Đối chiếu lại với khách rồi bấm In phiếu.</p>
+  </header>
+  <div class="grid gap-6 lg:grid-cols-3 lg:items-start">
+  <div class="lg:col-span-2">
   <ui:ticket title="PHIẾU MƯỢN" code="${billCode}">
     <div class="mb-4 grid gap-x-6 sm:grid-cols-2">
       <dl class="m-0">
@@ -197,9 +209,16 @@
       <p class="m-0">Tổng tiền thuê: <span class="font-num">${totalMoney}</span></p>
     </div>
   </ui:ticket>
-  <form method="post" action="${pageContext.request.contextPath}/nhan-vien/StaffHomeView.jsp" class="mt-6">
-    <t:csrf/>
-    <button type="submit" id="btnPrint" name="btnPrint" value="" data-print
-            class="inline-flex h-10 items-center justify-center rounded-paper bg-primary px-6 text-primary-foreground hover:bg-primary/90">In phiếu</button>
-  </form>
+  </div>
+  <aside aria-labelledby="print-note-h" class="flex flex-col gap-3 border border-dashed border-ink-soft bg-paper-deep px-5 py-4">
+    <h2 id="print-note-h" class="m-0 text-xl">In phiếu cho khách</h2>
+    <p class="m-0 text-sm text-ink-soft">Bản in khổ A5 chỉ gồm phiếu mượn, không có đầu trang hay nút bấm. In xong, trang quay về Trang chủ nhân viên.</p>
+    <form method="post" action="${pageContext.request.contextPath}/nhan-vien/StaffHomeView.jsp">
+      <t:csrf/>
+      <button type="submit" id="btnPrint" name="btnPrint" value="" data-print
+              class="tt-btn tt-btn--primary w-full sm:w-auto"><svg aria-hidden="true" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9V2h12v7"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><path d="M6 14h12v8H6z"/></svg><span>In phiếu</span></button>
+    </form>
+  </aside>
+  </div>
+  </div>
 </t:layout>

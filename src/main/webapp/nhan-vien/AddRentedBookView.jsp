@@ -180,57 +180,76 @@
     pageContext.setAttribute("quantityValue", selfPost ? clean(request.getParameter("txtQuantity")) : "");
 %>
 <t:layout title="Thêm truyện vào phiếu mượn">
-  <section class="mx-auto flex max-w-5xl flex-col gap-6 px-4 py-8">
-    <h1 class="font-sign text-ink">Thêm truyện vào phiếu mượn</h1>
+  <div class="flex flex-col gap-6">
+    <header class="flex flex-col gap-2 border-b border-dashed border-ink-soft pb-4">
+      <nav aria-label="Đường dẫn" class="text-sm text-ink-soft">
+        <ol class="m-0 flex list-none flex-wrap items-center gap-x-2 gap-y-1 p-0">
+          <li><a href="${base}/StaffHomeView.jsp">Trang chủ nhân viên</a></li>
+          <li class="flex items-center gap-2"><svg aria-hidden="true" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg><a href="${base}/SearchRentalBillView.jsp">Tìm phiếu mượn</a></li>
+          <li class="flex items-center gap-2"><svg aria-hidden="true" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg><a href="${base}/ProcessRentalBillView.jsp">Xử lí phiếu mượn</a></li>
+          <li class="flex items-center gap-2"><svg aria-hidden="true" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg><a href="${base}/EditRentedBookListView.jsp">Chỉnh sửa danh sách truyện</a></li>
+          <li aria-current="page" class="flex items-center gap-2"><svg aria-hidden="true" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg>Thêm truyện vào phiếu mượn</li>
+        </ol>
+      </nav>
+      <h1 class="m-0">Thêm truyện vào phiếu mượn</h1>
+      <p class="m-0 max-w-3xl text-ink-soft">Tìm đầu truyện, chọn một dòng trong bảng, nhập số quyển rồi bấm Thêm vào phiếu mượn. Tiệm tự lấy các quyển đang còn trống của đầu truyện đó.</p>
+    </header>
     <c:if test="${not empty pageMessage}"><ui:message-box kind="${messageKind}" text="${pageMessage}"/></c:if>
     <form method="post" action="${base}/AddRentedBookView.jsp" class="flex flex-col gap-6">
       <t:csrf/>
       <input type="hidden" name="rentalBillId" value="${billId}">
-      <p class="m-0 flex flex-wrap items-center gap-4">
-        <label for="txtKeyword" class="sr-only">Từ khoá</label>
-        <input type="text" id="txtKeyword" name="txtKeyword" value="${fn:escapeXml(keywordValue)}" maxlength="100" placeholder="Nhập tên đầu truyện hoặc tên tác giả…" class="h-9 min-w-0 flex-1 rounded-paper border border-input bg-paper px-3 py-1 text-ink">
-        <button type="submit" id="btnSearch" name="btnSearch" class="rounded-paper bg-primary px-4 py-2 text-primary-foreground shadow-paper">Tìm</button>
-      </p>
-      <div class="overflow-x-auto">
-        <table id="tblBook" class="tt-ledger-table">
-          <caption class="tt-ledger-table__caption">Danh sách đầu truyện</caption>
-          <thead>
-            <tr>
-              <th scope="col">Mã đầu truyện</th>
-              <th scope="col">Tên đầu truyện</th>
-              <th scope="col">Tác giả</th>
-              <th scope="col">Thể loại</th>
-              <th scope="col" class="text-right">Giá thuê theo ngày</th>
-              <th scope="col" class="text-right">Số lượng hiện có</th>
-            </tr>
-          </thead>
-          <tbody>
-            <c:forEach var="row" items="${rows}">
-              <tr>
-                <td class="font-num">${row.code}</td>
-                <td>
-                  <label class="flex items-center gap-2">
-                    <input type="radio" name="lnkChooseBook" id="lnkChooseBook-${row.id}" value="${row.id}"${row.checked ? ' checked' : ''}${bookInvalid ? ' aria-invalid="true"' : ''}>
-                    <span class="text-pen-blue underline"><c:out value="${row.name}"/></span>
-                  </label>
-                </td>
-                <td><c:out value="${row.author}"/></td>
-                <td><c:out value="${row.category}"/></td>
-                <td class="font-num text-right">${row.price}</td>
-                <td class="font-num text-right">${row.available}</td>
-              </tr>
-            </c:forEach>
-          </tbody>
-        </table>
+      <div class="tt-paper-card grid gap-2">
+        <label for="txtKeyword">Từ khoá</label>
+        <div class="flex flex-col gap-3 sm:flex-row sm:items-center">
+          <input type="text" id="txtKeyword" name="txtKeyword" value="${fn:escapeXml(keywordValue)}" maxlength="100" placeholder="Nhập tên đầu truyện hoặc tên tác giả…" aria-describedby="txtKeyword-hint" class="h-11 min-w-0 flex-1 rounded-paper border border-input bg-paper px-3 text-ink">
+          <button type="submit" id="btnSearch" name="btnSearch" class="tt-btn tt-btn--primary"><svg aria-hidden="true" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg><span>Tìm</span></button>
+        </div>
+        <p id="txtKeyword-hint" class="m-0 text-sm text-ink-soft">Tìm theo tên đầu truyện hoặc tên tác giả, gõ một phần tên cũng được.</p>
       </div>
-      <p class="m-0 flex flex-wrap items-center gap-4">
+      <div class="flex flex-col gap-3">
+        <div class="overflow-x-auto">
+          <table id="tblBook" class="tt-ledger-table">
+            <caption class="tt-ledger-table__caption">Danh sách đầu truyện</caption>
+            <thead>
+              <tr>
+                <th scope="col">Mã đầu truyện</th>
+                <th scope="col">Tên đầu truyện</th>
+                <th scope="col">Tác giả</th>
+                <th scope="col">Thể loại</th>
+                <th scope="col" class="text-right">Giá thuê theo ngày</th>
+                <th scope="col" class="text-right">Số lượng hiện có</th>
+              </tr>
+            </thead>
+            <tbody>
+              <c:forEach var="row" items="${rows}">
+                <tr>
+                  <td class="font-num">${row.code}</td>
+                  <td>
+                    <label class="flex cursor-pointer items-center gap-2">
+                      <input type="radio" name="lnkChooseBook" id="lnkChooseBook-${row.id}" value="${row.id}"${row.checked ? ' checked' : ''}${bookInvalid ? ' aria-invalid="true"' : ''} class="size-4 accent-pen-blue">
+                      <span class="text-pen-blue underline"><c:out value="${row.name}"/></span>
+                    </label>
+                  </td>
+                  <td><c:out value="${row.author}"/></td>
+                  <td><c:out value="${row.category}"/></td>
+                  <td class="font-num text-right">${row.price}</td>
+                  <td class="font-num text-right">${row.available}</td>
+                </tr>
+              </c:forEach>
+            </tbody>
+          </table>
+        </div>
+        <c:if test="${empty rows}"><p class="m-0 border border-dashed border-ink-soft bg-paper-deep px-4 py-3 text-ink">Chưa có đầu truyện nào trong bảng. Nhập từ khoá ở ô trên rồi bấm Tìm.</p></c:if>
+      </div>
+      <div class="tt-paper-card grid gap-2 sm:max-w-sm">
         <label for="txtQuantity">Số lượng:</label>
-        <input type="number" id="txtQuantity" name="txtQuantity" value="${fn:escapeXml(quantityValue)}" class="h-9 w-32 rounded-paper border border-input bg-paper px-3 py-1 font-num text-ink aria-invalid:border-destructive"${quantityInvalid ? ' aria-invalid="true"' : ''}>
-      </p>
-      <p class="m-0 flex flex-wrap gap-4">
-        <button type="submit" id="btnAddToRentalBill" name="btnAddToRentalBill" class="rounded-paper bg-primary px-4 py-2 text-primary-foreground shadow-paper">Thêm vào phiếu mượn</button>
-        <a id="lnkBack" href="${base}/EditRentedBookListView.jsp" class="rounded-paper border border-ink-soft bg-paper px-4 py-2 text-ink shadow-paper">Quay lại</a>
-      </p>
+        <input type="number" id="txtQuantity" name="txtQuantity" value="${fn:escapeXml(quantityValue)}" aria-describedby="txtQuantity-hint" class="h-11 w-32 rounded-paper border border-input bg-paper px-3 font-num text-ink aria-invalid:border-destructive"${quantityInvalid ? ' aria-invalid="true"' : ''}>
+        <p id="txtQuantity-hint" class="m-0 text-sm text-ink-soft">Số nguyên từ 1 trở lên, không quá số quyển còn trống chưa có trong phiếu.</p>
+      </div>
+      <div class="flex flex-wrap gap-3 border-t border-dashed border-ink-soft pt-4">
+        <button type="submit" id="btnAddToRentalBill" name="btnAddToRentalBill" class="tt-btn tt-btn--primary"><svg aria-hidden="true" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14"/><path d="M5 12h14"/></svg><span>Thêm vào phiếu mượn</span></button>
+        <a id="lnkBack" href="${base}/EditRentedBookListView.jsp" class="tt-btn tt-btn--ghost"><svg aria-hidden="true" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5"/><path d="m12 19-7-7 7-7"/></svg><span>Quay lại</span></a>
+      </div>
     </form>
-  </section>
+  </div>
 </t:layout>
