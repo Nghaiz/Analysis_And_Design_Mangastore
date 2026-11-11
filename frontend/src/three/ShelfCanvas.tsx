@@ -1,8 +1,12 @@
 import { Canvas, type RootState } from '@react-three/fiber'
-import { useCallback, useEffect, useMemo, useState } from 'react'
-import { frameCamera, layoutShelf } from './shelf-layout'
+import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState, type RefObject } from 'react'
+import { COMPACT_MAX_WIDTH_PX, frameCamera, layoutShelf } from './shelf-layout'
 import { ShelfStage } from './ShelfStage'
+import { installClockWarningFilter } from './silence-clock-warning'
 import { loadTypeFace } from './textures'
+
+// Phải chạy trước khi <Canvas> tạo THREE.Clock (xem silence-clock-warning.ts: lí do và điều kiện gỡ).
+installClockWarningFilter()
 
 // Chunk lười của ShelfScene: chỉ src/islands/ShelfScene/index.tsx import file này, bằng import động.
 // three và @react-three/fiber vào bundle qua đây, không lọt vào chunk entry.
@@ -20,13 +24,33 @@ export interface ShelfCanvasProps {
 /** Tối đa 1,75 điểm ảnh thiết bị cho mỗi điểm ảnh CSS: nét đủ trên màn hình dày điểm, đỡ GPU điện thoại. */
 const DPR_RANGE: [number, number] = [1, 1.75]
 
+/** Khung hẹp (điện thoại) theo chiều rộng thật của kệ trên trang, cập nhật khi xoay máy hay đổi cỡ. */
+function useCompactFrame(): [RefObject<HTMLDivElement | null>, boolean | null] {
+  const ref = useRef<HTMLDivElement>(null)
+  const [compact, setCompact] = useState<boolean | null>(null)
+  useLayoutEffect(() => {
+    const element = ref.current
+    if (!element) return
+    const update = (width: number): void => setCompact(width < COMPACT_MAX_WIDTH_PX)
+    update(element.getBoundingClientRect().width)
+    const observer = new ResizeObserver((entries) => {
+      const entry = entries[0]
+      if (entry) update(entry.contentRect.width)
+    })
+    observer.observe(element)
+    return () => observer.disconnect()
+  }, [])
+  return [ref, compact]
+}
+
 export default function ShelfCanvas({ categories, onReady, onPick, onContextLost }: ShelfCanvasProps) {
+  const [wrapper, compact] = useCompactFrame()
   const [fontFamily, setFontFamily] = useState<string | null>(null)
   const [ready, setReady] = useState(false)
   const [hovered, setHovered] = useState<number | null>(null)
   const [focused, setFocused] = useState<number | null>(null)
   const [pulling, setPulling] = useState<number | null>(null)
-  const layout = useMemo(() => layoutShelf(categories.length), [categories.length])
+  const layout = useMemo(() => layoutShelf(categories.length, { compact: compact === true }), [categories.length, compact])
   const camera = useMemo(() => frameCamera(layout), [layout])
 
   useEffect(() => {
@@ -49,15 +73,13 @@ export default function ShelfCanvas({ categories, onReady, onPick, onContextLost
   }, [])
 
   const handleCreated = useCallback(
-    ({ gl }: RootState) => {
-      gl.domElement.addEventListener('webglcontextlost', onContextLost, { once: true })
-      requestAnimationFrame(() => {
-        setReady(true)
-        onReady()
-      })
-    },
-    [onContextLost, onReady],
+    ({ gl }: RootState) => gl.domElement.addEventListener('webglcontextlost', onContextLost, { once: true }),
+    [onContextLost],
   )
+  const handleFirstFrame = useCallback(() => {
+    setReady(true)
+    onReady()
+  }, [onReady])
 
   const pick = (index: number): void => setPulling((current) => current ?? index)
   const handleHover = useCallback((index: number, isOver: boolean) => {
@@ -68,12 +90,14 @@ export default function ShelfCanvas({ categories, onReady, onPick, onContextLost
 
   return (
     <div
+      ref={wrapper}
       className={`absolute inset-0 has-[button:focus-visible]:outline-2 has-[button:focus-visible]:-outline-offset-4 has-[button:focus-visible]:outline-pen-blue ${hovered === null ? '' : 'cursor-pointer'}`}
     >
       <div aria-hidden="true" className="absolute inset-0">
-        {fontFamily !== null && (
+        {fontFamily !== null && compact !== null && (
           <Canvas
             frameloop="demand"
+            flat
             dpr={DPR_RANGE}
             camera={camera}
             gl={{ antialias: true, powerPreference: 'low-power' }}
@@ -81,6 +105,7 @@ export default function ShelfCanvas({ categories, onReady, onPick, onContextLost
           >
             <ShelfStage
               layout={layout}
+              camera={camera}
               categories={categories}
               fontFamily={fontFamily}
               active={active}
@@ -88,6 +113,7 @@ export default function ShelfCanvas({ categories, onReady, onPick, onContextLost
               onHover={handleHover}
               onPick={pick}
               onPulled={onPick}
+              onFirstFrame={handleFirstFrame}
             />
           </Canvas>
         )}

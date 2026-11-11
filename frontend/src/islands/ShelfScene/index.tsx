@@ -50,7 +50,9 @@ export default function ShelfScene(rawProps: IslandProps) {
       />
       {show3d && (
         <div
-          className={`absolute inset-0 transition-opacity duration-500 ${live ? 'opacity-100' : 'pointer-events-none opacity-0'}`}
+          // Chuyển mờ ngắn từ ảnh tĩnh sang canvas, chỉ sau khi canvas đã vẽ khung đầu (stage 'live').
+          // Giảm chuyển động thì không có cảnh 3D; `motion-reduce:transition-none` giữ luật đó cả ở tầng CSS.
+          className={`absolute inset-0 transition-opacity duration-300 ease-out motion-reduce:transition-none ${live ? 'opacity-100' : 'pointer-events-none opacity-0'}`}
         >
           <SceneBoundary onError={handleSceneError}>
             <Suspense fallback={null}>

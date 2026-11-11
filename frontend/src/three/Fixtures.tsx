@@ -1,6 +1,6 @@
 import { useFrame } from '@react-three/fiber'
 import { useRef } from 'react'
-import { DoubleSide, type Group, type Texture } from 'three'
+import { BackSide, FrontSide, type Group, type Texture } from 'three'
 import {
   BOARD_THICKNESS,
   CASE_DEPTH,
@@ -14,13 +14,19 @@ import {
 
 // Đồ đạc của tiệm: tủ gỗ, bóng đèn vàng chao men xanh, quạt trần cánh gỗ quay chậm. Tự dựng bằng hình khối.
 
+/** `--color-lamp`: màu ánh đèn và quầng sáng quanh bóng. */
 const LAMP_LIGHT = '#F6C453'
-const BULB_GLOW = '#FFE8A3'
+/** Lõi bóng đèn: vàng sáng hơn `--color-lamp` một chút, không ngả trắng xanh. */
+const BULB_CORE = '#FFD66E'
 const ENAMEL_GREEN = '#2A6334'
+/** Lòng chao đèn tráng men kem: hắt ánh vàng xuống, thay cho lòng xanh lá lần trước. */
+const ENAMEL_INSIDE = '#F3E6C8'
 const BACK_PANEL_TINT = '#8A6A50'
 const FAN_METAL = '#D9CDB0'
 const FAN_BLADE = '#7A5634'
 const CORD = '#2B2118'
+/** Cường độ (candela) của bóng đèn; three 0.187 tính ánh sáng theo đơn vị vật lí, suy giảm theo bình phương. */
+const LAMP_CANDELA = 7
 /** Quạt quay chậm: khoảng 8 vòng một phút. */
 const FAN_RADIANS_PER_SECOND = 0.85
 const MAX_DELTA = 1 / 10
@@ -61,13 +67,21 @@ export function Lamp({ position }: { position: [number, number, number] }) {
       </mesh>
       <mesh position={[0, 0.12, 0]}>
         <coneGeometry args={[0.34, 0.26, 28, 1, true]} />
-        <meshStandardMaterial color={ENAMEL_GREEN} metalness={0.3} roughness={0.45} side={DoubleSide} />
+        <meshStandardMaterial color={ENAMEL_GREEN} metalness={0.3} roughness={0.45} side={FrontSide} />
+      </mesh>
+      <mesh position={[0, 0.12, 0]}>
+        <coneGeometry args={[0.335, 0.255, 28, 1, true]} />
+        <meshStandardMaterial color={ENAMEL_INSIDE} emissive={LAMP_LIGHT} emissiveIntensity={0.35} side={BackSide} />
       </mesh>
       <mesh>
         <sphereGeometry args={[0.09, 20, 14]} />
-        <meshBasicMaterial color={BULB_GLOW} toneMapped={false} />
+        <meshBasicMaterial color={BULB_CORE} toneMapped={false} />
       </mesh>
-      <pointLight color={LAMP_LIGHT} intensity={16} decay={2} />
+      <mesh>
+        <sphereGeometry args={[0.2, 20, 14]} />
+        <meshBasicMaterial color={LAMP_LIGHT} transparent opacity={0.28} depthWrite={false} toneMapped={false} />
+      </mesh>
+      <pointLight color={LAMP_LIGHT} intensity={LAMP_CANDELA} decay={2} />
     </group>
   )
 }
