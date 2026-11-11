@@ -21,7 +21,7 @@ Hợp đồng: `docs/contracts.md` (trang, field, session, DAO, props `ProcessBi
 - [x] **7.4 Lane 7D `quan-tri`** xếp hàng, mở khi có chỗ trống. (mở 11/11/2026 sau khi 7C xong)
 - [x] **7.5 Orchestrator:** merge 7A, 7B, 7C; chạy nền compose e2e; mở **7.6 Lane 7E `xac-minh-m3`**. (11/11/2026: stack riêng `tiemtruyen-7e` 8087 vì phase 6 giữ e2e; `flow-m3.mjs` PASS sau khi sửa codec session Redisson fdaf8b6; 7.6 mở; 7.6 xong: `plans/reports/phase-07-xac-minh-m3-261111-1203.md`, L1/L2 sửa ở 33afcba)
 - [x] **7.7 Orchestrator:** merge 7D; mở **7.8 Lane 7F `xac-minh-quan-tri`**. (11/11/2026: probe HTTP `plans/reports/phase-07-quan-tri-probe.mjs` ALL PASS trên 8087; 7E và 7F gộp một agent chạy lần lượt vì trình duyệt Playwright MCP dùng chung; 7.8 xong, 0 lỗi: `plans/reports/phase-07-xac-minh-quan-tri-261111-1220.md`)
-- [ ] **7.9 Orchestrator:** `tiem-contract-guard` trên diff của phase; chạy Accept, đánh dấu, push nhánh phase, mở PR vào `main` và merge bằng merge commit (`contract.md` §9).
+- [x] **7.9 Orchestrator:** `tiem-contract-guard` trên diff của phase; chạy Accept, đánh dấu, push nhánh phase, mở PR vào `main` và merge bằng merge commit (`contract.md` §9). (11/11/2026: contract-guard 0 vi phạm, `plans/reports/phase-07-contract-guard-261111-1202.md`; Accept ALL PASS 5/5 tại ff75cdf, `plans/reports/accept-phase-07-261111-1228.log`; làm đỏ có chủ đích điều kiện cọc FAIL rồi PASS, `plans/reports/phase-07-lam-do-261111-1229.md`)
 
 ## Lane trong phase
 

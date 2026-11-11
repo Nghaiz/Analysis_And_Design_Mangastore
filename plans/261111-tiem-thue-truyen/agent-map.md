@@ -19,8 +19,6 @@ Nhánh phase: `phase/06-chuc-nang-1-2` (phiên 55, worktree `06-orch`) và `phas
 
 | Lane | Agent | Bắt đầu | Worktree / nhánh | Báo cáo |
 |---|---|---|---|---|
-| 7G `lib` (phiên 93) | `t1k-web-core-developer` | 2026-11-11 | `07-lib` / `lane/07-chuc-nang-3/lib` | |
-| 7H `lam-do` (phiên 93) | `t1k-tester` | 2026-11-11 | `07-lam-do` / `lane/07-chuc-nang-3/lam-do`, stack `tiemtruyen-7r` 8088 | |
 | 7I `in-a5-6` (phiên 93) | `t1k-web-testing-tester` | 2026-11-11 | 07-orch (chỉ ghi `plans/reports/`), stack `tiemtruyen-7e` 8087 | |
 
 ## Hàng đợi
@@ -121,3 +119,4 @@ Nhánh phase: `phase/06-chuc-nang-1-2` (phiên 55, worktree `06-orch`) và `phas
 | 2026-11-11 | 6H xong; bảng 390 break-word (79e1412); kiểm lại 8080: smoke ALL PASS, nút OK, bảng 390, console sạch. Phase 6 đóng: push nhánh phase, PR vào main |
 | 2026-11-11 | Phase 7: 7A, 7B, 7D xong (Docker treo nên chưa verify, chưa chạy HTTP); merge filter thật 6A 038d316 vào phase 7 (0cef444). Từ khoá > 100 kí tự ở 4 trang M3 đổi sang INPUT_TOO_LONG cho khớp §10.3 (9448e88). Quyết định cho 7D: nháp `book` id 0 trong session, `listBook = [đầu truyện vừa lưu]` sau doAddBook, `txtPublisher` không bắt buộc, số quyển 0 nhận ở AddBook. Stack 7e (8087) dựng sau khi phiên 55 báo "verify xong" |
 | 2026-11-11 | Phase 7: Docker VM nâng lên 12,5 GB/8 CPU (chủ dự án duyệt, phiên 55 làm). Smoke M3 PASS, probe D6 ALL PASS, verify 400 test, frontend 186 test. Sửa: codec session Redisson Kryo5 → SerializationCodec + test codec runtime (fdaf8b6, 500 khi session có listBook), từ khoá > 100 kí tự (9448e88), lưu danh sách quyển xoá ghi chú khách (5dade05, contract-guard), in A5 tràn trang và tiêu đề cột vỡ (33afcba, 7E). contract-guard 0 vi phạm. 7E, 7F gộp một agent vì trình duyệt MCP dùng chung |
+| 2026-11-11 | Phase 7: phase 6 vào main (PR #10); merge origin/main. 7G gộp helper island SelectedStack vào `frontend/src/lib` (196 test). 7H làm đỏ có chủ đích điều kiện cọc: FAIL rồi PASS. Accept bước 2 sửa reporter Vitest (75d3edd). Accept phase 7 ALL PASS 5/5 (ff75cdf). 7I đo phiếu 6 đầu truyện A5 đang chạy |
