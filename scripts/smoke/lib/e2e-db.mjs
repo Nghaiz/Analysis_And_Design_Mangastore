@@ -18,7 +18,9 @@ export class MissingStackError extends Error {}
 /** Chạy SQL (qua stdin) bằng mysql trong container db của stack E2E; trả stdout dạng TSV không tiêu đề. */
 export function sql(statements) {
   const args = ['compose', '-p', PROJECT, '-f', 'compose.yaml', '-f', 'compose.e2e.yaml', 'exec', '-T', 'db', 'sh', '-c',
-    'mysql --default-character-set=utf8mb4 -N -B -uroot -p"$MYSQL_ROOT_PASSWORD" tiemtruyen 2>&1 | grep -v "Using a password"'];
+    // MYSQL_PWD: không có cảnh báo "Using a password" nên khỏi lọc bằng grep (grep -v thoát 1 khi câu SQL không in gì,
+    // vd DELETE/INSERT), giữ nguyên exit code thật của mysql.
+    'MYSQL_PWD="$MYSQL_ROOT_PASSWORD" mysql --default-character-set=utf8mb4 -N -B -uroot tiemtruyen 2>&1'];
   const r = spawnSync('docker', args, { cwd: ROOT, input: statements, encoding: 'utf8', timeout: 60_000 });
   if (r.error?.code === 'ENOENT') throw new MissingStackError('không có lệnh docker → cài Docker Desktop');
   const out = `${r.stdout ?? ''}${r.stderr ?? ''}`;
