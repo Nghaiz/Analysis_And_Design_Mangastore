@@ -12,7 +12,13 @@ const runner = createRunner('phase-07');
 const { step } = runner;
 
 const NPM = IS_WIN ? 'npm.cmd' : 'npm';
-const PROJECT = 'tiemtruyen-e2e';
+// Mặc định stack E2E chung; SMOKE_COMPOSE_PROJECT (kèm NGINX_HTTP_PORT, DB_HOST_PORT, APP_IMAGE_TAG, SMOKE_BASE_URL)
+// cho chạy trên stack riêng khi phiên khác giữ tiemtruyen-e2e. lib/e2e-db.mjs từ chối project tiemtruyen.
+const PROJECT = process.env.SMOKE_COMPOSE_PROJECT ?? 'tiemtruyen-e2e';
+if (PROJECT === 'tiemtruyen') {
+  console.log('[accept] FAIL SMOKE_COMPOSE_PROJECT=tiemtruyen là dữ liệu thường → dùng tiemtruyen-e2e hoặc stack riêng');
+  process.exit(2);
+}
 const COMPOSE = ['compose', '-p', PROJECT, '-f', 'compose.yaml', '-f', 'compose.e2e.yaml'];
 const BASE_URL = process.env.SMOKE_BASE_URL ?? 'http://127.0.0.1:8080';
 const ISLANDS = ['ProcessBillDesk', 'CollateralDrawer'];
