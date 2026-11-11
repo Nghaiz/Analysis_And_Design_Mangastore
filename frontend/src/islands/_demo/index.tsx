@@ -19,10 +19,10 @@ import { RENTAL_STATUS } from '@/lib/rental-status'
 import { DEMO } from './sample'
 
 const FONT_SAMPLES = [
-  { className: 'font-body', label: 'Be Vietnam Pro' },
-  { className: 'font-type', label: 'Xanh Mono' },
-  { className: 'font-pen', label: 'Patrick Hand' },
-  { className: 'font-sign', label: 'Fraunces' },
+  { className: 'font-body', label: 'Fuzzy Bubbles' },
+  { className: 'font-type', label: 'Momo Trust Sans' },
+  { className: 'font-pen', label: 'Momo Signature' },
+  { className: 'font-sign', label: 'Momo Trust Display' },
 ] as const
 
 export default function DemoStyleGuide() {

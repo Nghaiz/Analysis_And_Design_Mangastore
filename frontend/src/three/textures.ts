@@ -2,7 +2,10 @@ import { CanvasTexture, RepeatWrapping, SRGBColorSpace } from 'three'
 import type { SpinePattern } from './shelf-layout'
 
 // Gáy truyện và vân gỗ vẽ tay bằng canvas 2D (không ảnh ngoài, không bìa crawl, không chữ của NXB).
-// Chữ nhãn vẽ bằng font của token `--font-type` đã nạp trên trang, nên tiếng Việt có dấu đầy đủ.
+// Chữ nhãn vẽ bằng font của token `--font-type` (Momo Trust Sans) đã nạp trên trang, nên tiếng Việt có
+// dấu đầy đủ. Chọn `--font-type` thay vì `--font-body`: nhãn giấy trên gáy là chữ "đánh máy" của tiệm
+// (cùng vai với số phiếu, mã vạch), Momo Trust Sans đã preload nên không tải thêm file, và nét sans gọn
+// đọc rõ hơn nét bong bóng của Fuzzy Bubbles khi chữ thu nhỏ còn 18px và nhìn nghiêng trên kệ 3D.
 
 const PAPER = '#F3E6C8'
 const INK = '#2B2118'
@@ -12,8 +15,8 @@ const LABEL_MAX_PX = 300
 const LABEL_MIN_FONT_PX = 18
 const LABEL_START_FONT_PX = 40
 
-/** Họ font khi trang chưa khai `--font-type` (cùng font Xanh Mono, chỉ thêm dự phòng của hệ thống). */
-const TYPE_FACE_STACK = '"Xanh Mono", ui-monospace, monospace'
+/** Họ font khi trang chưa khai `--font-type` (cùng font Momo Trust Sans, chỉ thêm dự phòng của hệ thống). */
+const TYPE_FACE_STACK = '"Momo Trust Sans", system-ui, sans-serif'
 
 function context2d(canvas: HTMLCanvasElement): CanvasRenderingContext2D {
   const ctx = canvas.getContext('2d')

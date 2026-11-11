@@ -1,6 +1,6 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="96" height="96" viewBox="0 0 96 96">
   <!-- Biểu trưng tiệm tự vẽ: mái hiên sọc, chồng truyện tự vẽ (gáy trơn, không bìa thật, không nhân vật, không logo NXB),
-       con dấu đỏ. Không chứa chữ: tên tiệm in bằng HTML (font Fraunces) cạnh ảnh này, nên ảnh dùng alt="". -->
+       con dấu đỏ. Không chứa chữ: tên tiệm in bằng HTML (font Momo Trust Display) cạnh ảnh này, nên ảnh dùng alt="". -->
   <rect x="4" y="4" width="88" height="88" fill="#F3E6C8" stroke="#6B4226" stroke-width="3"/>
   <!-- mái hiên sọc -->
   <path d="M10 14h76v14H10z" fill="#E9DDB0"/>
