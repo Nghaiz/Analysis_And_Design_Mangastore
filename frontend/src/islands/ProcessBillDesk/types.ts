@@ -1,5 +1,5 @@
 // docs/contracts.md §11.2, đúng từng trường. Props id trên trang: `process-bill-props`.
-import { propsReader, type RawProps } from './props-guard'
+import { propsReader, type RawProps } from '@/lib/props-guard'
 
 export interface ProcessBillDeskProps {
   /** "PM0125" */

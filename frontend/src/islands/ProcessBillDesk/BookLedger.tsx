@@ -6,7 +6,7 @@ import { LedgerTable } from '@/components/nostalgia/LedgerTable'
 import { Button } from '@/components/ui/button'
 import { formatMoney } from '@/lib/format'
 import { cn } from '@/lib/utils'
-import { entranceClasses } from './motion'
+import { entranceClasses } from '@/lib/motion'
 import type { BillDeskBookRow } from './types'
 
 export interface BookLedgerProps {

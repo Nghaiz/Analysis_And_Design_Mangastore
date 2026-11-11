@@ -2,7 +2,7 @@ import { cleanup, fireEvent, render, screen, waitFor, within } from '@testing-li
 import userEvent from '@testing-library/user-event'
 import { afterEach, beforeEach, describe, expect, it, vi, type MockInstance } from 'vitest'
 import ProcessBillDesk from './index'
-import { hideServerFallback } from './server-html'
+import { hideServerFallback } from '@/lib/server-html'
 import { parseProcessBillDeskProps, type ProcessBillDeskProps } from './types'
 
 // Props đúng kịch bản ch.2 mục 2.3 (PM0125: hai quyển 3.000đ/ngày, 7 ngày, tổng 42.000đ).

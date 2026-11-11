@@ -5,7 +5,7 @@
 // - phần tử JSP đánh dấu `data-island-slot="<Tên island>:<chỗ>"` (nút điều hướng, ô island không
 //   đụng tới) được chuyển vào đúng chỗ trong island để giữ thứ tự thành phần của §9, rồi trả về
 //   chỗ cũ khi island gỡ ra (loader gỡ island khi nó hỏng: HTML gốc về nguyên vẹn).
-// Dùng chung cho ProcessBillDesk và CollateralDrawer (đề xuất chuyển sang frontend/src/hooks/).
+// Dùng chung cho ProcessBillDesk và CollateralDrawer (frontend/src/lib/).
 import { useLayoutEffect, type RefObject } from 'react'
 import { enclosingForm } from '@/hooks/useFormBridge'
 

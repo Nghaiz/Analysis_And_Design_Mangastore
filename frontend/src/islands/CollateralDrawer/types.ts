@@ -1,5 +1,5 @@
 // docs/contracts.md §11.3, đúng từng trường. Props id trên trang: `collateral-drawer-props`.
-import { propsReader, type RawProps } from '../ProcessBillDesk/props-guard'
+import { propsReader, type RawProps } from '@/lib/props-guard'
 
 export interface CollateralDrawerProps {
   /** Thứ tự = listRentalCollateral. */
