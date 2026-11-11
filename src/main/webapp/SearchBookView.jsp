@@ -264,9 +264,12 @@
       <div data-island="SelectedStack" data-props="selected-stack-props"></div>
       <script type="application/json" id="selected-stack-props">${selectedStackJson}</script>
     </ui:paper-card>
-    <div class="mt-6 flex justify-center">
-      <button type="submit" name="btnCreateRentalBill" id="btnCreateRentalBill"
-              class="rounded-paper border-2 border-ink bg-paper-deep px-6 py-2 font-type text-ink shadow-paper hover:bg-tape focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-pen-blue">Tạo phiếu mượn</button>
+    <%-- Bọc ngoài, không lớp hiển thị: island gắn thì đặt hidden lên phần tử này (§11), lớp flex không đè được. --%>
+    <div id="createRentalBillFallback" data-island-fallback="SelectedStack">
+      <div class="mt-6 flex justify-center">
+        <button type="submit" name="btnCreateRentalBill" id="btnCreateRentalBill"
+                class="rounded-paper border-2 border-ink bg-paper-deep px-6 py-2 font-type text-ink shadow-paper hover:bg-tape focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-pen-blue">Tạo phiếu mượn</button>
+      </div>
     </div>
   </form>
 </t:layout>
