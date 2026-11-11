@@ -1,26 +1,8 @@
-// Chuyển động của chồng truyện. Giảm chuyển động (prefers-reduced-motion) thì không có hoạt cảnh:
-// không lớp transition, không xê dịch; chỉ còn đổi trạng thái (mờ dòng đang xoá). Lớp `motion-safe:`
-// giữ cùng luật ở tầng CSS. Tên lớp viết nguyên chuỗi để Tailwind quét được.
-import { useEffect, useState } from 'react'
-
-const TRANSITION = 'motion-safe:transition motion-safe:duration-300 motion-safe:ease-out'
-
-export type MotionMode = 'reduced' | 'full'
-
-export function motionMode(reducedMotion: boolean): MotionMode {
-  return reducedMotion ? 'reduced' : 'full'
-}
-
-/** true khi chồng đã ở trạng thái cuối: ngay khi giảm chuyển động, sau một khung hình nếu không. */
-export function useEntered(reducedMotion: boolean): boolean {
-  const [entered, setEntered] = useState(false)
-  useEffect(() => {
-    if (reducedMotion) return
-    const frame = requestAnimationFrame(() => setEntered(true))
-    return () => cancelAnimationFrame(frame)
-  }, [reducedMotion])
-  return reducedMotion || entered
-}
+// Chuyển động riêng của chồng truyện: lớp từng gáy (lệch so le, rút ra khi tích, trượt đi khi xoá).
+// Phần chung (chế độ `data-motion`, hook "đã vào", chuỗi lớp transition) ở `@/lib/motion`. Giảm
+// chuyển động thì không có hoạt cảnh: không lớp transition, không xê dịch; chỉ còn đổi trạng thái
+// (mờ dòng đang xoá). Tên lớp viết nguyên chuỗi để Tailwind quét được.
+import { ENTRANCE_TRANSITION, type MotionMode } from '@/lib/motion'
 
 export interface SpineState {
   index: number
@@ -40,5 +22,5 @@ export function spineClasses(mode: MotionMode, state: SpineState): string {
         ? 'translate-x-0.5'
         : '-translate-x-0.5'
   const drop = state.entered ? '' : '-translate-y-2 opacity-0'
-  return [TRANSITION, shift, drop].filter(Boolean).join(' ')
+  return [ENTRANCE_TRANSITION, shift, drop].filter(Boolean).join(' ')
 }

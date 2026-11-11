@@ -217,6 +217,7 @@ describe('SelectedStack props and server HTML', () => {
     [{ rows: [{ ...props.rows[0], quantity: 0 }], focusBookId: null }, 'props.rows[0].quantity must be an integer >= 1'],
     [{ rows: [{ ...props.rows[0], checked: 'yes' }], focusBookId: null }, 'props.rows[0].checked must be a boolean'],
     [{ rows: [{ ...props.rows[0], name: ' ' }], focusBookId: null }, 'props.rows[0].name must be a non-empty string'],
+    [{ rows: [{ ...props.rows[0], author: null }], focusBookId: null }, 'props.rows[0].author must be a string'],
     [{ rows: [props.rows[0], props.rows[0]], focusBookId: null }, 'props.rows[1].bookId repeats 1'],
     [{ rows: [] }, 'props.focusBookId must be an integer >= 1'],
   ])('rejects bad props and names the field (%#)', (raw, message) => {
@@ -227,6 +228,20 @@ describe('SelectedStack props and server HTML', () => {
     real('button[name="lnkDeleteSelectedBook"][value="20"]').remove()
     vi.spyOn(console, 'error').mockImplementation(() => {})
     expect(() => mount()).toThrow('lnkDeleteSelectedBook')
+  })
+
+  it('accepts an empty author (the island drops the " · author" part)', () => {
+    const parsed = parseSelectedStackProps({ rows: [{ ...props.rows[0], author: '' }], focusBookId: null })
+    expect(parsed.rows[0]?.author).toBe('')
+  })
+
+  it('keeps its own message when the mount point sits inside the fallback twin', () => {
+    real('#fallback').appendChild(real('#mount'))
+    vi.spyOn(console, 'error').mockImplementation(() => {})
+    expect(() => mount()).toThrow(
+      '[SelectedStack] An element marked data-island-fallback="SelectedStack" contains the island itself; mark only the server-rendered twin.',
+    )
+    expect(real<HTMLElement>('#fallback').hidden).toBe(false)
   })
 })
 

@@ -5,7 +5,7 @@
 // - phần tử JSP đánh dấu `data-island-slot="<Tên island>:<chỗ>"` (nút điều hướng, ô island không
 //   đụng tới) được chuyển vào đúng chỗ trong island để giữ thứ tự thành phần của §9, rồi trả về
 //   chỗ cũ khi island gỡ ra (loader gỡ island khi nó hỏng: HTML gốc về nguyên vẹn).
-// Dùng chung cho ProcessBillDesk và CollateralDrawer (frontend/src/lib/).
+// Dùng chung cho SelectedStack, ProcessBillDesk và CollateralDrawer (frontend/src/lib/).
 import { useLayoutEffect, type RefObject } from 'react'
 import { enclosingForm } from '@/hooks/useFormBridge'
 
@@ -14,15 +14,23 @@ export const SLOT_ATTRIBUTE = 'data-island-slot'
 
 type Undo = () => void
 
-/** Ẩn bản HTML dự phòng của `island` trong `form`; trả hàm hiện lại đúng các phần tử đã ẩn. */
-export function hideServerFallback(form: HTMLFormElement, island: string, anchor: Element): Undo {
+/** Vế cuối của lỗi khi phần tử đánh dấu dự phòng chứa luôn chỗ gắn island. */
+export const FALLBACK_MISUSE_REMEDY = 'mark only the server-rendered twin, never the mount point.'
+
+/**
+ * Ẩn bản HTML dự phòng của `island` trong `form`; trả hàm hiện lại đúng các phần tử đã ẩn.
+ * `remedy` là vế cuối của lỗi đánh dấu sai; SelectedStack giữ câu riêng từ phase 6.
+ */
+export function hideServerFallback(
+  form: HTMLFormElement,
+  island: string,
+  anchor: Element,
+  remedy: string = FALLBACK_MISUSE_REMEDY,
+): Undo {
   const targets = Array.from(form.querySelectorAll<HTMLElement>(`[${FALLBACK_ATTRIBUTE}="${island}"]`))
   for (const target of targets) {
     if (target.contains(anchor)) {
-      throw new Error(
-        `[${island}] An element marked ${FALLBACK_ATTRIBUTE}="${island}" contains the island itself; ` +
-          'mark only the server-rendered twin, never the mount point.',
-      )
+      throw new Error(`[${island}] An element marked ${FALLBACK_ATTRIBUTE}="${island}" contains the island itself; ${remedy}`)
     }
   }
   const hidden = targets.filter((target) => !target.hidden)
