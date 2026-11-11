@@ -27,22 +27,23 @@ Tương phản theo WCAG 2.x, đo trên ba nền `paper` / `paper-deep` / `tape`
 
 ## 2. Font
 
-<!-- updated 261111 (đổi bộ font theo chủ dự án) -->
+<!-- updated 261111 (đổi bộ font theo chủ dự án; thêm --font-num Nunito) -->
 
-Bộ font do chủ dự án chốt ngày 11/11/2026: Fuzzy Bubbles làm font chính, kèm ba font Momo. Cả bốn có subset `vietnamese` (đã kiểm gói npm ngày 11/11/2026), giấy phép OFL-1.1. Tự host bằng Fontsource 5.3.0, chỉ subset latin và vietnamese, không gọi Google Fonts lúc chạy ([ADR-0011](adr/0011-font-tu-host.md)).
+Bộ font do chủ dự án chốt ngày 11/11/2026: Fuzzy Bubbles làm font chính, kèm ba font Momo, cộng Nunito cho chữ số (`--font-num`). Cả năm có subset `vietnamese` (đã kiểm gói npm ngày 11/11/2026), giấy phép OFL-1.1. Tự host bằng Fontsource 5.3.0, chỉ subset latin và vietnamese, không gọi Google Fonts lúc chạy ([ADR-0011](adr/0011-font-tu-host.md)).
 
 | Token | Font | Gói Fontsource 5.3.0 | Độ đậm | Nạp | Dùng cho |
 |---|---|---|---|---|---|
 | `--font-body` | Fuzzy Bubbles | `@fontsource/fuzzy-bubbles` | 400, 700 | preload 400 (latin + vietnamese) | Chữ thân: bảng, form, đoạn văn, nút |
-| `--font-type` | Momo Trust Sans | `@fontsource-variable/momo-trust-sans` (trục wght) | variable | preload (latin + vietnamese) | Số phiếu, mã vạch, chữ trong dấu, số tiền |
+| `--font-type` | Momo Trust Sans | `@fontsource-variable/momo-trust-sans` (trục wght) | variable | preload (latin + vietnamese) | Chữ trong dấu, tiêu đề phiếu, nhãn gáy |
+| `--font-num` | Nunito | `@fontsource/nunito` (bản tĩnh) | 400, 700 | lười | Mọi chữ số và mã cần thẳng cột: số phiếu, mã đầu truyện, mã vạch, tiền, ngày, giờ, cột số trong bảng sổ |
 | `--font-pen` | Momo Signature | `@fontsource/momo-signature` | 400 | lười | Ghi chú tay, tình trạng truyện, chữ kí |
 | `--font-sign` | Momo Trust Display | `@fontsource/momo-trust-display` | 400 | lười | Tên tiệm, tiêu đề lớn |
 
-Momo Trust Sans không đơn cách và **không có** tính năng OpenType `tnum` (GSUB chỉ có `ccmp`, `locl`; đo trong file woff2 ngày 11/11/2026), Fuzzy Bubbles cũng vậy: `font-variant-numeric: tabular-nums` vẫn đặt cho số và mã nhưng không có tác dụng, chữ số rộng khác nhau nên cột số không thẳng theo từng chữ số; cột tiền căn phải.
+Momo Trust Sans không đơn cách và **không có** tính năng OpenType `tnum` (GSUB chỉ có `ccmp`, `locl`; đo trong file woff2 ngày 11/11/2026), Fuzzy Bubbles cũng vậy, nên `font-variant-numeric: tabular-nums` không làm chữ số của chúng cùng bề rộng. Đã giải bằng `--font-num` (Nunito): chữ số mặc định rộng đúng 600 đơn vị ở 400/700/800 (đo bằng fontTools ngày 11/11/2026), nên mọi chữ số và mã cần thẳng cột dùng `font-num`; cột tiền vẫn căn phải.
 
 Khoảng dòng (đo từ chiều cao dấu trong file woff2, để dấu chồng như ố, ặ, ẫ không bị cắt): chữ thân và cỡ `text-xs` tới `text-2xl` là 1.75; tiêu đề (`text-3xl` trở lên) 1.6; tem tình trạng và hộp thông báo 1.85. Giá trị nằm trong `frontend/src/styles/tokens.css` (`--text-*--line-height`).
 
-Nạp font: woff2 chép từng byte từ gói Fontsource đã ghim vào `frontend/public/fonts/` bằng `check-font-subsets.mjs --sync` (tên cố định, để preload), xem [ADR-0011](adr/0011-font-tu-host.md) mục Cập nhật. Đã loại: Special Elite (không có subset vietnamese); Be Vietnam Pro, Xanh Mono, Patrick Hand, Fraunces (chủ dự án đổi ngày 11/11/2026). Kiểm chữ: chụp màn hình chuỗi "Đã huỷ · Ố vàng · Nguyễn Thu Hà · Thám tử lừng danh Conan" ở cả bốn font (phase 5).
+Nạp font: woff2 chép từng byte từ gói Fontsource đã ghim vào `frontend/public/fonts/` bằng `check-font-subsets.mjs --sync` (tên cố định, để preload), xem [ADR-0011](adr/0011-font-tu-host.md) mục Cập nhật. Đã loại: Special Elite (không có subset vietnamese); Be Vietnam Pro, Xanh Mono, Patrick Hand, Fraunces (chủ dự án đổi ngày 11/11/2026). Kiểm chữ: chụp màn hình chuỗi "Đã huỷ · Ố vàng · Nguyễn Thu Hà · Thám tử lừng danh Conan" ở cả năm font (phase 5).
 
 ## 3. Khoảng cách
 

@@ -25,3 +25,17 @@ Trạng thái: DONE
 
 - Tiêu chí 6 và chuỗi thử "ở cả bốn font" giữ nguyên câu (không nêu tên font), vẫn đúng với bộ mới.
 - Bước 5.0 đã đánh dấu `[x]` từ trước; câu gói font giờ mô tả bộ mới, việc cài gói thật do lane code làm song song.
+
+## Bổ sung: font số Nunito (`--font-num`)
+
+Trạng thái: DONE. Theo yêu cầu của orchestrator: Momo Trust Sans và Fuzzy Bubbles không có `tnum`, chủ dự án giao chọn font số; đã chọn Nunito (`@fontsource/nunito` 5.3.0, 400/700, nạp lười).
+
+| File | Nội dung |
+|---|---|
+| `docs/design-tokens.md` §2 | Thêm dòng `--font-num` vào bảng; `--font-type` chỉ còn chữ trong dấu, tiêu đề phiếu, nhãn gáy; đoạn về `tnum` (commit f05c0cd) ghi đã giải bằng `--font-num`; "bốn" thành "năm" font |
+| `docs/adr/0011-font-tu-host.md` | Mục Cập nhật 11/11/2026 thêm Nunito (lí do, số đo 600 đơn vị, nạp lười, phạm vi dùng); lí do loại M PLUS Rounded 1c, Livvic, Varela Round vào bảng Phương án đã loại; Hệ quả "năm font" |
+| `.claude/rules/tiem-ui-theme.md` | Thêm Nunito `font-num`, bỏ ý `tabular-nums` |
+| `.claude/skills/tiem-create-nostalgia-component/SKILL.md` | Bước 3 thêm Nunito; bước 10 "năm font"; Gotchas thay ý `tabular-nums` bằng "Số và mã dùng `font-num`" |
+| `plans/261111-tiem-thue-truyen/phase-05-he-thiet-ke-giao-dien.md` | Lane 5A (Nunito nạp lười, "năm font"), tiêu chí 3 và 6 "năm họ font", rủi ro không đơn cách ghi đã giải bằng Nunito |
+
+Kiểm: `node --test "scripts/check/*.test.mjs"` 56 pass, 0 fail; `node scripts/check/section10-sync.mjs` PASS. Không sửa `phase-05-ui-contract.md` (orchestrator đã sửa §1).
