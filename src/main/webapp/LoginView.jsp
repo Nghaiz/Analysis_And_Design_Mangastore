@@ -7,7 +7,7 @@
   - Biến trang user: User (tên đăng nhập trim + NFC, mật khẩu NFC như doRegister), không lưu session. Ô trống hoặc
     mật khẩu dài hơn mức doRegister nhận: LOGIN_FAILED, không gọi DAO. Tên đăng nhập không phân biệt hoa thường nhờ
     collation utf8mb4_0900_ai_ci.
-  - ClientDAO.checkLogin(user) khác null: changeSessionId, session W client (không mật khẩu), 302 ClientHomeView.
+  - ClientDAO.checkLogin(user) khác null: huỷ session cũ, tạo session mới, W client (không mật khẩu), 302 ClientHomeView.
     null: message = LOGIN_FAILED, hiện lại trang, giữ txtUsername, txtPassword trống.
   - Khách đã đăng nhập (client id > 0) mở trang: 302 về ClientHomeView. Nhân viên đã đăng nhập vẫn thấy trang
     (hai vai tách nhau).
@@ -52,8 +52,10 @@
             }
         }
         if (client != null) {
-            request.changeSessionId();
-            session.setAttribute("client", client);
+            // phase-06-integration.md §2: session mới hẳn, người đăng nhập sau không kế thừa cart, rentalBill
+            // hay danh sách tạm của người trước trên máy dùng chung (chống cố định session như changeSessionId).
+            session.invalidate();
+            request.getSession(true).setAttribute("client", client);
             response.sendRedirect(request.getContextPath() + "/ClientHomeView.jsp");
             return;
         }
