@@ -26,7 +26,7 @@ Thứ tự chuỗi (`web.xml`): Utf8 → SecurityHeaders → Csrf → Auth → L
 
 **Đăng nhập (LoginView, cả hai bản)**
 - Trang chỉ xử lí đăng nhập khi `"POST".equals(request.getMethod())`, `request.getDispatcherType() == DispatcherType.REQUEST` và có tham số `btnLogin`. Mọi trường hợp khác chỉ hiển thị (kể cả khi doRegister forward sang kèm `REGISTER_SUCCESS`: request đó mang `txtUsername`, `txtPassword` của form đăng kí nhưng không được đăng nhập).
-- Thành công: `request.changeSessionId()`, ghi `client` / `staff` (không mật khẩu), `response.sendRedirect(contextPath + "/ClientHomeView.jsp")` (nhân viên: `/nhan-vien/StaffHomeView.jsp`).
+- Thành công: huỷ session cũ rồi tạo session mới (`session.invalidate()`, `request.getSession(true)`; đổi 11/11/2026 thay cho `changeSessionId()` để người đăng nhập sau không kế thừa `cart`, `rentalBill`, danh sách tạm của người trước trên máy dùng chung), ghi `client` / `staff` (không mật khẩu), `response.sendRedirect(contextPath + "/ClientHomeView.jsp")` (nhân viên: `/nhan-vien/StaffHomeView.jsp`). `CsrfFilter` sau chain đọc lại `request.getSession(false)` (session mới) và đặt token mới.
 - Thất bại: request attribute `message` = `Messages.LOGIN_FAILED`, hiện lại trang (giữ `txtUsername`, bỏ trống `txtPassword`).
 
 **Chặn đăng nhập sai (`LoginRateLimitFilter`, Deferred #23)**
@@ -42,10 +42,13 @@ Thứ tự chuỗi (`web.xml`): Utf8 → SecurityHeaders → Csrf → Auth → L
 
 **Trang lỗi** `error/403.jsp`, `404.jsp`, `500.jsp`: tiếng Việt, dùng `<t:layout>`, có link về trang chủ, không lộ stack trace; giữ đúng mã trạng thái.
 
-**Header bảo mật** (`SecurityHeadersFilter`): `X-Content-Type-Options: nosniff`, `Referrer-Policy: same-origin`, `X-Frame-Options: DENY`, `Cache-Control: no-store` cho `*.jsp`. CSP do nginx đặt (`contract.md` §10), filter không đặt lại.
+**Header bảo mật** (`SecurityHeadersFilter`): nginx là SSOT của header nó đã đặt (CSP, `Referrer-Policy: strict-origin-when-cross-origin`… theo `contract.md` §10); filter chỉ đặt những header nginx không đặt (`Cache-Control: no-store` cho `*.jsp` và các header nginx ẩn đi), để chạy thẳng Tomcat cũng an toàn mà qua nginx không ra hai giá trị khác nhau.
+
+**Trang lỗi chung** `error/error.jsp` cho mọi mã không có trang riêng (400, 413, 414, 501…), giữ nguyên mã trạng thái (`web.xml` đã khai).
 
 ## 3. Quy ước trang (thêm vào `docs/contracts.md` §8)
 
+- Mọi `<form>` ghi rõ `action="${pageContext.request.contextPath}/<Trang>.jsp"` (kể cả form gửi về chính trang): sau một forward, URL trình duyệt là `doXxx.jsp`, form không có `action` sẽ gửi nhầm về đó.
 - Trang xem tự gửi về chính nó chỉ xử lí khi là POST, dispatcher `REQUEST`, và nhận ra việc bằng tên nút gửi (`btnSearch`, `lnkChooseBook`, `lnkDeleteSelectedBook`, `btnCreateRentalBill`, `lnkViewDetail`, `lnkCancelRentalBill`, `btnCloseCancel`…). Request forward tới (từ `doXxx.jsp`) chỉ hiển thị.
 - `doXxx.jsp`: dòng đầu từ chối mọi method khác POST bằng `response.sendError(405)` (C2). Kết thúc bằng forward (`request.getRequestDispatcher("/XxxView.jsp").forward(...)`) kèm request attribute `message` khi có câu báo. Không ghi thuộc tính session ngoài §7.
 - Câu báo hiện bằng `<ui:message-box kind="success|error|info" text="${message}"/>`; câu lấy từ `Messages`, không gõ lại.
