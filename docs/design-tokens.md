@@ -39,7 +39,7 @@ Bộ font do chủ dự án chốt ngày 11/11/2026: Fuzzy Bubbles làm font ch�
 | `--font-pen` | Momo Signature | `@fontsource/momo-signature` | 400 | lười | Ghi chú tay, tình trạng truyện, chữ kí |
 | `--font-sign` | Momo Trust Display | `@fontsource/momo-trust-display` | 400 | lười | Tên tiệm, tiêu đề lớn |
 
-Momo Trust Sans không đơn cách và **không có** tính năng OpenType `tnum` (GSUB chỉ có `ccmp`, `locl`; đo trong file woff2 ngày 11/11/2026), Fuzzy Bubbles cũng vậy, nên `font-variant-numeric: tabular-nums` không làm chữ số của chúng cùng bề rộng. Đã giải bằng `--font-num` (Nunito): chữ số mặc định rộng đúng 600 đơn vị ở 400/700/800 (đo bằng fontTools ngày 11/11/2026), nên mọi chữ số và mã cần thẳng cột dùng `font-num`; cột tiền vẫn căn phải.
+Momo Trust Sans không đơn cách và **không có** tính năng OpenType `tnum` (GSUB chỉ có `ccmp`, `locl`; đo trong file woff2 ngày 11/11/2026), Fuzzy Bubbles cũng vậy, nên `font-variant-numeric: tabular-nums` không làm chữ số của chúng cùng bề rộng. Đã giải bằng `--font-num` (Nunito): chữ số mặc định rộng đúng 600 đơn vị ở 400/700/800 (đo bằng fontTools ngày 11/11/2026), nên mọi chữ số và mã cần thẳng cột dùng `font-num`; cột tiền vẫn căn phải. `npm --prefix frontend run check:fonts` có bước kiểm font gán cho `--font-num`: 10 chữ số 0–9 phải cùng advance width (đọc bảng `hmtx`/`cmap` bằng `frontend/scripts/font-digits.mjs`), lệch thì exit 1. `tabular-nums` đã bỏ khỏi `.tt-ticket__code` và `.tt-ledger-table`.
 
 Khoảng dòng (đo từ chiều cao dấu trong file woff2, để dấu chồng như ố, ặ, ẫ không bị cắt): chữ thân và cỡ `text-xs` tới `text-2xl` là 1.75; tiêu đề (`text-3xl` trở lên) 1.6; tem tình trạng và hộp thông báo 1.85. Giá trị nằm trong `frontend/src/styles/tokens.css` (`--text-*--line-height`).
 
