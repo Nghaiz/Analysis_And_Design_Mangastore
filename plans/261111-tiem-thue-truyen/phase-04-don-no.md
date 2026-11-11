@@ -23,7 +23,7 @@ Lane chỉ commit tại máy (pathspec), không push, không đổi nhánh, ghi 
 
 - [x] Lane J (b81736b; #24 đổi thành giữ `JsonReader` vì phase 5 dùng)
 - [x] Lane P (ff4e2af; thêm crawl bù Thần Đồng Đất Việt 164)
-- [ ] Lane D (code a6b5178; còn chạy thử trên compose khi phase 5 trả stack)
+- [x] Lane D (code a6b5178; chạy thử 11/11/2026 trên nhánh đã gộp phase 5 (94e4007): build mode CSP đúng §10 và `csp-page-check --mode build` PASS; `APP_VITE_DEV=true` + `npm run dev`: `csp-page-check --mode dev` PASS 12/12, Playwright `/dev/HomePreviewView.jsp` 0 lỗi console, `[vite] connected` (WebSocket HMR), `ShelfScene` `data-island-state=mounted`, `$RefreshReg$` có; 4 cảnh báo preload font chỉ có ở dev (Vite chèn CSS bằng JS), build mode 0 cảnh báo; stack trả về `APP_VITE_DEV=false`, `/health.jsp` ok)
 - [x] Phần orchestrator (1f636a0, 479e1d2, bf83876, 1e9685c, d4d05a5)
 - [ ] Nạp lại DB: `mysqldump` sao lưu, DROP + CREATE database `tiemtruyen` (không xoá volume), publish V10 mới
 - [ ] Merge, Accept 1–4 trên `main`
