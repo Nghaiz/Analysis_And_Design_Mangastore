@@ -34,6 +34,20 @@ Cả tag JSP (5A) lẫn component React (5B) in **đúng** cây lớp này; Styl
 | Bìa truyện | `book-cover.tag` | `BookCover.tsx` | `bookId` (số), `name` (chuỗi), `size` (`sm` = 160 · `md` = 320 · `lg` = 640, là cỡ hiển thị), `eager` (bool, mặc định false) | `.tt-book-cover` + `.tt-book-cover--sm/--md/--lg`; `<img>` có `srcset` 160w/320w/640w từ `${coversBase}/{bookId}/cover-{w}.webp`, `alt` = `name`, `loading="lazy"` trừ khi `eager` |
 | Hộp thông báo | `message-box.tag` | `MessageBox.tsx` | `kind`: `success` · `error` · `info`; `text`: câu nguyên văn (§10) | `.tt-message-box` + `--success/--error/--info`, `role="status"` (success, info) hoặc `role="alert"` (error) |
 
+### 3a. Thẻ HTML và dữ liệu mẫu (ghim 11/11/2026 sau khi 5B xong; 5A khớp theo)
+
+| Component | Cây thẻ |
+|---|---|
+| Ticket | `article.tt-ticket` > `div.tt-ticket__perf[aria-hidden=true]`, `header.tt-ticket__head` > `h2.tt-ticket__title` + `span.tt-ticket__code` (bỏ hẳn span khi `code` trống); `div.tt-ticket__body` |
+| Stamp | `span.tt-stamp.tt-stamp--{pending,renting,cancelled}`, chữ hoa viết sẵn trong DOM (không `text-transform`); trạng thái ngoài ba giá trị §4 là lỗi |
+| ConditionTag | `span.tt-condition-tag.tt-condition-tag--{none,ok,damaged}` |
+| PaperCard | `section.tt-paper-card[.tt-paper-card--taped]` > `h3.tt-paper-card__heading` (bỏ khi trống), `div.tt-paper-card__body` |
+| LedgerTable | `table.tt-ledger-table` > `caption.tt-ledger-table__caption` |
+| BookCover | `span.tt-book-cover.tt-book-cover--{sm,md,lg}` bọc `img` (lớp ở thẻ bọc); `img`: `src` = cỡ hiển thị, `srcset` 160w/320w/640w, `sizes="{W}px"`, `width`/`height` tỉ lệ 2:3, `alt` = `name`, `loading` lazy/eager, `decoding="async"`; gốc URL bỏ `/` cuối |
+| MessageBox | `p.tt-message-box.tt-message-box--{kind}`, `role` status (success, info) / alert (error) |
+
+Dữ liệu mẫu (SSOT: `frontend/src/islands/_demo/sample.ts`; StyleGuideView in y hệt): Ticket "Phiếu mượn" / `PM0125` / "Khách: Nguyễn Thu Hà · Ngày mượn 25/09/2026 · Hẹn trả 02/10/2026"; PaperCard "Truyện đã chọn" có băng dính, chứa ba dấu và ba tem (`null`, "Không có lỗi", "Rách bìa, Vết bẩn, viết vẽ"); LedgerTable "Danh sách truyện thuê", cột Mã · Tên đầu truyện · Giá thuê, dòng `DT001` · "Thám tử lừng danh Conan - Tập 1" · `3.000đ`; bìa `bookId` 1 cỡ sm (eager), md, lg; MessageBox success "Đăng kí tài khoản thành công!", error "Đăng nhập thất bại, vui lòng thử lại.", info "Không tìm thấy thông tin phù hợp."; chuỗi thử bốn font. Khối "Điều khiển (shadcn theo chủ đề)" chỉ có ở bản React.
+
 Gốc URL ảnh bìa `coversBase`: JSP lấy từ biến môi trường `APP_COVERS_BASE_URL` qua `AppConfig` (5A tra `src/main/java/vn/tiemtruyen/util/AppConfig.java`; thiếu getter thì ghi đề xuất, dùng `/covers` cho StyleGuide); React nhận qua prop `coversBase` (mặc định `/covers`).
 
 Lớp chất liệu dùng tự do (5A định nghĩa trong `paper.css`): `.tt-paper` (nền giấy ố), `.tt-worn` (mép sờn), `.tt-tape` (băng dính giấy), `.tt-typed` (chữ đánh máy, font-type), `.tt-pen` (nét bút bi, font-pen), `.tt-sign` (bảng hiệu, font-sign).
