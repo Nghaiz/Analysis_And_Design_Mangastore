@@ -36,6 +36,8 @@ Owner: orchestrator phase 7 (phiên 93), lập 11/11/2026 theo yêu cầu của 
 
 ### 3.1 Session, điều hướng, bấm lặp (lane 7A, 7B theo trang mình sở hữu)
 
+Thứ tự kiểm ở đầu mỗi trang M3 (trước mọi xử lí nút): (1) session thiếu thuộc tính cần đọc → chuyển trang; (2) `rentalBill` không còn "Chờ nhận" → câu D9 (áp cả khi mở trang bằng GET); (3) `rentalBillId` gửi lên thiếu hoặc khác id của `rentalBill` → `RENTAL_BILL_CHANGED`.
+
 | Trường hợp | Xử lí |
 |---|---|
 | Mở `ProcessRentalBillView`, `EditRentedBookListView`, `AddRentedBookView`, `AddRentalCollateralView`, `AddCollateralView`, `PrintRentalBillView` hay `doUpdateRentalBill`, `doUpdateRentedBookList` khi session không có `rentalBill` | 302 về `SearchRentalBillView.jsp` |
