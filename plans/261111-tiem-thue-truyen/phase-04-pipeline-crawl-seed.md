@@ -19,14 +19,14 @@ Chạy song song với phase 5 (lane `ui`). Ngân sách agent chung là 3: phase
 
 ## Các bước
 
-- [ ] **4.0 Orchestrator, tuần tự (hợp đồng trong pipeline):** `pipeline/package.json` (Node 24 ESM; `sharp`, trình đọc XML cho sitemap, Vitest; phiên bản tra npm registry lúc ghim) và lockfile; `pipeline/schema/raw-record.schema.json` (bản ghi thô mỗi nguồn: `source`, `sourceUrl`, `fetchedAt`, `name`, `authors[]`, `publisher`, `publishedAt`, `pages`, `isbn`, `categoryHints[]`, `descriptionHtml`, `imageUrls[]`) và `clean-record.schema.json` (đủ cột `tblBook` cộng `seriesKey`, `volume`, `variant`, `images[]`, `copies`); `pipeline/config/categories.json` (R3, có "Thiếu nhi", "Phiêu lưu", "Trinh thám"); `scripts/accept/phase-04.mjs`. Commit trước khi spawn.
-- [ ] **4.1 Lane 4A `nguon`** và **4.2 Lane 4B `xu-li`** song song.
-- [ ] **4.3 Orchestrator:** merge; chạy nền `node pipeline/cli.mjs census` (đếm ứng viên từng bộ từ sitemap Kim Đồng và tìm Tiki, ≤ 40 request) rồi `node pipeline/cli.mjs run --limit 10`. Mười đầu truyện chạy thử gồm cả hai nguồn: Conan (Kim Đồng), Doraemon (Kim Đồng và Tiki), Thần đồng đất Việt (Tiki).
-- [ ] **4.4 Lane 4C `xac-minh`:** Playwright MCP mở `data/reports/trial/index.html` (trang ảnh bìa và bảng trường do bước validate sinh), chụp khổ điện thoại và máy tính, ghi `plans/reports/phase-04-trial-<ts>.md` (số trường thiếu, ảnh lỗi, tên trùng, nguồn thắng từng bản ghi).
-- [ ] **4.5 HARD STOP (Gate: human).** Orchestrator đưa chủ dự án báo cáo validate, kết quả census và ảnh chụp, hỏi bằng câu hỏi lựa chọn: crawl hết / chỉnh nguồn rồi chạy thử lại / dừng. Kill (a) của `plan.md`: dưới 6/10 đầu truyện đủ trường bắt buộc và có bìa thì không đề xuất crawl hết. Không crawl đầy đủ khi chưa có câu trả lời.
-- [ ] **4.6 Orchestrator:** chạy nền `node pipeline/cli.mjs run` (ước tính 400 Book × khoảng 4 request ≈ 1.500 request, cách nhau ≥ 2 giây, khoảng 50–60 phút). Trong lúc chờ làm việc của phase 5. Validate có lỗi chặn thì brief lại 4A hoặc 4B theo loại lỗi.
-- [ ] **4.7 Orchestrator:** `node pipeline/cli.mjs publish` (chép `data/export/*.sql` vào volume `catalog_data`, ảnh vào `covers_data`); khởi động lại `app`; Flyway nạp V10, V11.
-- [ ] **4.8 Orchestrator:** chạy Accept, đánh dấu, push nhánh phase, mở PR vào `main` và merge bằng merge commit (`contract.md` §9).
+- [x] **4.0 Orchestrator, tuần tự (hợp đồng trong pipeline):** `pipeline/package.json` (Node 24 ESM; `sharp`, trình đọc XML cho sitemap, Vitest; phiên bản tra npm registry lúc ghim) và lockfile; `pipeline/schema/raw-record.schema.json` (bản ghi thô mỗi nguồn: `source`, `sourceUrl`, `fetchedAt`, `name`, `authors[]`, `publisher`, `publishedAt`, `pages`, `isbn`, `categoryHints[]`, `descriptionHtml`, `imageUrls[]`) và `clean-record.schema.json` (đủ cột `tblBook` cộng `seriesKey`, `volume`, `variant`, `images[]`, `copies`); `pipeline/config/categories.json` (R3, có "Thiếu nhi", "Phiêu lưu", "Trinh thám"); `scripts/accept/phase-04.mjs`. Commit trước khi spawn.
+- [x] **4.1 Lane 4A `nguon`** và **4.2 Lane 4B `xu-li`** song song.
+- [x] **4.3 Orchestrator:** merge; chạy nền `node pipeline/cli.mjs census` (đếm ứng viên từng bộ từ sitemap Kim Đồng và tìm Tiki, ≤ 40 request) rồi `node pipeline/cli.mjs run --limit 10`. Mười đầu truyện chạy thử gồm cả hai nguồn: Conan (Kim Đồng), Doraemon (Kim Đồng và Tiki), Thần đồng đất Việt (Tiki).
+- [x] **4.4 Lane 4C `xac-minh`:** Playwright MCP mở `data/reports/trial/index.html` (trang ảnh bìa và bảng trường do bước validate sinh), chụp khổ điện thoại và máy tính, ghi `plans/reports/phase-04-trial-<ts>.md` (số trường thiếu, ảnh lỗi, tên trùng, nguồn thắng từng bản ghi).
+- [x] **4.5 HARD STOP (Gate: human).** Orchestrator đưa chủ dự án báo cáo validate, kết quả census và ảnh chụp, hỏi bằng câu hỏi lựa chọn: crawl hết / chỉnh nguồn rồi chạy thử lại / dừng. Kill (a) của `plan.md`: dưới 6/10 đầu truyện đủ trường bắt buộc và có bìa thì không đề xuất crawl hết. Không crawl đầy đủ khi chưa có câu trả lời.
+- [x] **4.6 Orchestrator:** chạy nền `node pipeline/cli.mjs run` (ước tính 400 Book × khoảng 4 request ≈ 1.500 request, cách nhau ≥ 2 giây, khoảng 50–60 phút). Trong lúc chờ làm việc của phase 5. Validate có lỗi chặn thì brief lại 4A hoặc 4B theo loại lỗi.
+- [x] **4.7 Orchestrator:** `node pipeline/cli.mjs publish` (chép `data/export/*.sql` vào volume `catalog_data`, ảnh vào `covers_data`); khởi động lại `app`; Flyway nạp V10, V11.
+- [x] **4.8 Orchestrator:** chạy Accept, đánh dấu, push nhánh phase, mở PR vào `main` và merge bằng merge commit (`contract.md` §9).
 
 ## Lane trong phase
 
