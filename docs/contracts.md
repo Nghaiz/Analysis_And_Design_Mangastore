@@ -293,7 +293,7 @@ Chọn câu theo trạng thái mới: "Đã huỷ" → `RENTAL_BILL_CANCELLED`; 
 
 ## 7. Thuộc tính session
 
-Đúng 12 thuộc tính nghiệp vụ (ch.9, ch.10). Không thêm thuộc tính nghiệp vụ khác; thuộc tính kĩ thuật (token CSRF, `probeCount` của trang dev) không thuộc danh sách này.
+Đúng 12 thuộc tính nghiệp vụ (ch.9, ch.10). Không thêm thuộc tính nghiệp vụ khác; thuộc tính kĩ thuật (token CSRF `csrfToken`, `uncheckedBarcodes` của C20, `probeCount` của trang dev) không thuộc danh sách này.
 
 | Thuộc tính | Kiểu | Ghi bởi | Đọc bởi | Bỏ bởi |
 |---|---|---|---|---|
@@ -837,3 +837,4 @@ Báo cáo và các quyết định D1–D11 không trả lời các điểm dư�
 | C17 | Lí do huỷ trống (báo cáo không nói; ch.2 2.2 bước 24.7 khách có nhập) | `txtCancelReason` sau `trim()` trống thì `CANCEL_REASON_REQUIRED`, hộp xác nhận vẫn mở, ô `aria-invalid`; dài quá 255 thì `INPUT_TOO_LONG`. Áp cho khách và nhân viên | phase 6, phase 7 |
 | C18 | Phiếu "Chờ nhận" quá ngày giờ hẹn mà khách không đến | Không làm gì (chủ dự án chọn 11/11/2026): không nhãn, không tự huỷ; nhân viên huỷ tay như ch.2 | |
 | C19 | Edge case kĩ thuật ngoài báo cáo (dữ liệu nhập lạ, bấm hai lần, F5, Back, URL trực tiếp, session thiếu thuộc tính, id sửa tay, hai tab) | Theo `plans/261111-tiem-thue-truyen/phase-06-integration.md` §6.1: không trang nào ra 500 hay ghi đôi; thiếu thuộc tính session thì 302 về trang đầu mối; id không có trong danh sách của session thì bỏ qua | phase 6, phase 7 |
+| C20 | Trạng thái ô "Nhận" của ProcessRentalBillView khi quay về từ AddConditionView, EditRentedBookListView, AddRentalCollateralView (model không có chỗ giữ; chủ dự án chốt 11/11/2026 ở phiên phase 7, chọn thuộc tính kĩ thuật thay vì đổi model) | Thuộc tính session kĩ thuật `uncheckedBarcodes: ArrayList<String>` = mã vạch nhân viên đã bỏ tích "Nhận" của phiếu đang mở. ProcessRentalBillView ghi khi đổi ô `chkReceived`; SearchRentalBillView bỏ khi đưa phiếu "Chờ nhận" vào session; doUpdateRentalBill bỏ khi thành công. Không phải thuộc tính nghiệp vụ của §7 | phase 7 |
