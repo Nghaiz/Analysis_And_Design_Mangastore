@@ -24,6 +24,9 @@
   /* Font (docs/design-tokens.md §2; @font-face ở fonts.css) */
   --font-body: "Fuzzy Bubbles", system-ui, "Segoe UI", Roboto, sans-serif;
   --font-type: "Momo Trust Sans", system-ui, "Segoe UI", Roboto, sans-serif;
+  /* Chữ số và mã cần thẳng cột (số phiếu, mã đầu truyện, mã vạch, tiền, ngày, giờ): Nunito có chữ số
+     mặc định cùng bề rộng 600/1000 em, check:fonts kiểm từng file */
+  --font-num: "Nunito", system-ui, "Segoe UI", Roboto, sans-serif;
   --font-pen: "Momo Signature", "Segoe Script", "Segoe Print", cursive;
   --font-sign: "Momo Trust Display", system-ui, "Segoe UI", Roboto, sans-serif;
   /* Font mặc định của preflight (html, code) trỏ về hai font chính */

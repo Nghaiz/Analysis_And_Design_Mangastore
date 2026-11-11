@@ -55,10 +55,9 @@
     color: var(--color-ink);
   }
 
-  /* Số phiếu in đỏ như sổ phiếu in sẵn */
+  /* Số phiếu in đỏ như sổ phiếu in sẵn (Nunito: chữ số cùng bề rộng) */
   .tt-ticket__code {
-    font-family: var(--font-type);
-    font-variant-numeric: tabular-nums;
+    font-family: var(--font-num);
     font-size: 1.375rem;
     line-height: 1.4;
     letter-spacing: 0.06em;
@@ -196,8 +195,8 @@
   .tt-ledger-table {
     width: 100%;
     border-collapse: collapse;
+    /* Cột số (mã, mã vạch, tiền, ngày) đặt tiện ích font-num; cột tiền thêm text-right */
     font-family: var(--font-body);
-    font-variant-numeric: tabular-nums;
     background-color: var(--color-paper);
     color: var(--color-ink);
   }

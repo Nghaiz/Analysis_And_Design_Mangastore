@@ -12,6 +12,14 @@ export const DEMO = {
   ledgerCaption: 'Danh sách truyện thuê',
   damageText: 'Rách bìa, Vết bẩn, viết vẽ',
   accentSample: 'Đã huỷ · Ố vàng · Nguyễn Thu Hà · Thám tử lừng danh Conan',
+  /** Bảng thử thẳng cột số (--font-num): mã phiếu và số tiền có chữ số hẹp (1) lẫn rộng (0, 8). */
+  numCaption: 'Thử thẳng cột số',
+  numRows: [
+    { rentalBillId: 1, amount: 3000 },
+    { rentalBillId: 12, amount: 21000 },
+    { rentalBillId: 125, amount: 7500 },
+    { rentalBillId: 1111, amount: 89500 },
+  ],
   messages: {
     success: 'Đăng kí tài khoản thành công!',
     error: 'Đăng nhập thất bại, vui lòng thử lại.',
