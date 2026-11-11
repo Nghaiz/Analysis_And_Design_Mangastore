@@ -60,37 +60,61 @@
     pageContext.setAttribute("message", request.getAttribute("message"));
 %>
 <t:layout title="Thêm đầu truyện">
-  <h1>Thêm đầu truyện</h1>
-  <p class="tt-typed mb-6 text-sm text-ink-soft">Phần ngoài báo cáo (D6): trang quản trị đơn giản, chỉ dành cho nhân viên có chức vụ Quản lí. Mã vạch của các quyển tạo kèm được đánh số tự động (DTxxx-01, DTxxx-02…).</p>
+  <div class="mx-auto max-w-3xl">
+    <nav aria-label="Đường dẫn" class="mb-4 text-sm">
+      <ol class="m-0 flex list-none flex-wrap items-center gap-2 p-0 text-ink-soft">
+        <li><a href="${pageContext.request.contextPath}/nhan-vien/quan-tri/ManageBookView.jsp">Quản lí đầu truyện</a></li>
+        <li aria-hidden="true">/</li>
+        <li aria-current="page" class="text-ink">Thêm đầu truyện</li>
+      </ol>
+    </nav>
+    <header class="mb-6">
+      <h1 class="m-0">Thêm đầu truyện</h1>
+      <p class="tt-typed m-0 mt-2 text-sm text-ink-soft">Phần ngoài báo cáo (D6): trang quản trị đơn giản, chỉ dành cho nhân viên có chức vụ Quản lí. Mã vạch của các quyển tạo kèm được đánh số tự động (DTxxx-01, DTxxx-02…).</p>
+      <p class="m-0 mt-2 text-ink-soft">Điền thông tin đầu truyện mới; ô ghi "bắt buộc" phải có chữ. Ô nhập sai được viền đỏ để sửa lại.</p>
+    </header>
 
-  <c:if test="${not empty message}">
-    <div class="mb-6"><ui:message-box kind="error" text="${message}"/></div>
-  </c:if>
+    <c:if test="${not empty message}">
+      <div class="mb-6"><ui:message-box kind="error" text="${message}"/></div>
+    </c:if>
 
-  <form method="post" action="${pageContext.request.contextPath}/nhan-vien/quan-tri/AddBookView.jsp">
-    <t:csrf/>
-    <ui:paper-card heading="Thông tin đầu truyện">
-      <div class="grid max-w-2xl gap-2">
-        <c:forEach var="f" items="${fields}">
-          <label for="${f.name}" class="mt-2 text-ink"><c:out value="${f.label}"/></label>
-          <c:choose>
-            <c:when test="${f.multiline}">
-              <textarea id="${f.name}" name="${f.name}" maxlength="${f.maxlength}" rows="3"${f.invalid ? ' aria-invalid="true"' : ''}
-                        class="w-full rounded-paper border border-input bg-paper px-3 py-2 text-ink aria-invalid:border-2 aria-invalid:border-stamp-red focus-visible:outline-2 focus-visible:outline-pen-blue"><c:out value="${f.value}"/></textarea>
-            </c:when>
-            <c:otherwise>
-              <input type="text" id="${f.name}" name="${f.name}" value="${fn:escapeXml(f.value)}" maxlength="${f.maxlength}"${f.numeric ? ' inputmode="numeric"' : ''}${f.required ? ' aria-required="true"' : ''}${f.invalid ? ' aria-invalid="true"' : ''} autocomplete="off"
-                     class="w-full rounded-paper border border-input bg-paper px-3 py-2 text-ink${f.numeric ? ' font-num' : ''} aria-invalid:border-2 aria-invalid:border-stamp-red focus-visible:outline-2 focus-visible:outline-pen-blue">
-            </c:otherwise>
-          </c:choose>
-        </c:forEach>
+    <form method="post" action="${pageContext.request.contextPath}/nhan-vien/quan-tri/AddBookView.jsp" class="flex flex-col gap-6">
+      <t:csrf/>
+      <ui:paper-card heading="Thông tin đầu truyện">
+        <div class="grid gap-x-6 gap-y-4 md:grid-cols-2">
+          <c:forEach var="f" items="${fields}">
+            <c:if test="${f.name eq 'txtRentalPrice'}">
+              <p class="m-0 border-t border-dashed border-ink-soft pt-4 font-type text-ink md:col-span-2">Giá thuê và số quyển</p>
+            </c:if>
+            <div class="flex flex-col gap-1${f.name eq 'txtName' or f.multiline ? ' md:col-span-2' : ''}">
+              <label for="${f.name}" class="text-ink"><c:out value="${f.label}"/></label>
+              <c:choose>
+                <c:when test="${f.multiline}">
+                  <textarea id="${f.name}" name="${f.name}" maxlength="${f.maxlength}" rows="3"${f.invalid ? ' aria-invalid="true"' : ''}
+                            class="w-full rounded-paper border border-input bg-paper px-3 py-2 text-ink aria-invalid:border-2 aria-invalid:border-stamp-red focus-visible:outline-2 focus-visible:outline-pen-blue"><c:out value="${f.value}"/></textarea>
+                </c:when>
+                <c:otherwise>
+                  <input type="text" id="${f.name}" name="${f.name}" value="${fn:escapeXml(f.value)}" maxlength="${f.maxlength}"${f.numeric ? ' inputmode="numeric"' : ''}${f.required ? ' aria-required="true"' : ''}${f.invalid ? ' aria-invalid="true"' : ''} autocomplete="off"
+                         class="min-h-11 w-full rounded-paper border border-input bg-paper px-3 py-2 text-ink${f.numeric ? ' font-num' : ''} aria-invalid:border-2 aria-invalid:border-stamp-red focus-visible:outline-2 focus-visible:outline-pen-blue">
+                </c:otherwise>
+              </c:choose>
+            </div>
+          </c:forEach>
+        </div>
+      </ui:paper-card>
+      <div class="flex flex-wrap items-center gap-3">
+        <button type="submit" name="btnSave" id="btnSave" formaction="${pageContext.request.contextPath}/nhan-vien/quan-tri/doAddBook.jsp"
+                class="tt-btn tt-btn--primary focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-pen-blue">
+          <svg aria-hidden="true" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12 5 5L20 7"/></svg>
+          <span>Lưu</span>
+        </button>
+        <a href="${pageContext.request.contextPath}/nhan-vien/quan-tri/ManageBookView.jsp" id="lnkBack"
+           class="tt-btn tt-btn--ghost focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-pen-blue">
+          <svg aria-hidden="true" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5"/><path d="m11 18-6-6 6-6"/></svg>
+          <span>Quay lại</span>
+        </a>
+        <p class="m-0 text-sm text-ink-soft">Lưu xong, trang quay về danh sách và hiện đầu truyện vừa thêm.</p>
       </div>
-    </ui:paper-card>
-    <div class="mt-6 flex flex-wrap gap-3">
-      <button type="submit" name="btnSave" id="btnSave" formaction="${pageContext.request.contextPath}/nhan-vien/quan-tri/doAddBook.jsp"
-              class="rounded-paper border-2 border-ink bg-paper-deep px-6 py-2 font-type text-ink shadow-paper hover:bg-tape focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-pen-blue">Lưu</button>
-      <a href="${pageContext.request.contextPath}/nhan-vien/quan-tri/ManageBookView.jsp" id="lnkBack"
-         class="rounded-paper border border-ink-soft bg-paper px-4 py-2 font-type text-ink no-underline hover:bg-tape focus-visible:outline-2 focus-visible:outline-pen-blue">Quay lại</a>
-    </div>
-  </form>
+    </form>
+  </div>
 </t:layout>
