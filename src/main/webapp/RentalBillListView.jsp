@@ -103,74 +103,95 @@
     pageContext.setAttribute("reasonInvalid", reasonInvalid);
 %>
 <t:layout title="Danh sách phiếu mượn">
-  <h1>Danh sách phiếu mượn</h1>
+  <div class="flex flex-col gap-6">
+    <header class="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
+      <div class="flex flex-col gap-1">
+        <p class="tt-hero__eyebrow">Sổ phiếu của bạn</p>
+        <h1 class="m-0">Danh sách phiếu mượn</h1>
+        <p class="m-0 text-ink-soft">Các phiếu bạn đã tạo, mới nhất ở trên. Phiếu "Chờ nhận" là phiếu tiệm đang giữ truyện, bạn có thể huỷ khi chưa đến nhận.</p>
+      </div>
+      <a href="${ctx}/SearchBookView.jsp" class="tt-btn tt-btn--ghost flex-none">
+        <svg aria-hidden="true" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14"/></svg>
+        <span>Thuê thêm truyện</span>
+      </a>
+    </header>
 
-  <c:if test="${not empty message}">
-    <div class="mb-6"><ui:message-box kind="${messageKind}" text="${message}"/></div>
-  </c:if>
+    <c:if test="${not empty message}">
+      <div><ui:message-box kind="${messageKind}" text="${message}"/></div>
+    </c:if>
 
-  <form method="post" action="${ctx}/RentalBillListView.jsp">
-    <t:csrf/>
-    <div class="overflow-x-auto">
-      <table class="tt-ledger-table" id="tblRentalBill">
-        <caption class="tt-ledger-table__caption sr-only">Danh sách phiếu mượn</caption>
-        <thead>
-          <tr>
-            <th scope="col">Mã phiếu mượn</th>
-            <th scope="col">Ngày giờ tạo phiếu</th>
-            <th scope="col">Ngày giờ dự kiến đến nhận</th>
-            <th scope="col">Số quyển</th>
-            <th scope="col">Tổng tiền thuê</th>
-            <th scope="col">Trạng thái</th>
-            <th scope="col">Thao tác</th>
-          </tr>
-        </thead>
-        <tbody>
-          <c:forEach var="r" items="${rows}">
-            <tr>
-              <td class="font-num"><c:out value="${r.code}"/></td>
-              <td class="font-num"><c:out value="${r.createdAt}"/></td>
-              <td class="font-num"><c:out value="${r.expectedPickupAt}"/></td>
-              <td class="font-num"><c:out value="${r.copies}"/></td>
-              <td class="font-num"><c:out value="${r.total}"/></td>
-              <td><c:out value="${r.status}"/></td>
-              <td>
-                <div class="flex flex-wrap gap-2">
-                  <button type="submit" name="lnkViewDetail" value="${r.id}" aria-label="Xem chi tiết ${r.code}"
-                          class="rounded-paper border border-ink-soft bg-paper px-3 py-1 font-type text-sm text-ink hover:bg-tape focus-visible:outline-2 focus-visible:outline-pen-blue">Xem chi tiết</button>
-                  <c:if test="${r.pending}">
-                    <button type="submit" name="lnkCancelRentalBill" value="${r.id}" aria-label="Huỷ phiếu ${r.code}"
-                            class="rounded-paper border border-stamp-red bg-paper px-3 py-1 font-type text-sm text-stamp-red hover:bg-tape focus-visible:outline-2 focus-visible:outline-pen-blue">Huỷ phiếu</button>
-                  </c:if>
-                </div>
-              </td>
-            </tr>
-          </c:forEach>
-        </tbody>
-      </table>
-    </div>
-  </form>
-
-  <c:if test="${cancelling}">
-    <form method="post" action="${ctx}/RentalBillListView.jsp" class="mt-8">
+    <form method="post" action="${ctx}/RentalBillListView.jsp" class="tt-paper-card">
       <t:csrf/>
-      <section role="alertdialog" aria-modal="false" aria-labelledby="cancelDialogTitle" aria-describedby="cancelDialogText" id="cancelDialog">
-        <ui:paper-card taped="true">
-          <h2 id="cancelDialogTitle" class="mt-0">Xác nhận huỷ phiếu mượn <span class="font-num"><c:out value="${cancellingCode}"/></span></h2>
-          <p id="cancelDialogText"><c:out value="${cancelConfirm}"/></p>
-          <label for="txtCancelReason" class="font-type">Lí do huỷ:</label>
-          <input type="text" name="txtCancelReason" id="txtCancelReason" maxlength="255" autofocus
-                 value="${fn:escapeXml(reasonText)}"${reasonInvalid ? ' aria-invalid="true"' : ''}
-                 class="mt-1 w-full rounded-paper border border-ink-soft bg-paper px-3 py-2 text-ink focus-visible:outline-2 focus-visible:outline-pen-blue aria-invalid:border-2 aria-invalid:border-stamp-red">
-          <input type="hidden" name="from" value="client">
-          <div class="mt-4 flex flex-wrap justify-center gap-4">
-            <button type="submit" name="btnConfirmCancel" id="btnConfirmCancel" formaction="${ctx}/doCancelRentalBill.jsp"
-                    class="rounded-paper border-2 border-ink bg-paper-deep px-6 py-2 font-type text-ink shadow-paper hover:bg-tape focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-pen-blue">Xác nhận</button>
-            <button type="submit" name="btnCloseCancel" id="btnCloseCancel"
-                    class="rounded-paper border-2 border-ink bg-paper px-6 py-2 font-type text-ink shadow-paper hover:bg-tape focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-pen-blue">Huỷ</button>
-          </div>
-        </ui:paper-card>
-      </section>
+      <div class="overflow-x-auto">
+        <table class="tt-ledger-table" id="tblRentalBill">
+          <caption class="tt-ledger-table__caption sr-only">Danh sách phiếu mượn</caption>
+          <thead>
+            <tr>
+              <th scope="col">Mã phiếu mượn</th>
+              <th scope="col">Ngày giờ tạo phiếu</th>
+              <th scope="col">Ngày giờ dự kiến đến nhận</th>
+              <th scope="col">Số quyển</th>
+              <th scope="col">Tổng tiền thuê</th>
+              <th scope="col">Trạng thái</th>
+              <th scope="col">Thao tác</th>
+            </tr>
+          </thead>
+          <tbody>
+            <c:forEach var="r" items="${rows}">
+              <tr>
+                <td class="font-num whitespace-nowrap"><c:out value="${r.code}"/></td>
+                <td class="font-num"><c:out value="${r.createdAt}"/></td>
+                <td class="font-num"><c:out value="${r.expectedPickupAt}"/></td>
+                <td class="font-num"><c:out value="${r.copies}"/></td>
+                <td class="font-num whitespace-nowrap"><c:out value="${r.total}"/></td>
+                <c:choose>
+                  <c:when test="${r.pending}"><td class="font-type whitespace-nowrap text-stamp-amber"><c:out value="${r.status}"/></td></c:when>
+                  <c:when test="${r.status eq RentalBill.STATUS_RENTING}"><td class="font-type whitespace-nowrap text-stamp-green"><c:out value="${r.status}"/></td></c:when>
+                  <c:otherwise><td class="font-type whitespace-nowrap text-stamp-red"><c:out value="${r.status}"/></td></c:otherwise>
+                </c:choose>
+                <td>
+                  <div class="flex flex-wrap gap-2">
+                    <button type="submit" name="lnkViewDetail" value="${r.id}" aria-label="Xem chi tiết ${r.code}"
+                            class="tt-btn tt-btn--ghost tt-btn--sm">Xem chi tiết</button>
+                    <c:if test="${r.pending}">
+                      <button type="submit" name="lnkCancelRentalBill" value="${r.id}" aria-label="Huỷ phiếu ${r.code}"
+                              class="tt-btn tt-btn--ghost tt-btn--sm border-stamp-red text-stamp-red">Huỷ phiếu</button>
+                    </c:if>
+                  </div>
+                </td>
+              </tr>
+            </c:forEach>
+          </tbody>
+        </table>
+      </div>
+      <c:if test="${empty rows}">
+        <p class="m-0 mt-3 border border-dashed border-ink-soft px-4 py-3 text-ink-soft">Bạn chưa có phiếu mượn nào. Vào "Tìm truyện", chọn các tập muốn đọc rồi tạo phiếu, phiếu sẽ hiện ở đây.</p>
+      </c:if>
     </form>
-  </c:if>
+
+    <c:if test="${cancelling}">
+      <form method="post" action="${ctx}/RentalBillListView.jsp">
+        <t:csrf/>
+        <section role="alertdialog" aria-modal="false" aria-labelledby="cancelDialogTitle" aria-describedby="cancelDialogText" id="cancelDialog" class="mx-auto w-full max-w-2xl">
+          <ui:paper-card taped="true">
+            <h2 id="cancelDialogTitle" class="mt-0 mb-2">Xác nhận huỷ phiếu mượn <span class="font-num text-stamp-red"><c:out value="${cancellingCode}"/></span></h2>
+            <p id="cancelDialogText" class="mt-0 mb-4"><c:out value="${cancelConfirm}"/></p>
+            <div class="flex flex-col gap-1">
+              <label for="txtCancelReason" class="font-type">Lí do huỷ:</label>
+              <input type="text" name="txtCancelReason" id="txtCancelReason" maxlength="255" autofocus
+                     value="${fn:escapeXml(reasonText)}"${reasonInvalid ? ' aria-invalid="true"' : ''} aria-describedby="txtCancelReasonHint"
+                     class="w-full rounded-paper border border-ink-soft bg-paper px-3 py-2 text-ink focus-visible:outline-2 focus-visible:outline-pen-blue aria-invalid:border-2 aria-invalid:border-stamp-red">
+              <p id="txtCancelReasonHint" class="m-0 text-sm text-ink-soft">Bắt buộc, tối đa 255 kí tự. Huỷ rồi thì các quyển được trả lại kệ.</p>
+            </div>
+            <input type="hidden" name="from" value="client">
+            <div class="mt-5 flex flex-col gap-3 sm:flex-row sm:flex-wrap">
+              <button type="submit" name="btnConfirmCancel" id="btnConfirmCancel" formaction="${ctx}/doCancelRentalBill.jsp"
+                      class="tt-btn border-stamp-red bg-stamp-red text-paper">Xác nhận</button>
+              <button type="submit" name="btnCloseCancel" id="btnCloseCancel" class="tt-btn tt-btn--ghost">Huỷ</button>
+            </div>
+          </ui:paper-card>
+        </section>
+      </form>
+    </c:if>
+  </div>
 </t:layout>

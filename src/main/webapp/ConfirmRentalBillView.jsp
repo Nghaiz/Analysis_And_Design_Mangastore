@@ -107,80 +107,101 @@
     pageContext.setAttribute("totalRentalPrice", days == null ? pending : Display.money(linesTotal - rentalBill.getDiscount()));
 %>
 <t:layout title="Xác nhận phiếu mượn">
-  <h1>Xác nhận phiếu mượn</h1>
+  <div class="mx-auto flex w-full max-w-160 flex-col gap-6">
+    <header class="flex flex-col gap-1">
+      <nav aria-label="Đường dẫn" class="text-sm">
+        <ol class="m-0 flex list-none flex-wrap items-center gap-x-2 p-0 text-ink-soft">
+          <li><a href="${ctx}/SearchBookView.jsp">Tìm truyện</a></li>
+          <li aria-hidden="true">›</li>
+          <li aria-current="page">Xác nhận phiếu mượn</li>
+        </ol>
+      </nav>
+      <h1 class="m-0">Xác nhận phiếu mượn</h1>
+      <p class="m-0 text-ink-soft">Kiểm lại thông tin và các đầu truyện, nhập số ngày thuê và lúc bạn đến nhận rồi bấm "Xác nhận". Tiệm giữ các quyển này cho bạn đến khi nhận tại quầy.</p>
+    </header>
 
-  <c:if test="${not empty message}">
-    <div class="mb-6"><ui:message-box kind="error" text="${message}"/></div>
-  </c:if>
+    <c:if test="${not empty message}">
+      <div><ui:message-box kind="error" text="${message}"/></div>
+    </c:if>
 
-  <form method="post" action="${ctx}/ConfirmRentalBillView.jsp">
-    <t:csrf/>
-    <ui:ticket title="PHIẾU MƯỢN">
-      <dl class="grid gap-x-6 gap-y-1 sm:grid-cols-2">
-        <div><dt class="inline font-type text-ink-soft">Họ và tên:</dt> <dd class="m-0 inline"><c:out value="${fullName}"/></dd></div>
-        <div><dt class="inline font-type text-ink-soft">Số điện thoại:</dt> <dd class="m-0 inline font-num"><c:out value="${phone}"/></dd></div>
-        <div><dt class="inline font-type text-ink-soft">Số CCCD:</dt> <dd class="m-0 inline font-num"><c:out value="${idCard}"/></dd></div>
-        <div><dt class="inline font-type text-ink-soft">Email:</dt> <dd class="m-0 inline"><c:out value="${email}"/></dd></div>
-      </dl>
+    <form method="post" action="${ctx}/ConfirmRentalBillView.jsp" class="flex flex-col gap-6">
+      <t:csrf/>
+      <ui:ticket title="PHIẾU MƯỢN">
+        <dl class="m-0 grid gap-x-6 gap-y-1 sm:grid-cols-2">
+          <div><dt class="inline font-type text-ink-soft">Họ và tên:</dt> <dd class="m-0 inline"><c:out value="${fullName}"/></dd></div>
+          <div><dt class="inline font-type text-ink-soft">Số điện thoại:</dt> <dd class="m-0 inline font-num"><c:out value="${phone}"/></dd></div>
+          <div><dt class="inline font-type text-ink-soft">Số CCCD:</dt> <dd class="m-0 inline font-num"><c:out value="${idCard}"/></dd></div>
+          <div class="min-w-0 break-words"><dt class="inline font-type text-ink-soft">Email:</dt> <dd class="m-0 inline"><c:out value="${email}"/></dd></div>
+        </dl>
 
-      <div class="mt-4 overflow-x-auto">
-        <table class="tt-ledger-table" id="tblRentedBook">
-          <caption class="tt-ledger-table__caption">Danh sách các đầu truyện đã chọn:</caption>
-          <thead>
-            <tr>
-              <th scope="col">Tên đầu truyện</th>
-              <th scope="col">Tác giả</th>
-              <th scope="col">Giá thuê theo ngày</th>
-              <th scope="col">Số lượng</th>
-              <th scope="col">Tổng tiền</th>
-            </tr>
-          </thead>
-          <tbody>
-            <c:forEach var="r" items="${rows}">
+        <div class="mt-5 overflow-x-auto">
+          <table class="tt-ledger-table" id="tblRentedBook">
+            <caption class="tt-ledger-table__caption">Danh sách các đầu truyện đã chọn:</caption>
+            <thead>
               <tr>
-                <td><c:out value="${r.name}"/></td>
-                <td><c:out value="${r.author}"/></td>
-                <td class="font-num"><c:out value="${r.price}"/></td>
-                <td class="font-num"><c:out value="${r.quantity}"/></td>
-                <td class="font-num"><c:out value="${r.total}"/></td>
+                <th scope="col">Tên đầu truyện</th>
+                <th scope="col">Tác giả</th>
+                <th scope="col">Giá thuê theo ngày</th>
+                <th scope="col">Số lượng</th>
+                <th scope="col">Tổng tiền</th>
               </tr>
-            </c:forEach>
-          </tbody>
-        </table>
-      </div>
-
-      <div class="mt-4 grid gap-3 sm:grid-cols-[auto_1fr] sm:items-center">
-        <label for="txtExpectedDays" class="font-type">Số ngày thuê dự kiến:</label>
-        <div class="flex flex-wrap items-center gap-2">
-          <input type="number" name="txtExpectedDays" id="txtExpectedDays" inputmode="numeric"
-                 value="${fn:escapeXml(daysText)}" data-submit-on-change${daysInvalid ? ' aria-invalid="true"' : ''}
-                 class="w-28 rounded-paper border border-ink-soft bg-paper px-3 py-2 font-num text-ink focus-visible:outline-2 focus-visible:outline-pen-blue aria-invalid:border-2 aria-invalid:border-stamp-red">
-          <noscript>
-            <button type="submit" name="btnRecalculate" id="btnRecalculate"
-                    class="rounded-paper border border-ink-soft bg-paper px-3 py-1 font-type text-sm text-ink hover:bg-tape focus-visible:outline-2 focus-visible:outline-pen-blue">Tính lại</button>
-          </noscript>
+            </thead>
+            <tbody>
+              <c:forEach var="r" items="${rows}">
+                <tr>
+                  <td><c:out value="${r.name}"/></td>
+                  <td><c:out value="${r.author}"/></td>
+                  <td class="font-num whitespace-nowrap"><c:out value="${r.price}"/></td>
+                  <td class="font-num"><c:out value="${r.quantity}"/></td>
+                  <td class="font-num whitespace-nowrap"><c:out value="${r.total}"/></td>
+                </tr>
+              </c:forEach>
+            </tbody>
+          </table>
         </div>
-        <label for="txtExpectedPickupAt" class="font-type">Ngày giờ dự kiến đến nhận:</label>
-        <input type="datetime-local" name="txtExpectedPickupAt" id="txtExpectedPickupAt"
-               value="${fn:escapeXml(pickupText)}"${pickupInvalid ? ' aria-invalid="true"' : ''}
-               class="w-full max-w-xs rounded-paper border border-ink-soft bg-paper px-3 py-2 font-num text-ink focus-visible:outline-2 focus-visible:outline-pen-blue aria-invalid:border-2 aria-invalid:border-stamp-red">
-        <label for="txtNote" class="font-type">Ghi chú:</label>
-        <input type="text" name="txtNote" id="txtNote" maxlength="255" value="${fn:escapeXml(noteText)}"${noteInvalid ? ' aria-invalid="true"' : ''}
-               class="w-full rounded-paper border border-ink-soft bg-paper px-3 py-2 text-ink focus-visible:outline-2 focus-visible:outline-pen-blue aria-invalid:border-2 aria-invalid:border-stamp-red">
+
+        <fieldset class="m-0 mt-5 min-w-0 border border-dashed border-ink-soft p-4">
+          <legend class="tt-tape font-type text-ink">Thông tin nhận truyện</legend>
+          <div class="mt-2 grid gap-x-5 gap-y-4 sm:grid-cols-2">
+            <div class="flex flex-col gap-1">
+              <label for="txtExpectedDays" class="font-type">Số ngày thuê dự kiến:</label>
+              <div class="flex flex-wrap items-center gap-2">
+                <input type="number" name="txtExpectedDays" id="txtExpectedDays" inputmode="numeric"
+                       value="${fn:escapeXml(daysText)}" data-submit-on-change${daysInvalid ? ' aria-invalid="true"' : ''} aria-describedby="txtExpectedDaysHint"
+                       class="w-28 rounded-paper border border-ink-soft bg-paper px-3 py-2 text-ink focus-visible:outline-2 focus-visible:outline-pen-blue aria-invalid:border-2 aria-invalid:border-stamp-red font-num">
+                <noscript>
+                  <button type="submit" name="btnRecalculate" id="btnRecalculate" class="tt-btn tt-btn--ghost tt-btn--sm">Tính lại</button>
+                </noscript>
+              </div>
+              <p id="txtExpectedDaysHint" class="m-0 text-sm text-ink-soft">Từ 1 tới 30 ngày. Đổi số ngày thì tổng tiền được tính lại.</p>
+            </div>
+            <div class="flex flex-col gap-1">
+              <label for="txtExpectedPickupAt" class="font-type">Ngày giờ dự kiến đến nhận:</label>
+              <input type="datetime-local" name="txtExpectedPickupAt" id="txtExpectedPickupAt"
+                     value="${fn:escapeXml(pickupText)}"${pickupInvalid ? ' aria-invalid="true"' : ''} aria-describedby="txtExpectedPickupAtHint"
+                     class="w-full max-w-xs rounded-paper border border-ink-soft bg-paper px-3 py-2 text-ink focus-visible:outline-2 focus-visible:outline-pen-blue aria-invalid:border-2 aria-invalid:border-stamp-red font-num">
+              <p id="txtExpectedPickupAtHint" class="m-0 text-sm text-ink-soft">Chọn một thời điểm sau bây giờ.</p>
+            </div>
+            <div class="flex flex-col gap-1 sm:col-span-2">
+              <label for="txtNote" class="font-type">Ghi chú:</label>
+              <input type="text" name="txtNote" id="txtNote" maxlength="255" value="${fn:escapeXml(noteText)}"${noteInvalid ? ' aria-invalid="true"' : ''} aria-describedby="txtNoteHint"
+                     class="w-full rounded-paper border border-ink-soft bg-paper px-3 py-2 text-ink focus-visible:outline-2 focus-visible:outline-pen-blue aria-invalid:border-2 aria-invalid:border-stamp-red">
+              <p id="txtNoteHint" class="m-0 text-sm text-ink-soft">Không bắt buộc, tối đa 255 kí tự.</p>
+            </div>
+          </div>
+        </fieldset>
+
+        <dl class="m-0 mt-5 ml-auto grid w-full max-w-sm gap-y-1 border-t-2 border-double border-ink-soft pt-3">
+          <div class="flex items-baseline justify-between gap-4"><dt class="font-type text-ink-soft">Tổng số quyển:</dt> <dd class="m-0 font-num" id="totalCopies"><c:out value="${totalCopies}"/></dd></div>
+          <div class="flex items-baseline justify-between gap-4"><dt class="font-type text-ink-soft">Giảm giá:</dt> <dd class="m-0 font-num" id="discount"><c:out value="${discount}"/></dd></div>
+          <div class="flex items-baseline justify-between gap-4"><dt class="font-type text-ink">Tổng tiền thuê:</dt> <dd class="m-0 font-num text-xl font-bold text-stamp-red" id="totalRentalPrice"><c:out value="${totalRentalPrice}"/></dd></div>
+        </dl>
+      </ui:ticket>
+
+      <div class="flex flex-col gap-3 sm:flex-row sm:flex-wrap">
+        <button type="submit" name="btnConfirm" id="btnConfirm" formaction="${ctx}/doAddRentalBill.jsp" class="tt-btn tt-btn--primary">Xác nhận</button>
+        <a href="${ctx}/SearchBookView.jsp" id="lnkBack" class="tt-btn tt-btn--ghost">Quay lại</a>
       </div>
-
-      <dl class="mt-4 grid gap-y-1">
-        <div><dt class="inline font-type text-ink-soft">Tổng số quyển:</dt> <dd class="m-0 inline font-num" id="totalCopies"><c:out value="${totalCopies}"/></dd></div>
-        <div><dt class="inline font-type text-ink-soft">Giảm giá:</dt> <dd class="m-0 inline font-num" id="discount"><c:out value="${discount}"/></dd></div>
-        <div><dt class="inline font-type text-ink-soft">Tổng tiền thuê:</dt> <dd class="m-0 inline font-num font-bold" id="totalRentalPrice"><c:out value="${totalRentalPrice}"/></dd></div>
-      </dl>
-    </ui:ticket>
-
-    <div class="mt-6 flex flex-wrap justify-center gap-4">
-      <button type="submit" name="btnConfirm" id="btnConfirm" formaction="${ctx}/doAddRentalBill.jsp"
-              class="rounded-paper border-2 border-ink bg-paper-deep px-6 py-2 font-type text-ink shadow-paper hover:bg-tape focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-pen-blue">Xác nhận</button>
-      <a href="${ctx}/SearchBookView.jsp" id="lnkBack"
-         class="inline-block rounded-paper border-2 border-ink bg-paper px-6 py-2 font-type text-ink no-underline shadow-paper hover:bg-tape focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-pen-blue">Quay lại</a>
-    </div>
-  </form>
+    </form>
+  </div>
 </t:layout>

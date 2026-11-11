@@ -78,20 +78,36 @@
     pageContext.setAttribute("username", username);
 %>
 <t:layout title="Đăng nhập">
-  <section class="mx-auto flex max-w-xl flex-col gap-6 py-8">
-    <h1 class="font-sign text-ink">Đăng nhập</h1>
+  <div class="mx-auto flex max-w-4xl flex-col gap-6 py-4">
+    <header class="flex flex-col gap-1">
+      <p class="tt-hero__eyebrow">Mời bạn vào tiệm</p>
+      <h1 class="m-0">Đăng nhập</h1>
+      <p class="m-0 text-ink-soft">Đăng nhập bằng tài khoản khách hàng để tìm truyện, tạo phiếu mượn và xem các phiếu của bạn.</p>
+    </header>
     <c:if test="${not empty requestScope.message}"><ui:message-box kind="${messageKind}" text="${requestScope.message}"/></c:if>
-    <form method="post" action="${pageContext.request.contextPath}/LoginView.jsp" class="tt-worn flex flex-col gap-4 rounded-paper bg-paper p-6 shadow-paper">
-      <t:csrf/>
-      <div class="grid gap-x-4 gap-y-3 sm:grid-cols-[9rem_1fr] sm:items-center">
-        <label for="txtUsername" class="text-ink">Tên đăng nhập:</label>
-        <input type="text" id="txtUsername" name="txtUsername" value="${fn:escapeXml(username)}" autocomplete="username" autocapitalize="none" spellcheck="false" class="w-full rounded-paper border border-input bg-paper px-3 py-2 text-ink">
-        <label for="txtPassword" class="text-ink">Mật khẩu:</label>
-        <input type="password" id="txtPassword" name="txtPassword" value="" autocomplete="current-password" class="w-full rounded-paper border border-input bg-paper px-3 py-2 text-ink">
-      </div>
-      <p class="flex justify-center">
-        <button type="submit" id="btnLogin" name="btnLogin" class="rounded-paper bg-primary px-6 py-2 text-primary-foreground shadow-paper">Đăng nhập</button>
-      </p>
-    </form>
-  </section>
+    <div class="grid gap-6 md:grid-cols-[minmax(0,3fr)_minmax(0,2fr)] md:items-start">
+      <form method="post" action="${pageContext.request.contextPath}/LoginView.jsp" class="tt-paper-card tt-worn flex flex-col gap-5">
+        <t:csrf/>
+        <h2 class="tt-paper-card__heading">Tài khoản khách hàng</h2>
+        <div class="flex flex-col gap-1">
+          <label for="txtUsername" class="font-type text-ink">Tên đăng nhập:</label>
+          <input type="text" id="txtUsername" name="txtUsername" value="${fn:escapeXml(username)}" autocomplete="username" autocapitalize="none" spellcheck="false" aria-describedby="txtUsernameHint" class="w-full rounded-paper border border-ink-soft bg-paper px-3 py-2 text-ink focus-visible:outline-2 focus-visible:outline-pen-blue">
+          <p id="txtUsernameHint" class="m-0 text-sm text-ink-soft">Tên bạn đặt lúc đăng kí, không phân biệt chữ hoa, chữ thường.</p>
+        </div>
+        <div class="flex flex-col gap-1">
+          <label for="txtPassword" class="font-type text-ink">Mật khẩu:</label>
+          <input type="password" id="txtPassword" name="txtPassword" value="" autocomplete="current-password" class="w-full rounded-paper border border-ink-soft bg-paper px-3 py-2 text-ink focus-visible:outline-2 focus-visible:outline-pen-blue">
+        </div>
+        <p class="m-0 flex justify-stretch sm:justify-start">
+          <button type="submit" id="btnLogin" name="btnLogin" class="tt-btn tt-btn--primary w-full sm:w-auto">Đăng nhập</button>
+        </p>
+      </form>
+      <section class="tt-paper-card flex flex-col gap-3" aria-labelledby="login-help-h">
+        <h2 id="login-help-h" class="tt-paper-card__heading">Chưa có tài khoản?</h2>
+        <p class="m-0 text-ink">Đăng kí bằng họ tên, số CCCD, số điện thoại và email. Xong là đăng nhập được ngay.</p>
+        <p class="m-0"><a href="${pageContext.request.contextPath}/RegisterView.jsp" class="tt-btn tt-btn--ghost">Tạo tài khoản mới</a></p>
+        <p class="m-0 border-t border-dashed border-ink-soft pt-3 text-sm text-ink-soft">Nhân viên của tiệm đăng nhập ở <a href="${pageContext.request.contextPath}/nhan-vien/LoginView.jsp">trang dành cho nhân viên</a>.</p>
+      </section>
+    </div>
+  </div>
 </t:layout>
