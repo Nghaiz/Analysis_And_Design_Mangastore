@@ -9,6 +9,9 @@
     hợp lệ → mỗi quyển (id nhỏ nhất trước, §6.2) một RentedBook mới (giá hiện tại, selectedBook = null)
     → W listRentedBook, sendRedirect EditRentedBookListView (PRG).
   - "Quay lại" là <a href> về EditRentedBookListView.
+  - Mỗi dòng có bìa (ui:book-cover); bấm dòng (nhãn bọc radio lnkChooseBook) thì chọn đầu truyện và mở khung chi tiết
+    ngay trong ô tên (nhà xuất bản, năm, mô tả, giá, số quyển trống). Mở bằng CSS :has(:checked), không reload, không JS;
+    không thêm dòng vào tblBook. Chi tiết đọc từ listBook đã có (không gọi DAO theo id).
   Đầu trang (phase-07-edge-cases.md §3.1): (1) thiếu rentalBill → 302 SearchRentalBillView, thiếu listRentedBook →
   302 EditRentedBookListView; (2) rentalBill không còn "Chờ nhận" → forward SearchRentalBillView kèm câu D9;
   (3) POST thiếu hoặc sai input ẩn rentalBillId → forward ProcessRentalBillView kèm RENTAL_BILL_CHANGED.
@@ -166,6 +169,9 @@
             view.put("price", Display.money(book.getRentalPrice()));
             view.put("available", book.getListBookCopy().size());
             view.put("checked", book.getId() == chosenBookId);
+            view.put("publisher", book.getPublisher());
+            view.put("publishYear", book.getPublishYear());
+            view.put("description", book.getDescription());
             rows.add(view);
         }
     }
@@ -192,7 +198,7 @@
         </ol>
       </nav>
       <h1 class="m-0">Thêm truyện vào phiếu mượn</h1>
-      <p class="m-0 max-w-3xl text-ink-soft">Tìm đầu truyện, chọn một dòng trong bảng, nhập số quyển rồi bấm Thêm vào phiếu mượn. Tiệm tự lấy các quyển đang còn trống của đầu truyện đó.</p>
+      <p class="m-0 max-w-3xl text-ink-soft">Tìm đầu truyện, bấm vào một đầu truyện để chọn và xem chi tiết, nhập số quyển rồi bấm Thêm vào phiếu mượn. Tiệm tự lấy các quyển đang còn trống của đầu truyện đó.</p>
     </header>
     <c:if test="${not empty pageMessage}"><ui:message-box kind="${messageKind}" text="${pageMessage}"/></c:if>
     <form method="post" action="${base}/AddRentedBookView.jsp" class="flex flex-col gap-6">
@@ -224,11 +230,23 @@
               <c:forEach var="row" items="${rows}">
                 <tr>
                   <td class="font-num">${row.code}</td>
-                  <td>
-                    <label class="flex cursor-pointer items-center gap-2">
-                      <input type="radio" name="lnkChooseBook" id="lnkChooseBook-${row.id}" value="${row.id}"${row.checked ? ' checked' : ''}${bookInvalid ? ' aria-invalid="true"' : ''} class="size-4 accent-pen-blue">
-                      <span class="text-pen-blue underline"><c:out value="${row.name}"/></span>
+                  <td class="tt-pick">
+                    <label class="tt-pick__label">
+                      <input type="radio" name="lnkChooseBook" id="lnkChooseBook-${row.id}" value="${row.id}"${row.checked ? ' checked' : ''}${bookInvalid ? ' aria-invalid="true"' : ''} aria-describedby="bookDetail-${row.id}" class="size-4 flex-none accent-pen-blue">
+                      <span class="tt-pick__cover"><ui:book-cover bookId="${row.id}" name="${row.name}" size="sm"/></span>
+                      <span class="tt-pick__title"><c:out value="${row.name}"/></span>
                     </label>
+                    <div id="bookDetail-${row.id}" class="tt-pick__detail">
+                      <p class="tt-pick__detail-head">Chi tiết đầu truyện</p>
+                      <dl class="tt-pick__facts">
+                        <div><dt>Nhà xuất bản</dt><dd><c:out value="${empty row.publisher ? '' : row.publisher}"/></dd></div>
+                        <div><dt>Năm xuất bản</dt><dd class="font-num"><c:out value="${row.publishYear}"/></dd></div>
+                        <div><dt>Giá thuê</dt><dd class="font-num">${row.price} / ngày</dd></div>
+                        <div><dt>Quyển còn trống</dt><dd class="font-num">${row.available}</dd></div>
+                      </dl>
+                      <c:if test="${not empty row.description}"><p class="tt-pick__desc"><c:out value="${row.description}"/></p></c:if>
+                      <p class="tt-pick__next">Nhập số lượng bên dưới rồi bấm "Thêm vào phiếu mượn".</p>
+                    </div>
                   </td>
                   <td><c:out value="${row.author}"/></td>
                   <td><c:out value="${row.category}"/></td>

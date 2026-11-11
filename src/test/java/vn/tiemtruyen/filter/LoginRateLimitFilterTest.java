@@ -163,6 +163,20 @@ class LoginRateLimitFilterTest {
     }
 
     @Test
+    void staffLoggingInOnTheSharedLoginPageIsNotCountedAsAFailure() throws IOException, ServletException {
+        // C23: /LoginView.jsp đăng nhập cả nhân viên; trước khi sửa, mỗi lần nhân viên đăng nhập đúng ở đây bị đếm
+        // là một lần sai của khách, đủ ngưỡng thì nhân viên bị khoá.
+        fail(MAX_FAILS - 1);
+        for (int i = 0; i < MAX_FAILS + 1; i++) {
+            response = new Response();
+            FakeChain chain = new FakeChain(r -> r.getSession(true).setAttribute(Requests.STAFF, staff(4)));
+            filter.doFilter(login("/LoginView.jsp", "khach01").proxy(), response.proxy(), chain.proxy());
+            assertEquals(1, chain.calls(), "lần " + (i + 1) + ": trang vẫn xử lí đăng nhập, không bị chặn");
+        }
+        assertEquals(Map.of(), store.counts());
+    }
+
+    @Test
     void clientAndStaffCountersAreSeparate() throws IOException, ServletException {
         fail(MAX_FAILS);
         run(login("/nhan-vien/LoginView.jsp", "khach01"), true);

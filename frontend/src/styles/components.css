@@ -831,6 +831,100 @@
     }
   }
 
+  /* ---------- Chọn đầu truyện trong bảng, mở chi tiết khi chọn: td.tt-pick (AddRentedBookView) ---------- */
+  .tt-pick {
+    min-width: 16rem;
+  }
+
+  .tt-pick__label {
+    display: flex;
+    align-items: center;
+    gap: var(--s-3);
+    cursor: pointer;
+  }
+
+  .tt-pick__cover {
+    flex: none;
+    width: 3.5rem;
+  }
+
+  .tt-pick__cover .tt-book-cover {
+    max-width: none;
+  }
+
+  .tt-pick__title {
+    color: var(--color-pen-blue);
+    text-decoration: underline;
+    text-underline-offset: 3px;
+  }
+
+  .tt-pick__label:hover .tt-pick__title {
+    text-decoration-thickness: 2px;
+  }
+
+  .tt-pick__detail {
+    display: none;
+    margin-top: var(--s-3);
+    padding: var(--s-3) var(--s-4);
+    background-color: var(--color-paper);
+    border: 1px dashed var(--color-ink-soft);
+    border-left: 4px solid var(--color-pen-blue);
+    border-radius: var(--radius-paper);
+  }
+
+  .tt-pick__detail-head {
+    margin: 0 0 var(--s-2);
+    font-family: var(--font-type);
+    letter-spacing: 0.04em;
+    color: var(--color-ink);
+  }
+
+  .tt-pick__facts {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(9rem, 1fr));
+    gap: var(--s-2) var(--s-4);
+    margin: 0;
+  }
+
+  .tt-pick__facts dt {
+    font-size: 0.8125rem;
+    color: var(--color-ink-soft);
+  }
+
+  .tt-pick__facts dd {
+    margin: 0;
+    color: var(--color-ink);
+  }
+
+  .tt-pick__desc {
+    margin: var(--s-3) 0 0;
+    color: var(--color-ink);
+  }
+
+  .tt-pick__next {
+    margin: var(--s-3) 0 0;
+    font-size: 0.875rem;
+    color: var(--color-pen-blue);
+  }
+
+  /* Dòng đang chọn: nền băng dính, bìa lớn, khung chi tiết mở */
+  .tt-ledger-table tbody tr:has(.tt-pick input:checked) {
+    background-color: var(--color-tape);
+  }
+
+  tr:has(.tt-pick input:checked) .tt-pick__cover {
+    width: 7.5rem;
+  }
+
+  tr:has(.tt-pick input:checked) .tt-pick__detail {
+    display: block;
+  }
+
+  .tt-pick__label:has(input:focus-visible) .tt-pick__title {
+    outline: 2px solid var(--color-pen-blue);
+    outline-offset: 2px;
+  }
+
   /* ---------- Chân trang ---------- */
   .tt-site-footer {
     margin-top: var(--s-7);

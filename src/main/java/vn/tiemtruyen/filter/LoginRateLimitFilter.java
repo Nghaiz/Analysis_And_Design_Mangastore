@@ -30,8 +30,10 @@ import vn.tiemtruyen.util.Messages;
  *       nhập viết thường đã trim.</li>
  *   <li>Đã sai đủ {@code LOGIN_RATE_MAX_FAILS} lần: đặt {@code message = Messages.LOGIN_FAILED} rồi cho trang chạy
  *       với request bọc trả {@code GET}, nên trang chỉ hiển thị kèm câu báo, không gọi DAO.</li>
- *   <li>Không bị chặn: sau khi trang chạy, session mang vai đó mới (danh tính khác trước, hoặc session id đã đổi
- *       do {@code changeSessionId}) thì xoá bộ đếm, không thì tăng. Lần sai chạm ngưỡng đặt lại hạn để thời gian
+ *   <li>Không bị chặn: sau khi trang chạy, session mang danh tính mới của khách hoặc nhân viên (danh tính khác
+ *       trước, hoặc session id đã đổi do {@code changeSessionId}) thì xoá bộ đếm, không thì tăng. Xét cả hai vai vì
+ *       {@code /LoginView.jsp} đăng nhập được cả nhân viên (C23): nhân viên đăng nhập đúng ở đó không phải
+ *       lần sai. Lần sai chạm ngưỡng đặt lại hạn để thời gian
  *       chặn đủ {@code LOGIN_RATE_WINDOW_SECONDS}.</li>
  *   <li>Bộ đếm lỗi: ghi log mức SEVERE và trả 500, không cho qua.</li>
  * </ul>
@@ -108,20 +110,20 @@ public class LoginRateLimitFilter implements Filter {
             return;
         }
         HttpSession before = httpRequest.getSession(false);
-        String identityBefore = roleIdentity(before, role);
+        String identityBefore = identity(before);
         String sessionIdBefore = before == null ? null : before.getId();
         chain.doFilter(request, response);
         try {
-            recordOutcome(httpRequest, key, role, identityBefore, sessionIdBefore);
+            recordOutcome(httpRequest, key, identityBefore, sessionIdBefore);
         } catch (LoginAttemptStoreException e) {
             fail(httpResponse, e);
         }
     }
 
-    private void recordOutcome(HttpServletRequest request, String key, String role, String identityBefore,
+    private void recordOutcome(HttpServletRequest request, String key, String identityBefore,
             String sessionIdBefore) {
         HttpSession after = request.getSession(false);
-        String identityAfter = roleIdentity(after, role);
+        String identityAfter = identity(after);
         boolean sessionIdChanged = after != null && !after.getId().equals(sessionIdBefore);
         boolean loggedIn = identityAfter != null && (!identityAfter.equals(identityBefore) || sessionIdChanged);
         if (loggedIn) {
@@ -148,13 +150,14 @@ public class LoginRateLimitFilter implements Filter {
         return Requests.path(request).startsWith(Requests.STAFF_PREFIX) ? ROLE_STAFF : ROLE_CLIENT;
     }
 
-    private static String roleIdentity(HttpSession session, String role) {
-        if (ROLE_STAFF.equals(role)) {
-            var staff = Requests.loggedInStaff(session);
-            return staff == null ? null : ROLE_STAFF + ":" + staff.getId();
-        }
+    /** Danh tính đã đăng nhập trong session, khách trước rồi nhân viên (C23); {@code null} khi chưa đăng nhập. */
+    private static String identity(HttpSession session) {
         var client = Requests.loggedInClient(session);
-        return client == null ? null : ROLE_CLIENT + ":" + client.getId();
+        if (client != null) {
+            return ROLE_CLIENT + ":" + client.getId();
+        }
+        var staff = Requests.loggedInStaff(session);
+        return staff == null ? null : ROLE_STAFF + ":" + staff.getId();
     }
 
     private static void fail(HttpServletResponse response, LoginAttemptStoreException e) throws IOException {
