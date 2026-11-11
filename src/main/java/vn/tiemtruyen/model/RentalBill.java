@@ -25,6 +25,9 @@ public class RentalBill implements Serializable {
     /** Phiếu đã huỷ; quyển của phiếu được giải phóng. */
     public static final String STATUS_CANCELLED = "Đã huỷ";
 
+    /** Số ngày thuê dự kiến tối đa khách được chọn (docs/contracts.md §14 C15; câu {@code EXPECTED_DAYS_TOO_LONG}). */
+    public static final int MAX_EXPECTED_DAYS = 30;
+
     @Serial
     private static final long serialVersionUID = 1L;
 

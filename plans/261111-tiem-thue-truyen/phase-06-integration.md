@@ -71,12 +71,12 @@ Tài khoản trên seed: nhân viên `hant`, quản lí `quanli`, khách `khach0
 
 ## 6. Edge case ngoài báo cáo (chủ dự án yêu cầu 11/11/2026: bao quát mọi ngoại lệ và mọi trường hợp hay gặp thực tế)
 
-Mọi ngoại lệ của ch.2 mục 2.1 (bước 6, 10) và 2.2 (bước 2, 5, 24) phải chạy và có trong smoke. Ngoài ra, mọi trang xử lí đủ các trường hợp dưới đây. **Không trường hợp nào được ra trang 500, stack trace, hay ghi DB sai.** Mục 6.1 không thêm câu báo hay luật nghiệp vụ mới (dùng câu có sẵn, C10, chuyển trang). Mục 6.2 chờ chủ dự án chốt; chưa chốt thì chưa làm.
+Mọi ngoại lệ của ch.2 mục 2.1 (bước 6, 10) và 2.2 (bước 2, 5, 24) phải chạy và có trong smoke. Ngoài ra, mọi trang xử lí đủ các trường hợp dưới đây. **Không trường hợp nào được ra trang 500, stack trace, hay ghi DB sai.** Câu báo dùng §10.1 và §10.3 của `docs/contracts.md` (8 câu ngoài báo cáo chủ dự án duyệt 11/11/2026); luật mới ở §14 C14–C19.
 
 ### 6.1 Làm ngay (mỗi trường hợp một test hoặc một bước kiểm trong báo cáo lane)
 
 **Chung (6A, cộng mọi trang)**
-- POST khi session đã hết hạn hoặc chưa có (không có `csrfToken` trong session, người dùng để form mở quá 60 phút): không ghi gì; trang khách/nhân viên chuyển 302 về LoginView của vai, trang công khai chuyển 302 về chính trang xem (doRegister → RegisterView). Session còn sống mà thiếu hoặc sai token: vẫn 403.
+- POST khi session đã hết hạn hoặc chưa có (không có `csrfToken` trong session, người dùng để form mở quá 60 phút): không ghi gì; trang khách/nhân viên chuyển 302 về LoginView của vai kèm `?expired=1` (LoginView hiện `SESSION_EXPIRED`, `docs/contracts.md` C16), trang công khai chuyển 302 về chính trang xem không câu báo (doRegister → RegisterView). GET tới trang cần đăng nhập mà session id gửi lên đã hết hạn: cũng `?expired=1`. Session còn sống mà thiếu hoặc sai token: vẫn 403.
 - Trang lỗi thêm 405 (`error/405.jsp`) và mọi exception không bắt (`java.lang.Throwable` → `error/500.jsp`); không lộ stack trace. Tomcat không hiện trang lỗi tiếng Anh ở bất kì mã nào.
 - Mọi chữ do người dùng nhập khi in ra trang đều escape (`<c:out>`, `fn:escapeXml`), kể cả giá trị điền lại vào ô, ghi chú, lí do huỷ, tên khách; props island qua `JsonUtil.toScriptJson`. Smoke thử đăng kí họ tên chứa `<script>`.
 - Dữ liệu nhập: `trim()` và chuẩn hoá Unicode NFC (`java.text.Normalizer`) mọi ô chữ trước khi kiểm và lưu (bàn phím macOS và một số bộ gõ gửi NFD).
@@ -96,13 +96,17 @@ Mọi ngoại lệ của ch.2 mục 2.1 (bước 6, 10) và 2.2 (bước 2, 5, 2
 | `RentalBillDetailView` khi không có `rentalBill` | 302 về `RentalBillListView.jsp` |
 | `doCancelRentalBill` khi không có `rentalBill` | 302 về trang danh sách của vai |
 | Huỷ lần hai cùng phiếu (bấm hai lần) | nhánh D9: `RENTAL_BILL_CANCELLED` |
-| `txtQuantity` trống, 0, âm, số thập phân, chữ, số lớn quá `int` | C10 (`aria-invalid`, hiện lại trang, giỏ không đổi) |
+| `txtQuantity` trống, 0, âm, số thập phân, chữ, số lớn quá `int` | `QUANTITY_INVALID` + `aria-invalid`, hiện lại BookDetailView, giỏ không đổi |
+| "Tạo phiếu mượn" khi không tích dòng nào | `BOOK_NOT_CHOSEN`, hiện lại SearchBookView |
 | Thêm đầu truyện đã có trong giỏ | cộng dồn; kiểm vượt theo số quyển sẵn sàng **chưa** có trong giỏ (§10.1 ghi chú) |
 | Đầu truyện có 0 quyển sẵn sàng | vẫn hiện trong kết quả tìm với "0"; thêm thì `QUANTITY_EXCEEDED` "(hiện còn 0 quyển)" |
-| `txtExpectedDays` trống, chữ, thập phân, số lớn quá `int` | `EXPECTED_DAYS_INVALID` |
+| `txtExpectedDays` trống, chữ, thập phân, nhỏ hơn 1 | `EXPECTED_DAYS_INVALID` |
+| `txtExpectedDays` > 30 (`RentalBill.MAX_EXPECTED_DAYS`, C15), kể cả số lớn quá `int` | `EXPECTED_DAYS_TOO_LONG` |
 | `txtExpectedPickupAt` trống, sai dạng, ở quá khứ, đúng bằng hiện tại | `PICKUP_TIME_INVALID` |
-| `txtNote`, `txtCancelReason` dài quá 255 | C10 (`aria-invalid`, giữ chữ đã nhập) |
-| `txtKeyword` chỉ có dấu cách | C9: `BOOK_NOT_FOUND`, không gọi DAO; dài quá 100 kí tự thì cắt còn 100 |
+| `txtNote`, `txtCancelReason` dài quá 255 | `INPUT_TOO_LONG` + `aria-invalid`, giữ chữ đã nhập |
+| `txtCancelReason` trống hoặc chỉ dấu cách | `CANCEL_REASON_REQUIRED`, hộp xác nhận vẫn mở (C17) |
+| `txtKeyword` chỉ có dấu cách | C9: `BOOK_NOT_FOUND`, không gọi DAO |
+| `txtKeyword` dài quá 100 kí tự | `INPUT_TOO_LONG`, không gọi DAO |
 | Từ khoá có `%`, `_`, `\` | tìm đúng chữ đó (DAO đã thoát, `DAO.java:166`) |
 | Từ khoá không dấu hay khác hoa thường (`tham tu`, `CONAN`) | ra kết quả như có dấu (collation `utf8mb4_0900_ai_ci`) |
 | Tích một phần giỏ rồi tạo phiếu | dòng không tích ở lại giỏ trong DB; mở lại "Tìm truyện" thấy lại |
@@ -110,6 +114,6 @@ Mọi ngoại lệ của ch.2 mục 2.1 (bước 6, 10) và 2.2 (bước 2, 5, 2
 | Quyển trong giỏ đã bị phiếu khác giữ | K1 đổi quyển cùng đầu truyện; không đủ thì `NOT_ENOUGH_COPIES` |
 | Nhân viên vừa xử lí hoặc huỷ phiếu trong lúc khách bấm huỷ | D9: câu theo trạng thái mới, danh sách cập nhật dòng đó |
 
-### 6.2 Chờ chủ dự án chốt (đổi hoặc thêm luật nghiệp vụ, câu báo, trang)
+### 6.2 Đã chốt với chủ dự án (11/11/2026)
 
-Ghi kết quả vào `docs/contracts.md` §14 (C14 trở đi) trước khi giao lane.
+`docs/contracts.md` §10.3 (8 câu ngoài báo cáo, hằng trong `Messages`) và §14 C14–C19: đăng xuất `doLogout.jsp` (C14, lane 6B làm trang và nút ở ClientHomeView; 6A mở đường dẫn trong `AuthFilter`), số ngày thuê ≤ 30 (C15), session hết hạn `?expired=1` (C16, 6A + 6B), lí do huỷ bắt buộc (C17, 6C), phiếu quá hạn nhận không làm gì (C18). Không giới hạn ngày hẹn nhận, số phiếu chờ mỗi khách, độ dài tối thiểu mật khẩu.

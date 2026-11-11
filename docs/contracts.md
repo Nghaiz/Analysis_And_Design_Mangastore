@@ -364,6 +364,7 @@ Luật chung:
 | 26 | `doAddCollateral.jsp` | `/nhan-vien/doAddCollateral.jsp` | xử lí | nhân viên | `CollateralDAO.addCollateral` |
 | 27 | `doUpdateRentalBill.jsp` | `/nhan-vien/doUpdateRentalBill.jsp` | xử lí | nhân viên | `RentalBillDAO.updateRentalBill` (+ D9) |
 | 28 | `PrintRentalBillView.jsp` | `/nhan-vien/PrintRentalBillView.jsp` | xem | nhân viên | không |
+| C14 | `doLogout.jsp` | `/doLogout.jsp` (dùng chung, ngoài báo cáo) | xử lí | khách hoặc nhân viên | không |
 | D6 | `ManageBookView.jsp` | `/nhan-vien/quan-tri/ManageBookView.jsp` | xem, tự gửi | quản lí | `BookDAO.searchBook` |
 | D6 | `AddBookView.jsp` | `/nhan-vien/quan-tri/AddBookView.jsp` | xem | quản lí | không |
 | D6 | `doAddBook.jsp` | `/nhan-vien/quan-tri/doAddBook.jsp` | xử lí | quản lí | `BookDAO.addBook` |
@@ -649,6 +650,21 @@ doUpdateRentalBill kiểm đủ bốn, kể cả điều kiện thứ tư dù lu
 | 3 | Phiếu đã có ít nhất một khoản đặt cọc | `COLLATERAL_MISSING` |
 | 4 | Ngày hẹn trả sau ngày mượn | `DUE_DATE_INVALID` |
 
+### 10.3 Câu ngoài báo cáo (chủ dự án duyệt 11/11/2026)
+
+Báo cáo không có câu cho các trường hợp dưới đây; chủ dự án duyệt thêm (phiên cook phase 6 và phase 7, cùng ngày). Cùng luật với §10.1: hằng của `Messages`, `MessagesTest` so từng kí tự, không sửa khi chưa duyệt. Bảng tách riêng để §10.1 giữ đúng 28 câu của báo cáo. Hai câu đề xuất của phiên phase 6 trùng ý với câu đã duyệt ở phiên phase 7 nên dùng chung (`BOOK_NOT_CHOSEN`, `QUANTITY_INVALID`).
+
+| Hằng số (ngoài báo cáo) | Câu | Dùng ở |
+|---|---|---|
+| DISCOUNT_INVALID | Giảm giá không hợp lệ, vui lòng nhập lại. | ProcessRentalBillView (`txtDiscount` trống, không phải số, âm, lớn hơn tổng) |
+| QUANTITY_INVALID | Số lượng phải là số nguyên lớn hơn hoặc bằng 1. | doAddSelectedBook, AddRentedBookView (`txtQuantity` không phải số nguyên ≥ 1) |
+| BOOK_NOT_CHOSEN | Vui lòng chọn đầu truyện. | SearchBookView ("Tạo phiếu mượn" khi không tích dòng nào), AddRentedBookView (chưa chọn đầu truyện) |
+| INPUT_TOO_LONG | Nội dung nhập quá dài, vui lòng rút gọn. | mọi ô ghi chú, lí do huỷ, giá trị cọc, từ khoá vượt độ dài cột (§2) hoặc 100 kí tự với từ khoá |
+| RENTAL_BILL_CHANGED | Phiếu mượn đang mở đã thay đổi, vui lòng chọn lại phiếu. | trang M3 khi phiếu trong session không còn khớp DB (phase 7) |
+| SESSION_EXPIRED | Phiên làm việc đã hết hạn, vui lòng đăng nhập lại. | LoginView (cả hai) khi bị chuyển về vì session hết hạn (C16) |
+| CANCEL_REASON_REQUIRED | Vui lòng nhập lí do huỷ. | doCancelRentalBill khi `txtCancelReason` trống (C17) |
+| EXPECTED_DAYS_TOO_LONG | Số ngày thuê tối đa là 30 ngày. | doAddRentalBill khi `txtExpectedDays` > `RentalBill.MAX_EXPECTED_DAYS` (C15) |
+
 ## 11. React island (cách B)
 
 Luật chung (brainstorm §3, `contract.md` §5):
@@ -768,6 +784,7 @@ Input island được đổi: không có (HomeView không có form). Bấm gáy 
 | `/HomeView.jsp`, `/RegisterView.jsp`, `/doRegister.jsp`, `/LoginView.jsp` | mọi người | |
 | `/nhan-vien/LoginView.jsp` | mọi người | |
 | `/doCancelRentalBill.jsp` | khách đã đăng nhập **hoặc** nhân viên đã đăng nhập (Deferred #13) | về `/LoginView.jsp` |
+| `/doLogout.jsp` | mọi người (C14; chưa đăng nhập thì chỉ chuyển về trang chủ) | |
 | Mọi trang khác ở gốc (`/*.jsp` ngoài các dòng trên) | khách: session có `client` với `id > 0` | về `/LoginView.jsp` |
 | `/nhan-vien/*` (trừ `LoginView.jsp`) | nhân viên: session có `staff` | về `/nhan-vien/LoginView.jsp` |
 | `/nhan-vien/quan-tri/*` | nhân viên có `staff.position = "Quản lí"` | 403 |
@@ -808,7 +825,13 @@ Báo cáo và các quyết định D1–D11 không trả lời các điểm dư�
 | C7 | Định nghĩa "đã có tình trạng khi giao"; giá trị mặc định của ngày mượn, ngày hẹn trả khi mở ProcessRentalBillView; ô ngày mượn có sửa được không | Đã có tình trạng khi `conditionNote` khác NULL (bấm "Lưu tình trạng" ghi chuỗi đã nhập, kể cả chuỗi rỗng). Khi SearchRentalBillView đưa phiếu "Chờ nhận" vào session: `borrowDate` = hôm nay, `dueDate` = hôm nay + `expectedDays` (ch.2 2.3 bước 10 hiện sẵn 25/09/2026 và 02/10/2026). `txtBorrowDate` hiển thị, chỉ đọc (ch.10 chỉ nhắc sửa ngày hẹn trả và giảm giá) | phase 7 |
 | C8 | doCancelRentalBill biết ai gọi để chọn trang quay về | Form gửi input ẩn `from` với một trong hai giá trị `client` hoặc `staff`; trang chỉ nhận giá trị khớp thuộc tính đang có trong session (`client` hoặc `staff`), không khớp thì 403 | phase 6 |
 | C9 | Cách `searchRentalBill` khớp từ khoá; tìm với từ khoá trống | Từ khoá dạng `PM` + số (không phân biệt hoa thường) → khớp id; ngược lại khớp tên khách chứa từ khoá hoặc CCCD bằng từ khoá. Từ khoá trống (cả `searchBook`, `searchDamage`, `searchCollateral`, `searchRentalBill`) → không gọi DAO, hiện câu "không tìm thấy" của trang | phase 3 |
-| C10 | Đầu vào không có câu báo trong báo cáo: "Tạo phiếu mượn" khi không tích dòng nào; `txtQuantity` không phải số nguyên dương; `txtDiscount` âm, không phải số hoặc lớn hơn tổng; `updateCart` trả `false`; trang quản trị nhập sai | Không thêm câu mới: số lượng, giảm giá không hợp lệ thì hiện lại trang với ô được đánh dấu lỗi bằng thuộc tính `aria-invalid` và giữ giá trị cũ trong session; không tích dòng nào thì nút "Tạo phiếu mượn" không làm gì (hiện lại trang). Cần chủ dự án duyệt nếu muốn thêm câu | phase 6 |
+| C10 | Đầu vào không có câu báo trong báo cáo: "Tạo phiếu mượn" khi không tích dòng nào; `txtQuantity` không phải số nguyên dương; `txtDiscount` âm, không phải số hoặc lớn hơn tổng; `updateCart` trả `false`; trang quản trị nhập sai | **Đổi 11/11/2026 (chủ dự án duyệt câu mới, §10.3):** lỗi nhập có câu riêng ở §10.3 thì hiện câu đó, đánh dấu ô bằng `aria-invalid="true"` và giữ giá trị cũ trong session (`QUANTITY_INVALID`, `DISCOUNT_INVALID`, `BOOK_NOT_CHOSEN`, `INPUT_TOO_LONG`). Trường hợp chưa có câu (`updateCart` trả `false`, trang quản trị) vẫn chỉ `aria-invalid` và hiện lại trang | phase 6 |
 | C11 | Hiển thị `publishYear` và `description` NULL | Ô để trống (không bịa chữ) | phase 6 |
 | C12 | Trang quản trị D6: thành phần, field, lối vào, sửa quyển | Như bảng ở mục 9.2. Lối vào: nút "Quản lí đầu truyện" ở StaffHomeView chỉ hiện với "Quản lí" (ghi rõ là phần ngoài báo cáo). `searchBook` chỉ trả quyển đang sẵn sàng nên `updateBook` chỉ **thêm** quyển mới (`id = 0`) và sửa cột của Book, không xoá quyển | phase 7 |
 | C13 | Kiểu Java của mảng và tiền | `List<T>` cho mọi `T[]`; tiền giữ `float` như ch.9 (không đổi sang `BigDecimal` vì đó là đổi thiết kế) | phase 3 |
+| C14 | Đăng xuất (báo cáo không có; chủ dự án duyệt thêm 11/11/2026) | Một trang `doLogout.jsp` ở gốc, khách và nhân viên dùng chung, chỉ nhận POST có CSRF: `session.invalidate()` rồi 302 về `HomeView.jsp` (khách) hoặc `/nhan-vien/LoginView.jsp` (nhân viên, đọc vai trước khi huỷ). Nút `btnLogout` "Đăng xuất" (form `method="post"` + `<t:csrf/>`, `formaction` tới `doLogout.jsp`) ở ClientHomeView và StaffHomeView, ghi rõ là phần ngoài báo cáo | phase 6 (trang, nút khách), phase 7 (nút nhân viên) |
+| C15 | Giới hạn số ngày thuê (chủ dự án chọn 11/11/2026) | `txtExpectedDays` từ 1 tới `RentalBill.MAX_EXPECTED_DAYS` = 30; lớn hơn thì `EXPECTED_DAYS_TOO_LONG`, nhỏ hơn 1 hay không phải số nguyên thì `EXPECTED_DAYS_INVALID`. Không giới hạn ngày hẹn nhận, số phiếu "Chờ nhận" mỗi khách, độ dài tối thiểu của mật khẩu (chủ dự án không chọn) | phase 6 |
+| C16 | Session hết hạn giữa chừng | `AuthFilter`: trang cần đăng nhập mà request mang session id không còn hợp lệ (`getRequestedSessionId() != null && !isRequestedSessionIdValid()`) thì 302 về LoginView của vai kèm `?expired=1`; `CsrfFilter`: POST tới trang cần đăng nhập mà session không có token cũng vậy (không ghi gì). LoginView thấy `expired=1` ở GET thì hiện `SESSION_EXPIRED` (kind info). Trang công khai (đăng kí) chỉ hiện lại form với token mới, không câu báo | phase 6 |
+| C17 | Lí do huỷ trống (báo cáo không nói; ch.2 2.2 bước 24.7 khách có nhập) | `txtCancelReason` sau `trim()` trống thì `CANCEL_REASON_REQUIRED`, hộp xác nhận vẫn mở, ô `aria-invalid`; dài quá 255 thì `INPUT_TOO_LONG`. Áp cho khách và nhân viên | phase 6, phase 7 |
+| C18 | Phiếu "Chờ nhận" quá ngày giờ hẹn mà khách không đến | Không làm gì (chủ dự án chọn 11/11/2026): không nhãn, không tự huỷ; nhân viên huỷ tay như ch.2 | |
+| C19 | Edge case kĩ thuật ngoài báo cáo (dữ liệu nhập lạ, bấm hai lần, F5, Back, URL trực tiếp, session thiếu thuộc tính, id sửa tay, hai tab) | Theo `plans/261111-tiem-thue-truyen/phase-06-integration.md` §6.1: không trang nào ra 500 hay ghi đôi; thiếu thuộc tính session thì 302 về trang đầu mối; id không có trong danh sách của session thì bỏ qua | phase 6, phase 7 |
