@@ -1,7 +1,6 @@
 import { Suspense, lazy, useCallback, useEffect, useMemo, useState } from 'react'
 import type { IslandProps } from '../../loader/mount-islands'
-// TẠM: đổi sang '@/hooks/useReducedMotion' (lane 5B) lúc merge phase 5, rồi xoá src/three/useReducedMotion.ts.
-import { useReducedMotion } from '../../three/useReducedMotion'
+import { useReducedMotion } from '@/hooks/useReducedMotion'
 import { followLoginLink } from './login-link'
 import { Poster } from './Poster'
 import { SceneBoundary } from './SceneBoundary'
