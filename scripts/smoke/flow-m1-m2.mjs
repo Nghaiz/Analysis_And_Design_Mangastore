@@ -24,7 +24,32 @@ const M = {
   RENTAL_BILL_CREATED: 'Tạo phiếu mượn thành công! Vui lòng đến quầy vào ngày giờ đã hẹn để đặt cọc và nhận truyện.',
   CANCEL_CONFIRM: 'Bạn có chắc chắn muốn huỷ phiếu mượn này?',
   CANCEL_SUCCESS: 'Huỷ phiếu mượn thành công!',
+  EXPECTED_DAYS_INVALID: 'Số ngày thuê phải lớn hơn hoặc bằng 1.',
+  PICKUP_TIME_INVALID: 'Ngày giờ đến nhận phải sau thời điểm hiện tại.',
+  // §10.3: câu ngoài báo cáo, chủ dự án duyệt 11/11/2026.
+  QUANTITY_INVALID: 'Số lượng phải là số nguyên lớn hơn hoặc bằng 1.',
+  BOOK_NOT_CHOSEN: 'Vui lòng chọn đầu truyện.',
+  INPUT_TOO_LONG: 'Nội dung nhập quá dài, vui lòng rút gọn.',
+  SESSION_EXPIRED: 'Phiên làm việc đã hết hạn, vui lòng đăng nhập lại.',
+  CANCEL_REASON_REQUIRED: 'Vui lòng nhập lí do huỷ.',
+  EXPECTED_DAYS_TOO_LONG: 'Số ngày thuê tối đa là 30 ngày.',
 };
+
+function expectRedirect(stepName, page, pathRe) {
+  const target = page.location ? new URL(page.location, BASE_URL) : null;
+  const where = target ? `${target.pathname}${target.search}` : '';
+  if (page.status !== 302 || !pathRe.test(where)) {
+    throw new StepError(stepName, page.url, `302 → ${pathRe}`, `${page.status} → ${where || '(không có Location)'}`);
+  }
+}
+
+function expectAriaInvalid(stepName, page, id) {
+  const re = new RegExp(`<(input|textarea)\\b[^>]*\\sid\\s*=\\s*["']${id}["'][^>]*>`, 'i');
+  const tag = (page.html.match(re) ?? [''])[0];
+  if (!/aria-invalid\s*=\s*["']true["']/.test(tag)) {
+    throw new StepError(stepName, page.url, `ô ${id} có aria-invalid="true"`, tag || '(không có ô)');
+  }
+}
 
 // Khách của ch.2 2.1 bước 5.
 const ANH = {
@@ -141,6 +166,19 @@ async function main() {
     page = await s.post('/doRegister.jsp', { ...ANH, txtIdCard: '12345', btnRegister: '' }, { page });
     expectMessage('C4', page, M.REGISTER_INVALID);
   });
+  await step('§6.1 chữ nhập in lại được escape (họ tên chứa <b>, "), không chèn được thẻ', async () => {
+    const evil = 'Tèo <b>đậm</b> "x"';
+    page = await s.post('/doRegister.jsp', { ...ANH, txtFullName: evil, txtIdCard: '12345', btnRegister: '' }, { page });
+    expectMessage('§6.1 escape', page, M.REGISTER_INVALID);
+    if (page.html.includes('<b>đậm</b>')) throw new StepError('§6.1 escape', page.url, 'thẻ <b> bị escape', 'thẻ <b> nằm nguyên trong HTML');
+    assertEq('§6.1 escape giữ đúng chữ', page.url, evil, valueOf(page.html, 'txtFullName'));
+  });
+  await step('C4 ngày sinh ở tương lai, ngày không có thật → REGISTER_INVALID', async () => {
+    page = await s.post('/doRegister.jsp', { ...ANH, txtDob: isoDate(addDays(vnToday(), 1)), btnRegister: '' }, { page });
+    expectMessage('C4 tương lai', page, M.REGISTER_INVALID);
+    page = await s.post('/doRegister.jsp', { ...ANH, txtDob: '2003-02-31', btnRegister: '' }, { page });
+    expectMessage('C4 31/02', page, M.REGISTER_INVALID);
+  });
   await step('§9.2 mật khẩu nhập lại không khớp → REGISTER_PASSWORD_MISMATCH', async () => {
     page = await s.post('/doRegister.jsp', { ...ANH, txtConfirmPassword: 'Anh@2004', btnRegister: '' }, { page });
     expectMessage('§9.2', page, M.REGISTER_PASSWORD_MISMATCH);
@@ -178,6 +216,11 @@ async function main() {
     expectText('2.1 bước 10', page, 'Trần Minh Anh');
     expectId('2.1 bước 10', page, 'lnkSearchBook');
     expectId('2.1 bước 10', page, 'lnkViewRentalBill');
+    expectId('C14 nút Đăng xuất', page, 'btnLogout');
+  });
+  await step('§6.1 khách đã đăng nhập mở LoginView, RegisterView → về ClientHomeView', async () => {
+    expectRedirect('§6.1 LoginView', await s.get('/LoginView.jsp', { follow: false }), /\/ClientHomeView\.jsp$/);
+    expectRedirect('§6.1 RegisterView', await s.get('/RegisterView.jsp', { follow: false }), /\/ClientHomeView\.jsp$/);
   });
 
   // ---------- 2.2 Khách hàng tìm và chọn truyện ----------
@@ -200,6 +243,26 @@ async function main() {
     expectMessage('2.2 ngoại lệ 5.1', page, M.BOOK_NOT_FOUND);
     assertEq('2.2 ngoại lệ 5.3 danh sách rỗng', page.url, '[]', JSON.stringify(buttonValues(page.html, 'lnkChooseBook')));
   });
+  await step('§6.1 từ khoá > 100 kí tự → INPUT_TOO_LONG; "%" → không tìm thấy; "tham tu" không dấu → ra Conan', async () => {
+    page = await s.post('/SearchBookView.jsp', { txtKeyword: 'a'.repeat(101), btnSearch: '' }, { page });
+    expectMessage('§6.1 từ khoá dài', page, M.INPUT_TOO_LONG);
+    page = await s.post('/SearchBookView.jsp', { txtKeyword: '%', btnSearch: '' }, { page });
+    expectMessage('§6.1 từ khoá %', page, M.BOOK_NOT_FOUND);
+    page = await s.post('/SearchBookView.jsp', { txtKeyword: 'tham tu', btnSearch: '' }, { page });
+    rowWith('§6.1 không dấu', page, 'tblBook', 'DT020');
+  });
+  await step('§6.1 Tạo phiếu mượn khi chưa tích dòng nào → BOOK_NOT_CHOSEN', async () => {
+    page = await s.post('/SearchBookView.jsp', { btnCreateRentalBill: '' }, { page });
+    expectMessage('§6.1 không tích', page, M.BOOK_NOT_CHOSEN);
+  });
+  await step('§6.1 id đầu truyện sửa tay (không có trong kết quả tìm, hoặc là chữ) → bỏ qua, vẫn ở Tìm truyện', async () => {
+    page = await s.post('/SearchBookView.jsp', { lnkChooseBook: '999' }, { page });
+    expectStatus('§6.1 id lạ', page, 200);
+    expectId('§6.1 id lạ', page, 'txtKeyword');
+    page = await s.post('/SearchBookView.jsp', { lnkChooseBook: 'abc' }, { page });
+    expectStatus('§6.1 id chữ', page, 200);
+    expectId('§6.1 id chữ', page, 'txtKeyword');
+  });
   await step('2.2 bước 6 tìm "Doraemon" → DT001 5 quyển, DT002 4, DT015 2', async () => {
     page = await s.post('/SearchBookView.jsp', { txtKeyword: 'Doraemon', btnSearch: '' }, { page });
     const last = (row) => row[row.length - 1];
@@ -218,6 +281,13 @@ async function main() {
     }
     expectId('2.2 bước 8', page, 'txtQuantity');
     expectId('2.2 bước 8', page, 'btnAddToSelectedList');
+  });
+  await step('§6.1 số lượng chữ, 0, âm, thập phân, trống → QUANTITY_INVALID, ô aria-invalid', async () => {
+    for (const q of ['abc', '0', '-2', '1.5', '']) {
+      page = await s.post('/doAddSelectedBook.jsp', { txtQuantity: q, btnAddToSelectedList: '' }, { page });
+      expectMessage(`§6.1 số lượng "${q}"`, page, M.QUANTITY_INVALID);
+      expectAriaInvalid(`§6.1 số lượng "${q}"`, page, 'txtQuantity');
+    }
   });
   await step('§9.2 số lượng vượt quá → "Số lượng vượt quá số quyển hiện có (hiện còn 5 quyển)."', async () => {
     page = await s.post('/doAddSelectedBook.jsp', { txtQuantity: '6', btnAddToSelectedList: '' }, { page });
@@ -262,12 +332,31 @@ async function main() {
     assertEq('2.2 bước 20 tổng tiền thuê', page.url, '42.000đ', textOf(page.html, 'totalRentalPrice'));
     assertEq('C3 giữ ô số ngày', page.url, '7', valueOf(page.html, 'txtExpectedDays'));
   });
+  await step('C15, §9.2: 31 ngày → EXPECTED_DAYS_TOO_LONG; 0 ngày → EXPECTED_DAYS_INVALID; hẹn quá khứ → PICKUP_TIME_INVALID; ghi chú > 255 → INPUT_TOO_LONG', async () => {
+    page = await s.post('/doAddRentalBill.jsp', { ...confirmFields, txtExpectedDays: '31', btnConfirm: '' }, { page });
+    expectMessage('C15', page, M.EXPECTED_DAYS_TOO_LONG);
+    page = await s.post('/doAddRentalBill.jsp', { ...confirmFields, txtExpectedDays: '0', btnConfirm: '' }, { page });
+    expectMessage('§9.2 số ngày 0', page, M.EXPECTED_DAYS_INVALID);
+    page = await s.post('/doAddRentalBill.jsp', { ...confirmFields, txtExpectedPickupAt: isoLocal(addDays(today, -1), '09:00'), btnConfirm: '' }, { page });
+    expectMessage('§9.2 hẹn quá khứ', page, M.PICKUP_TIME_INVALID);
+    page = await s.post('/doAddRentalBill.jsp', { ...confirmFields, txtNote: 'x'.repeat(256), btnConfirm: '' }, { page });
+    expectMessage('§6.1 ghi chú dài', page, M.INPUT_TOO_LONG);
+    assertEq('§6.1 chưa có phiếu nào được tạo', '(DB)', 'null', JSON.stringify(billState(125)));
+  });
   await step('2.2 bước 22 Xác nhận → PM0125 "Chờ nhận" giữ DT001-03, DT020-02, câu RENTAL_BILL_CREATED', async () => {
     page = await s.post('/doAddRentalBill.jsp', { ...confirmFields, btnConfirm: '' }, { page });
     expectMessage('2.2 bước 22', page, M.RENTAL_BILL_CREATED);
     expectId('2.2 bước 24', page, 'lnkViewRentalBill');
     const bill = billState(125);
     assertEq('2.2 bước 22 DB PM0125', '(DB)', '{"status":"Chờ nhận","cancelReason":"","barcodes":["DT001-03","DT020-02"]}', JSON.stringify(bill));
+  });
+  await step('§6.1 bấm Xác nhận lần hai (F5) → về ClientHomeView, không có PM0126', async () => {
+    const again = await s.post('/doAddRentalBill.jsp', { ...confirmFields, btnConfirm: '' }, { page, follow: false });
+    expectRedirect('§6.1 gửi lại', again, /\/ClientHomeView\.jsp$/);
+    assertEq('§6.1 không ghi đôi', '(DB)', 'null', JSON.stringify(billState(126)));
+  });
+  await step('§6.1 mở ConfirmRentalBillView bằng URL khi session đã bỏ rentalBill → về Tìm truyện', async () => {
+    expectRedirect('§6.1 Confirm trực tiếp', await s.get('/ConfirmRentalBillView.jsp', { follow: false }), /\/SearchBookView\.jsp$/);
   });
   await step('2.2 bước 24.1 Danh sách phiếu mượn: PM0125, PM0117, PM0110 (mới nhất trước)', async () => {
     page = await s.get('/RentalBillListView.jsp');
@@ -296,10 +385,23 @@ async function main() {
     page = await s.get('/RentalBillListView.jsp');
     assertEq('2.2 bước 24.4', page.url, '["PM0125","PM0117","PM0110"]', JSON.stringify((tableRows(page.html, 'tblRentalBill') ?? []).map((r) => r[0])));
   });
+  await step('§6.1 id phiếu sửa tay → bỏ qua; "Huỷ phiếu" trên phiếu Đang cho thuê (sửa HTML) → không mở hộp huỷ', async () => {
+    page = await s.post('/RentalBillListView.jsp', { lnkViewDetail: '999' }, { page });
+    expectStatus('§6.1 phiếu lạ', page, 200);
+    assertEq('§6.1 phiếu lạ', page.url, '["PM0125","PM0117","PM0110"]', JSON.stringify((tableRows(page.html, 'tblRentalBill') ?? []).map((r) => r[0])));
+    page = await s.post('/RentalBillListView.jsp', { lnkCancelRentalBill: '110' }, { page });
+    if (hasId(page.html, 'txtCancelReason')) throw new StepError('§6.1 huỷ phiếu đang cho thuê', page.url, 'không mở hộp huỷ cho PM0110', 'hộp huỷ mở');
+  });
   await step('2.2 bước 24.6 Huỷ phiếu PM0117 → hộp xác nhận có câu, ô Lí do huỷ, Xác nhận, Huỷ', async () => {
     page = await s.post('/RentalBillListView.jsp', { lnkCancelRentalBill: '117' }, { page });
     expectText('2.2 bước 24.6', page, M.CANCEL_CONFIRM);
     for (const id of ['txtCancelReason', 'btnConfirmCancel', 'btnCloseCancel']) expectId('2.2 bước 24.6', page, id);
+  });
+  await step('C17 lí do huỷ chỉ có dấu cách → CANCEL_REASON_REQUIRED, hộp vẫn mở, PM0117 chưa đổi', async () => {
+    page = await s.post('/doCancelRentalBill.jsp', { txtCancelReason: '   ', from: 'client', btnConfirmCancel: '' }, { page });
+    expectMessage('C17', page, M.CANCEL_REASON_REQUIRED);
+    expectId('C17 hộp vẫn mở', page, 'txtCancelReason');
+    assertEq('C17 DB', '(DB)', 'Chờ nhận', billState(117)?.status);
   });
   await step('2.2 bước 24.8 lí do "Đổi ý, chưa cần thuê nữa", Xác nhận → CANCEL_SUCCESS, PM0117 "Đã huỷ"', async () => {
     page = await s.post('/doCancelRentalBill.jsp', { txtCancelReason: 'Đổi ý, chưa cần thuê nữa', from: 'client', btnConfirmCancel: '' }, { page });
@@ -322,6 +424,22 @@ async function main() {
     page = await s.post('/SearchBookView.jsp', { txtKeyword: 'Conan', btnSearch: '' }, { page });
     const c = rowWith('sau huỷ', page, 'tblBook', 'DT020');
     assertEq('sau huỷ số lượng DT020 (DT020-01 trả lại)', page.url, '3', c[c.length - 1]);
+  });
+
+  await step('C14 đăng xuất: GET doLogout 405; POST → trang chủ; sau đó ClientHomeView về LoginView', async () => {
+    expectStatus('C14 GET', await s.get('/doLogout.jsp', { follow: false }), 405);
+    page = await s.get('/ClientHomeView.jsp');
+    const out = await s.post('/doLogout.jsp', { btnLogout: '' }, { page, follow: false });
+    expectRedirect('C14 POST', out, /\/HomeView\.jsp$/);
+    expectRedirect('C14 sau đăng xuất', await s.get('/ClientHomeView.jsp', { follow: false }), /\/LoginView\.jsp/);
+  });
+  await step('C16 session hết hạn (cookie phiên cũ) → LoginView?expired=1 có câu SESSION_EXPIRED', async () => {
+    const s4 = new Session(BASE_URL);
+    s4.cookies.set('JSESSIONID', 'het-han-0000000000000000');
+    const r = await s4.get('/ClientHomeView.jsp', { follow: false });
+    expectRedirect('C16', r, /\/LoginView\.jsp\?expired=1$/);
+    const login = await s4.get(new URL(r.location, BASE_URL).pathname + '?expired=1');
+    expectMessage('C16', login, M.SESSION_EXPIRED);
   });
 
   console.log(`[smoke] ALL PASS (${passed} bước, ${BASE_URL}, hôm nay ${isoDate(today)} Asia/Ho_Chi_Minh)`);

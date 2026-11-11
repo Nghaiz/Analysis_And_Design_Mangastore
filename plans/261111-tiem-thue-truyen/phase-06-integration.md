@@ -8,7 +8,9 @@ Owner: orchestrator (chốt 11/11/2026, bước 6.0, trước khi chia lane). B�
 |---|---|---|
 | 6A | 5 file khung `src/main/java/vn/tiemtruyen/filter/*Filter.java`, `WEB-INF/tags/csrf.tag` | Orchestrator tạo ở 6.0: filter cho qua, `csrf.tag` đã là bản thật. 6A viết đè. |
 | 6B | `frontend/src/islands/ShelfScene/**`, `frontend/public/img/shelf/**`, `src/main/webapp/dev/HomePreviewView.jsp` | Ảnh tĩnh khung hẹp và trường `posterNarrowSrc` (`docs/contracts.md` §11.4). |
-| 6C, 6D | không | |
+| 6B | `src/main/webapp/doLogout.jsp` | C14 (đăng xuất), thêm 11/11/2026 |
+| 6C | không | |
+| 6D | `frontend/src/loader/submit-on-change.ts` (+ test) và đúng một dòng gọi nó trong `frontend/src/loader/mount-islands.ts` | `data-submit-on-change` của C3 (ConfirmRentalBillView); bỏ qua sự kiện `isTrusted === false` (`docs/contracts.md` §11) |
 
 Chỉ orchestrator sửa: `web.xml`, `compose*.yaml`, `docs/contracts.md`, `src/main/java/vn/tiemtruyen/util/Display.java`, `scripts/**`. Định dạng hiển thị (§13) gọi `vn.tiemtruyen.util.Display` (`money`, `date`, `dateTime`) và `Codes` (`bookCode`, `rentalBillCode`); trang không tự định dạng tiền hay ngày.
 
