@@ -6,21 +6,25 @@
 //       tuỳ chọn: --css-dir <thư mục CSS đã build>  (mặc định src/main/webapp/static/assets)
 //
 // Kiểm trên CSS ĐÃ BUILD:
-//   1. Bốn họ font, mỗi độ đậm khai báo, có @font-face với unicode-range của subset vietnamese
+//   1. Năm họ font, mỗi độ đậm khai báo, có @font-face với unicode-range của subset vietnamese
 //      (chứa U+1EA0-1EF9) và của subset latin (chứa U+0000-00FF).
-//   2. Không có @font-face của bốn họ cho subset khác (latin-ext, cyrillic…): chỉ latin + vietnamese.
+//   2. Không có @font-face của năm họ cho subset khác (latin-ext, cyrillic…): chỉ latin + vietnamese.
 //   3. Mọi url() trong @font-face trỏ tới file có thật trong thư mục build, và không có URL ngoài
 //      (fonts.googleapis.com, fonts.gstatic.com, CDN).
 //   4. Bản chép trong frontend/public/fonts/ (woff2 và giấy phép OFL của từng họ) giống từng byte file
 //      của gói Fontsource đang cài; không có file lạ.
 //   5. layout.tag preload đúng các file của họ preload (Fuzzy Bubbles 400, Momo Trust Sans), không preload
 //      họ nạp lười, và mọi href preload có file thật trong build.
-//   6. Mọi tên họ font trong font-family và biến --font-* của CSS đã build là một trong bốn họ tự host,
+//   6. Mọi tên họ font trong font-family và biến --font-* của CSS đã build là một trong năm họ tự host,
 //      một font hệ thống dự phòng (SYSTEM_FALLBACKS) hay từ khoá CSS: họ font đã bỏ còn sót là vi phạm.
+//   7. Họ đánh dấu tabularDigits (font của --font-num): trong mỗi file subset có chữ số (latin), 10 chữ
+//      số 0–9 có cùng advance width (đọc bảng hmtx/cmap của bản chép trong public/fonts, font-digits.mjs).
+//      Subset vietnamese không chứa chữ số (unicode-range không gồm U+0030-0039) nên bỏ qua.
 // Exit 0: đạt. Exit 1: vi phạm (liệt kê từng dòng). Exit 2: thiếu đầu vào (chưa build, chưa npm ci).
 import { copyFileSync, existsSync, mkdirSync, readdirSync, readFileSync } from 'node:fs';
 import { dirname, join, relative } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { digitAdvances } from './font-digits.mjs';
 
 const FRONTEND = join(dirname(fileURLToPath(import.meta.url)), '..');
 const ROOT = join(FRONTEND, '..');
@@ -65,9 +69,21 @@ const FAMILIES = [
     preloadWeights: [],
     file: (subset, weight) => `momo-trust-display-${subset}-${weight}-normal.woff2`,
   },
+  {
+    // --font-num: chữ số mặc định cùng bề rộng (600/1000 em), không cần tnum; bản tĩnh, không variable
+    family: 'Nunito',
+    pkg: '@fontsource/nunito',
+    weights: ['400', '700'],
+    preloadWeights: [],
+    tabularDigits: true,
+    file: (subset, weight) => `nunito-${subset}-${weight}-normal.woff2`,
+  },
 ];
 
-// Tên được phép trong font-family và biến --font-* của CSS đã build, ngoài bốn họ tự host: font hệ thống
+// Subset có chữ số 0–9 (U+0030-0039): kiểm 7 chỉ đòi đủ 10 chữ số ở các subset này.
+const DIGIT_SUBSETS = ['latin'];
+
+// Tên được phép trong font-family và biến --font-* của CSS đã build, ngoài năm họ tự host: font hệ thống
 // dự phòng của tokens.css, stack mặc định của Tailwind, từ khoá chung của CSS. Họ nào khác (ví dụ một họ
 // font đã bỏ còn sót trong stack hay @font-face) là vi phạm.
 const SYSTEM_FALLBACKS = [
@@ -221,7 +237,7 @@ function main() {
   for (const f of cssFiles) {
     for (const { prop, name } of familyNames(readFileSync(join(cssDir, f), 'utf8'))) {
       if (!allowed.has(name.toLowerCase())) {
-        violations.push(`${f}: ${prop} có họ font "${name}" không thuộc bốn họ tự host hay font hệ thống dự phòng → bỏ khỏi frontend/src/styles/ (tokens.css, fonts.css…)`);
+        violations.push(`${f}: ${prop} có họ font "${name}" không thuộc các họ tự host hay font hệ thống dự phòng → bỏ khỏi frontend/src/styles/ (tokens.css, fonts.css…)`);
       }
     }
   }
@@ -260,6 +276,29 @@ function main() {
     }
   }
 
+  // 7. Chữ số cùng bề rộng ở font của --font-num
+  let digitFiles = 0;
+  for (const e of expected.filter((x) => x.tabularDigits)) {
+    const copy = join(PUBLIC_FONTS, e.name);
+    if (!existsSync(copy)) continue; // đã báo ở bước 4
+    let widths;
+    try {
+      widths = digitAdvances(copy);
+    } catch (error) {
+      violations.push(`frontend/public/fonts/${e.name}: không đọc được độ rộng chữ số (${error.message})`);
+      continue;
+    }
+    const found = Object.keys(widths);
+    if (found.length === 0 && !DIGIT_SUBSETS.includes(e.subset)) continue;
+    digitFiles++;
+    const list = found.map((d) => `${d}:${widths[d]}`).join(' ');
+    if (found.length !== 10) {
+      violations.push(`frontend/public/fonts/${e.name} ("${e.family}" ${e.weight}, subset ${e.subset}) thiếu chữ số: chỉ có [${list}] → --font-num cần đủ 0–9 trong subset này`);
+    } else if (new Set(Object.values(widths)).size !== 1) {
+      violations.push(`frontend/public/fonts/${e.name} ("${e.family}" ${e.weight}): chữ số không cùng bề rộng [${list}] → --font-num phải là font có chữ số mặc định cùng bề rộng`);
+    }
+  }
+
   // 5. Preload trong layout.tag
   const layout = readFileSync(LAYOUT_TAG, 'utf8');
   const preloads = [...layout.matchAll(/<link\b[^>]*\brel="preload"[^>]*>/g)]
@@ -291,10 +330,10 @@ function main() {
   const families = FAMILIES.length;
   if (violations.length) {
     for (const v of violations) console.error(`${TAG} FAIL ${v}`);
-    console.error(`${TAG} FAIL ${violations.length} vi phạm (ngưỡng: ${families} họ font đều có subset vietnamese + latin, không subset khác, không URL ngoài, không họ font lạ)`);
+    console.error(`${TAG} FAIL ${violations.length} vi phạm (ngưỡng: ${families} họ font đều có subset vietnamese + latin, không subset khác, không URL ngoài, không họ font lạ, chữ số --font-num cùng bề rộng)`);
     process.exit(1);
   }
-  console.log(`${TAG} PASS ${families} họ font có subset vietnamese (U+1EA0-1EF9) và latin; ${faces.length} @font-face trong ${cssFiles.length} file CSS; ${copies.length} file (woff2 + OFL) khớp Fontsource; ${preloads.length} preload đúng; không họ font lạ`);
+  console.log(`${TAG} PASS ${families} họ font có subset vietnamese (U+1EA0-1EF9) và latin; ${faces.length} @font-face trong ${cssFiles.length} file CSS; ${copies.length} file (woff2 + OFL) khớp Fontsource; ${preloads.length} preload đúng; không họ font lạ; ${digitFiles} file của --font-num có 0–9 cùng bề rộng`);
 }
 
 main();

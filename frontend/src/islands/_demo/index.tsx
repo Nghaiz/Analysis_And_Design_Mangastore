@@ -23,6 +23,7 @@ const FONT_SAMPLES = [
   { className: 'font-type', label: 'Momo Trust Sans' },
   { className: 'font-pen', label: 'Momo Signature' },
   { className: 'font-sign', label: 'Momo Trust Display' },
+  { className: 'font-num', label: 'Nunito' },
 ] as const
 
 export default function DemoStyleGuide() {
@@ -51,15 +52,35 @@ export default function DemoStyleGuide() {
             <tr>
               <th scope="col">Mã</th>
               <th scope="col">Tên đầu truyện</th>
-              <th scope="col">Giá thuê</th>
+              <th scope="col" className="text-right">
+                Giá thuê
+              </th>
             </tr>
           </thead>
           <tbody>
             <tr>
-              <td>{bookCode(DEMO.bookId)}</td>
+              <td className="font-num">{bookCode(DEMO.bookId)}</td>
               <td>{DEMO.bookName}</td>
-              <td>{formatMoney(DEMO.rentalPrice)}</td>
+              <td className="font-num text-right">{formatMoney(DEMO.rentalPrice)}</td>
             </tr>
+          </tbody>
+        </LedgerTable>
+        <LedgerTable caption={DEMO.numCaption}>
+          <thead>
+            <tr>
+              <th scope="col">Mã phiếu</th>
+              <th scope="col" className="text-right">
+                Tiền
+              </th>
+            </tr>
+          </thead>
+          <tbody>
+            {DEMO.numRows.map((row) => (
+              <tr key={row.rentalBillId}>
+                <td className="font-num">{rentalBillCode(row.rentalBillId)}</td>
+                <td className="font-num text-right">{formatMoney(row.amount)}</td>
+              </tr>
+            ))}
           </tbody>
         </LedgerTable>
       </PaperCard>

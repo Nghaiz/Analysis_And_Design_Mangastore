@@ -86,7 +86,7 @@
   <%-- ===================== Font ===================== --%>
   <section id="font" class="mb-16" aria-labelledby="font-h">
     <h2 id="font-h">Font</h2>
-    <p class="text-ink-soft">Tự host, chỉ subset latin và vietnamese, cả bốn họ giấy phép SIL OFL 1.1. Fuzzy Bubbles 400 và Momo Trust Sans được preload; Fuzzy Bubbles 700, Momo Signature và Momo Trust Display nạp lười.</p>
+    <p class="text-ink-soft">Tự host, chỉ subset latin và vietnamese, cả năm họ giấy phép SIL OFL 1.1. Fuzzy Bubbles 400 và Momo Trust Sans được preload; Fuzzy Bubbles 700, Momo Signature, Momo Trust Display và Nunito nạp lười. Nunito (<code>--font-num</code>) cho mọi chữ số và mã cần thẳng cột: chữ số mặc định cùng bề rộng.</p>
     <dl class="grid gap-4">
       <div class="border-b border-ink-soft pb-3">
         <dt class="tt-typed text-sm text-ink-soft">--font-body · Fuzzy Bubbles 400</dt>
@@ -107,6 +107,14 @@
       <div class="border-b border-ink-soft pb-3">
         <dt class="tt-typed text-sm text-ink-soft">--font-sign · Momo Trust Display 400</dt>
         <dd class="tt-sign m-0 text-2xl">Đã huỷ · Ố vàng · Nguyễn Thu Hà · Thám tử lừng danh Conan</dd>
+      </div>
+      <div class="border-b border-ink-soft pb-3">
+        <dt class="tt-typed text-sm text-ink-soft">--font-num · Nunito 400</dt>
+        <dd class="m-0 font-num text-2xl font-normal">PM0125 · DT001-03 · 89.500đ · 21.000đ · 25/09/2026 14:30 · 0123456789 · Đã huỷ · Ố vàng · Nguyễn Thu Hà · Thám tử lừng danh Conan</dd>
+      </div>
+      <div class="border-b border-ink-soft pb-3">
+        <dt class="tt-typed text-sm text-ink-soft">--font-num · Nunito 700</dt>
+        <dd class="m-0 font-num text-2xl font-bold">PM0125 · DT001-03 · 89.500đ · 21.000đ · 25/09/2026 14:30 · 0123456789 · Đã huỷ · Ố vàng · Nguyễn Thu Hà · Thám tử lừng danh Conan</dd>
       </div>
     </dl>
     <p class="mt-4 text-sm">Cỡ nhỏ nhất (dấu chồng không bị cắt): <span class="font-type">ĐÃ HUỶ · Ẩ Ặ Ồ Ỡ Ữ</span> · <span class="font-pen">ẫ ặ ố ỡ ự</span> · <span class="tt-sign">Ổ Ẵ Ự</span></p>
@@ -201,12 +209,12 @@
     <h3 class="mt-8"><code>&lt;ui:ledger-table&gt;</code> bảng sổ</h3>
     <ui:ledger-table caption="Danh sách truyện thuê">
       <thead>
-        <tr><th scope="col">Mã</th><th scope="col">Tên đầu truyện</th><th scope="col">Mã vạch</th><th scope="col">Giá thuê/ngày</th><th scope="col">Tình trạng khi giao</th></tr>
+        <tr><th scope="col">Mã</th><th scope="col">Tên đầu truyện</th><th scope="col">Mã vạch</th><th scope="col" class="text-right">Giá thuê/ngày</th><th scope="col">Tình trạng khi giao</th></tr>
       </thead>
       <tbody>
-        <tr><td>DT001</td><td>Thám tử lừng danh Conan - Tập 1</td><td class="font-type tabular-nums">DT001-03</td><td>3.000đ</td><td><ui:condition-tag text="Không có lỗi"/></td></tr>
-        <tr><td>DT002</td><td>Doraemon - Tập 5</td><td class="font-type tabular-nums">DT002-01</td><td>2.000đ</td><td><ui:condition-tag text="Rách bìa, Vết bẩn, viết vẽ"/></td></tr>
-        <tr><td>DT003</td><td>Thần đồng đất Việt - Tập 12</td><td class="font-type tabular-nums">DT003-02</td><td>2.500đ</td><td><ui:condition-tag text=""/></td></tr>
+        <tr><td class="font-num">DT001</td><td>Thám tử lừng danh Conan - Tập 1</td><td class="font-num">DT001-03</td><td class="font-num text-right">3.000đ</td><td><ui:condition-tag text="Không có lỗi"/></td></tr>
+        <tr><td class="font-num">DT002</td><td>Doraemon - Tập 5</td><td class="font-num">DT002-01</td><td class="font-num text-right">2.000đ</td><td><ui:condition-tag text="Rách bìa, Vết bẩn, viết vẽ"/></td></tr>
+        <tr><td class="font-num">DT003</td><td>Thần đồng đất Việt - Tập 12</td><td class="font-num">DT003-02</td><td class="font-num text-right">2.500đ</td><td><ui:condition-tag text=""/></td></tr>
       </tbody>
     </ui:ledger-table>
 
@@ -254,10 +262,21 @@
           <ui:paper-card>
             <ui:ledger-table caption="Danh sách truyện thuê">
               <thead>
-                <tr><th scope="col">Mã</th><th scope="col">Tên đầu truyện</th><th scope="col">Giá thuê</th></tr>
+                <tr><th scope="col">Mã</th><th scope="col">Tên đầu truyện</th><th scope="col" class="text-right">Giá thuê</th></tr>
               </thead>
               <tbody>
-                <tr><td>DT001</td><td>Thám tử lừng danh Conan - Tập 1</td><td>3.000đ</td></tr>
+                <tr><td class="font-num">DT001</td><td>Thám tử lừng danh Conan - Tập 1</td><td class="font-num text-right">3.000đ</td></tr>
+              </tbody>
+            </ui:ledger-table>
+            <ui:ledger-table caption="Thử thẳng cột số">
+              <thead>
+                <tr><th scope="col">Mã phiếu</th><th scope="col" class="text-right">Tiền</th></tr>
+              </thead>
+              <tbody>
+                <tr><td class="font-num">PM0001</td><td class="font-num text-right">3.000đ</td></tr>
+                <tr><td class="font-num">PM0012</td><td class="font-num text-right">21.000đ</td></tr>
+                <tr><td class="font-num">PM0125</td><td class="font-num text-right">7.500đ</td></tr>
+                <tr><td class="font-num">PM1111</td><td class="font-num text-right">89.500đ</td></tr>
               </tbody>
             </ui:ledger-table>
           </ui:paper-card>
@@ -279,6 +298,7 @@
             <li class="font-type">Momo Trust Sans: Đã huỷ · Ố vàng · Nguyễn Thu Hà · Thám tử lừng danh Conan</li>
             <li class="font-pen">Momo Signature: Đã huỷ · Ố vàng · Nguyễn Thu Hà · Thám tử lừng danh Conan</li>
             <li class="font-sign">Momo Trust Display: Đã huỷ · Ố vàng · Nguyễn Thu Hà · Thám tử lừng danh Conan</li>
+            <li class="font-num">Nunito: Đã huỷ · Ố vàng · Nguyễn Thu Hà · Thám tử lừng danh Conan</li>
           </ul>
         </div>
       </div>
