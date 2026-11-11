@@ -13,3 +13,6 @@ singleServerConfig:
 password: "${REDIS_PASSWORD}"
 threads: 4
 nettyThreads: 8
+# JDK serialization (model Serializable, SerializationTest kiểm). Không dùng Kryo5Codec mặc định: Kryo không giữ
+# tham chiếu vòng Book.listBookCopy ↔ BookCopy.book nên tràn ngăn xếp khi session có listBook (500).
+codec: !<org.redisson.codec.SerializationCodec> {}

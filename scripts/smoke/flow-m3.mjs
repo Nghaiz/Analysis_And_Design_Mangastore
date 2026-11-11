@@ -176,7 +176,7 @@ async function main() {
     'DELETE FROM tblRentedBook WHERE rentalBillId = 126;',
     'DELETE FROM tblRentalBill WHERE id = 126;',
     "INSERT INTO tblRentalBill (id, createdAt, expectedPickupAt, expectedDays, discount, status, clientId)" +
-      " SELECT 126, NOW(), NOW() + INTERVAL 1 DAY, 3, 0, 'Chờ nhận', userId FROM tblUser WHERE username = 'khach01';",
+      " SELECT 126, NOW(), NOW() + INTERVAL 1 DAY, 3, 0, 'Chờ nhận', id FROM tblUser WHERE username = 'khach01';",
     "INSERT INTO tblRentedBook (rentalPrice, rentalBillId, bookCopyId) SELECT 3000, 126, id FROM tblBookCopy WHERE barcode = 'DT021-01';",
   ].join('\n'));
 
@@ -210,7 +210,7 @@ async function main() {
   page = await send(a, page, PAGE.search, { txtKeyword: '001203012345', btnSearch: '' });
   assertEq(stepOf('6.5', 'danh sách theo CCCD'), PAGE.search, ['PM0125', 'PM0117', 'PM0110'], firstColumn(page.html, 'tblRentalBill'));
   const row125 = (tableRows(page.html, 'tblRentalBill') ?? [])[0] ?? [];
-  for (const cell of ['Trần Minh Anh', '0912345678', '2', 'Chờ nhận']) {
+  for (const cell of ['Trần Minh Anh', '0912345678', '2', 'Chờ nhận'.toLocaleUpperCase('vi')]) {
     if (!row125.includes(cell)) throw new StepError(stepOf('6.5', 'dòng PM0125'), PAGE.search, cell, row125.join(' | '));
   }
   let pick = await send(a, page, PAGE.search, { lnkChooseRentalBill: '117' });
