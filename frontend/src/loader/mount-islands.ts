@@ -1,4 +1,6 @@
 import type { ComponentType } from 'react'
+import { installMessageOk } from './message-ok'
+import { installSubmitOnChange } from './submit-on-change'
 
 /** Props an island receives: the JSON object from its `<script type="application/json">`. */
 export type IslandProps = Record<string, unknown>
@@ -102,6 +104,8 @@ class IslandError extends Error {}
  */
 export async function mountIslands(options: MountOptions): Promise<MountReport> {
   const root = options.root ?? document
+  installSubmitOnChange(root)
+  installMessageOk(root)
   const reportError = options.reportError ?? defaultReportError
   const report: MountReport = { mounted: [], failed: [] }
 
