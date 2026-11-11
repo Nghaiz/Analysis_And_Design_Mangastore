@@ -13,7 +13,7 @@ Nhánh phase: `phase/06-chuc-nang-1-2` (phiên 55, worktree `06-orch`) và `phas
 - Hợp đồng đã commit trước khi mở bất kì lane song song nào.
 - Mỗi lane sửa code một worktree `D:/Coding/mangastore-wt/<0N>-<lane>`; Owns không chồng nhau; file dùng chung (`contract.md` §8) chỉ orchestrator sửa.
 - Lane ghi báo cáo chi tiết vào `plans/reports/`, trả về tóm tắt ≤ 15 dòng kèm đường dẫn và trạng thái.
-- Trạng thái lane: `chờ` · `xếp hàng` · `đang chạy` · `xong` · `trễ` · `hỏng` · `chặn`.
+- Trạng thái lane: `chờ` · `xếp hàng` · `xong, merge (3bf2fb0): 50/50 pass` · `xong` · `trễ` · `hỏng` · `chặn`.
 
 ## Đang chạy (tối đa 3 dòng)
 
@@ -74,13 +74,13 @@ Nhánh phase: `phase/06-chuc-nang-1-2` (phiên 55, worktree `06-orch`) và `phas
 | 7 | 7E `xac-minh-m3` | Playwright MCP chức năng 3 | `t1k-web-testing-tester` | `plans/reports/` | 7A, 7B, 7C | xong (L1 in A5, L2 tiêu đề cột → sửa 33afcba, đo lại PASS) | `plans/reports/phase-07-xac-minh-m3-261111-1203.md` |
 | 7 | 7F `xac-minh-quan-tri` | Playwright MCP quản trị | `t1k-web-testing-tester` | `plans/reports/` | 7D | xong (0 lỗi) | `plans/reports/phase-07-xac-minh-quan-tri-261111-1220.md` |
 | 8 | 8.0 orchestrator | gói e2e, config, fixture chung, Accept, `phase-08-integration.md` | phiên chính | xem `phase-08-integration.md` §1 | phase 7 | xong | |
-| 8 | 8A1 `e2e-dang-ki` | 01-dang-ki.spec.ts (2.1 và ngoại lệ) | `t1k-web-core-developer` | `e2e/tests/01-dang-ki.spec.ts`, `e2e/fixtures/dang-ki-*` | 8.0 | đang chạy | |
-| 8 | 8A2 `e2e-chon` | 02-tim-chon-truyen.spec.ts (2.2 và ngoại lệ) | `t1k-web-core-developer` | `e2e/tests/02-tim-chon-truyen.spec.ts`, `e2e/fixtures/chon-*` | 8.0 | đang chạy | |
-| 8 | 8A3 `e2e-quay` | 03-nhan-truyen-tai-quay.spec.ts (2.3 và ngoại lệ) | `t1k-web-core-developer` | `e2e/tests/03-nhan-truyen-tai-quay.spec.ts`, `e2e/fixtures/quay-*` | 8.0 | đang chạy | |
-| 8 | 8A4 `e2e-bao-mat` | bao-mat.spec.ts (CSRF, chặn chéo, giảm chuyển động, axe AA) | `t1k-web-core-developer` | `e2e/tests/bao-mat.spec.ts`, `e2e/fixtures/bao-mat-*` | 8.0 | đang chạy | |
+| 8 | 8A1 `e2e-dang-ki` | 01-dang-ki.spec.ts (2.1 và ngoại lệ) | `t1k-web-core-developer` | `e2e/tests/01-dang-ki.spec.ts`, `e2e/fixtures/dang-ki-*` | 8.0 | bỏ (chủ dự án 11/11) | |
+| 8 | 8A2 `e2e-chon` | 02-tim-chon-truyen.spec.ts (2.2 và ngoại lệ) | `t1k-web-core-developer` | `e2e/tests/02-tim-chon-truyen.spec.ts`, `e2e/fixtures/chon-*` | 8.0 | xong, merge (1c22264); Trivy đỏ, sửa bỏ | |
+| 8 | 8A3 `e2e-quay` | 03-nhan-truyen-tai-quay.spec.ts (2.3 và ngoại lệ) | `t1k-web-core-developer` | `e2e/tests/03-nhan-truyen-tai-quay.spec.ts`, `e2e/fixtures/quay-*` | 8.0 | bỏ (chủ dự án 11/11) | |
+| 8 | 8A4 `e2e-bao-mat` | bao-mat.spec.ts (CSRF, chặn chéo, giảm chuyển động, axe AA) | `t1k-web-core-developer` | `e2e/tests/bao-mat.spec.ts`, `e2e/fixtures/bao-mat-*` | 8.0 | xong, merge (8acd99c); số chờ để trống | |
 | 8 | 8B `ci` | GitHub Actions | `t1k-web-core-developer` | `.github/workflows/**` | 8.0 | đang chạy | |
 | 8 | 8C `lighthouse-do` | đo Lighthouse mọi trang | `t1k-web-core-developer` | `e2e/lighthouse/**` | 8.0 | đang chạy | |
-| 8 | 8D `sua-lighthouse` | sửa theo danh sách file | theo danh sách | danh sách do orchestrator ghi ở đây | 8.4 | chờ | |
+| 8 | 8D `sua-lighthouse` | sửa theo danh sách file | theo danh sách | danh sách do orchestrator ghi ở đây | 8.4 | bỏ | |
 | 8 | 8E `tai-lieu` | README, docs cuối | `t1k-docs-manager` | `README.md`, `docs/architecture.md`, `docs/pdr.md` | 8.0 (chủ dự án: chạy ngay, cập nhật lại sau 8A, 8B) | đang chạy | |
 
 ## Danh sách file của lane 8D (orchestrator ghi sau bước 8.4)
@@ -124,3 +124,4 @@ Nhánh phase: `phase/06-chuc-nang-1-2` (phiên 55, worktree `06-orch`) và `phas
 | 2026-11-11 | Phase 7: Docker VM nâng lên 12,5 GB/8 CPU (chủ dự án duyệt, phiên 55 làm). Smoke M3 PASS, probe D6 ALL PASS, verify 400 test, frontend 186 test. Sửa: codec session Redisson Kryo5 → SerializationCodec + test codec runtime (fdaf8b6, 500 khi session có listBook), từ khoá > 100 kí tự (9448e88), lưu danh sách quyển xoá ghi chú khách (5dade05, contract-guard), in A5 tràn trang và tiêu đề cột vỡ (33afcba, 7E). contract-guard 0 vi phạm. 7E, 7F gộp một agent vì trình duyệt MCP dùng chung |
 | 2026-11-11 | Phase 7: phase 6 vào main (PR #10); merge origin/main. 7G gộp helper island SelectedStack vào `frontend/src/lib` (196 test). 7H làm đỏ có chủ đích điều kiện cọc: FAIL rồi PASS. Accept bước 2 sửa reporter Vitest (75d3edd). Accept phase 7 ALL PASS 5/5 (ff75cdf). 7I đo phiếu 6 đầu truyện A5 đang chạy |
 | 2026-11-11 | Phase 8: chủ dự án yêu cầu xong trong 1 giờ, không giới hạn 3 agent. 8.0 xong (gói e2e, config, fixture chung dùng lại `scripts/smoke/lib/e2e-db.mjs`, Accept, `phase-08-integration.md`); ảnh app tag `p8` build sẵn; 8A tách 4 lane theo file test; spawn 8A1–8A4, 8B, 8C, 8E cùng lúc (7 agent) |
+| 2026-11-11 | Phase 8: chủ dự án chỉ giữ 8A1, 8A2, 8A3; dừng 8A4, 8C, 8F (sửa Trivy), bỏ 8D; giữ 8B, 8E đã merge. Sau 8A2, 8A3: merge, chạy cả bộ Playwright, commit; không push, không PR, không chạy Accept đủ |
