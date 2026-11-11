@@ -16,6 +16,8 @@ WORKDIR /src/frontend
 COPY frontend/package.json frontend/package-lock.json ./
 RUN --mount=type=cache,target=/root/.npm npm ci --no-audit --no-fund
 COPY frontend/ ./
+# vite.config.ts phát thể loại ra static/data/categories.json (SSOT ở pipeline/config, contract.md §6).
+COPY pipeline/config/categories.json /src/pipeline/config/categories.json
 RUN npm run build && test -f /src/src/main/webapp/static/.vite/manifest.json
 
 FROM ${MAVEN_IMAGE} AS war

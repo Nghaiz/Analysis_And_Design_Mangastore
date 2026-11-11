@@ -22,4 +22,10 @@ export default defineConfig([
       globals: globals.browser,
     },
   },
+  {
+    // shadcn files export their cva variants next to the component (buttonVariants);
+    // islands mount once per page and never hot-reload through these files.
+    files: ['src/components/ui/**/*.tsx'],
+    rules: { 'react-refresh/only-export-components': 'off' },
+  },
 ])
