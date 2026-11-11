@@ -91,9 +91,8 @@
     List<Integer> valueInvalid = new ArrayList<>();
     List<Integer> noteInvalid = new ArrayList<>();
     String keyword = clean(request.getParameter("txtKeyword"));
-    if (keyword.length() > KEYWORD_MAX) {
-        keyword = keyword.substring(0, KEYWORD_MAX);
-    }
+    // Từ khoá dài quá KEYWORD_MAX kí tự: INPUT_TOO_LONG, không gọi DAO (docs/contracts.md §10.3).
+    boolean keywordTooLong = keyword.codePointCount(0, keyword.length()) > KEYWORD_MAX;
 
     if (selfPost) {
         if (listRentalCollateral != null) {
@@ -114,6 +113,8 @@
         }
 
         if (!valueInvalid.isEmpty() || !noteInvalid.isEmpty()) {
+            message = Messages.INPUT_TOO_LONG;
+        } else if (request.getParameter("btnSearch") != null && keywordTooLong) {
             message = Messages.INPUT_TOO_LONG;
         } else if (request.getParameter("btnSearch") != null) {
             if (keyword.isEmpty()) {

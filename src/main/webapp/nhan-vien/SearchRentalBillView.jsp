@@ -35,16 +35,17 @@
     boolean ownPost = "POST".equals(request.getMethod()) && request.getDispatcherType() == DispatcherType.REQUEST;
     @SuppressWarnings("unchecked")
     List<RentalBill> listRentalBill = (List<RentalBill>) session.getAttribute("listRentalBill");
-    // Từ khoá: trim + NFC, cắt còn KEYWORD_MAX_LENGTH kí tự (phase-07-edge-cases.md §3.2). Ô tìm chỉ điền lại khi
+    // Từ khoá: trim + NFC; dài quá KEYWORD_MAX_LENGTH kí tự → INPUT_TOO_LONG, không gọi DAO (docs/contracts.md §10.3).
+    // Ô tìm chỉ điền lại khi
     // request đến từ form của chính trang này (forward từ doXxx mang field của form khác).
     String keyword = request.getParameter("txtKeyword");
     String text = keyword == null ? "" : Normalizer.normalize(keyword.strip(), Normalizer.Form.NFC);
-    if (text.length() > KEYWORD_MAX_LENGTH) {
-        text = text.substring(0, KEYWORD_MAX_LENGTH);
-    }
+    boolean keywordTooLong = text.codePointCount(0, text.length()) > KEYWORD_MAX_LENGTH;
     String keywordValue = ownPost ? text : "";
 
-    if (ownPost && request.getParameter("btnSearch") != null) {
+    if (ownPost && request.getParameter("btnSearch") != null && keywordTooLong) {
+        request.setAttribute("message", Messages.INPUT_TOO_LONG);
+    } else if (ownPost && request.getParameter("btnSearch") != null) {
         listRentalBill = new ArrayList<>();
         if (!text.isEmpty()) {
             try (RentalBillDAO dao = new RentalBillDAO()) {

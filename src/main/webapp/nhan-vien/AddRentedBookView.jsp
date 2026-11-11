@@ -86,13 +86,14 @@
     boolean bookInvalid = false;
     boolean quantityInvalid = false;
     String keyword = clean(request.getParameter("txtKeyword"));
-    if (keyword.length() > KEYWORD_MAX) {
-        keyword = keyword.substring(0, KEYWORD_MAX);
-    }
+    // Từ khoá dài quá KEYWORD_MAX kí tự: INPUT_TOO_LONG, không gọi DAO (docs/contracts.md §10.3).
+    boolean keywordTooLong = keyword.codePointCount(0, keyword.length()) > KEYWORD_MAX;
     String chosenParam = selfPost ? clean(request.getParameter("lnkChooseBook")) : "";
     int chosenBookId = positiveInt(chosenParam);
 
-    if (selfPost && request.getParameter("btnSearch") != null) {
+    if (selfPost && request.getParameter("btnSearch") != null && keywordTooLong) {
+        message = Messages.INPUT_TOO_LONG;
+    } else if (selfPost && request.getParameter("btnSearch") != null) {
         if (keyword.isEmpty()) {
             listBook = new ArrayList<>();
         } else {

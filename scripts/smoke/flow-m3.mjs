@@ -205,6 +205,8 @@ async function main() {
   expectText('4', 'giao diện Tìm phiếu mượn', page, PAGE.search, 'Tìm phiếu mượn');
   page = await send(a, page, PAGE.search, { txtKeyword: 'PM0152', btnSearch: '' });
   expectMessage('6.2', 'tìm PM0152', page, PAGE.search, M.NOT_FOUND_BILL);
+  page = await send(a, page, PAGE.search, { txtKeyword: LONG_100, btnSearch: '' });
+  expectMessage('EC', 'từ khoá quá 100 kí tự (§10.3)', page, PAGE.search, M.INPUT_TOO_LONG);
   page = await send(a, page, PAGE.search, { txtKeyword: '001203012345', btnSearch: '' });
   assertEq(stepOf('6.5', 'danh sách theo CCCD'), PAGE.search, ['PM0125', 'PM0117', 'PM0110'], firstColumn(page.html, 'tblRentalBill'));
   const row125 = (tableRows(page.html, 'tblRentalBill') ?? [])[0] ?? [];

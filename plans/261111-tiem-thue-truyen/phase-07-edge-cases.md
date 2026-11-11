@@ -60,7 +60,7 @@ Thứ tự kiểm ở đầu mỗi trang M3 (trước mọi xử lí nút): (1) 
 | Ô | Trường hợp | Xử lí |
 |---|---|---|
 | `txtKeyword` (Search, AddRentedBook, AddCondition, AddRentalCollateral) | trống hoặc chỉ dấu cách | C9: câu "không tìm thấy" của trang, không gọi DAO |
-| | dài quá 100 kí tự | cắt còn 100 |
+| | dài quá 100 kí tự | `INPUT_TOO_LONG`, không gọi DAO, giữ danh sách cũ (`docs/contracts.md` §10.3); ô có `maxlength="100"` |
 | | `pm0125`, ` PM0125 `, `PM125` | C9 (khớp id, không phân biệt hoa thường; trim) |
 | | không dấu, khác hoa thường (`ran bia`, `TIEN MAT`) | khớp như có dấu (collation `utf8mb4_0900_ai_ci`) |
 | `txtDiscount` | trống | coi là 0 |
