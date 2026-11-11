@@ -1,0 +1,358 @@
+/*
+ * Component hoài niệm, lớp tiền tố tt- kiểu BEM (phase-05-ui-contract.md §3). Tag JSP
+ * (WEB-INF/tags/ui/*.tag) và component React (components/nostalgia/*.tsx) in đúng cây lớp này.
+ * Chữ chỉ dùng màu đã đo AA trên paper / paper-deep / tape (docs/design-tokens.md §1).
+ * Bo góc ≤ 2px; chuyển động chỉ trong `prefers-reduced-motion: no-preference`, và khối cuối file
+ * tắt mọi chuyển động CSS khi người dùng chọn giảm chuyển động.
+ */
+
+@layer components {
+  /* ---------- Phiếu xé từ sổ: .tt-ticket ---------- */
+  .tt-ticket {
+    position: relative;
+    max-width: 40rem;
+    padding: 0 var(--s-5) var(--s-5);
+    background-color: var(--color-paper);
+    background-image: url("/img/paper-grain.svg");
+    background-size: 180px 180px;
+    color: var(--color-ink);
+    border-radius: var(--radius-none);
+    box-shadow: var(--shadow-paper);
+  }
+
+  /* Mép răng cưa: hàng lỗ đục và đường xé nét đứt ở đầu phiếu */
+  .tt-ticket__perf {
+    height: var(--s-4);
+    margin: 0 calc(-1 * var(--s-5)) var(--s-4);
+    background-color: var(--color-paper-deep);
+    background-image: radial-gradient(circle at center, var(--color-paper) 0 3px, transparent 3.5px);
+    background-size: var(--s-3) var(--s-4);
+    background-repeat: repeat-x;
+    background-position: center;
+    border-bottom: 1px dashed var(--color-ink-soft);
+  }
+
+  .tt-ticket__head {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: var(--s-2) var(--s-4);
+    padding-bottom: var(--s-2);
+    margin-bottom: var(--s-4);
+    border-bottom: 3px double var(--color-ink-soft);
+  }
+
+  .tt-ticket__title {
+    margin: 0;
+    font-family: var(--font-type);
+    font-variation-settings: normal;
+    font-weight: 400;
+    font-size: 1.25rem;
+    line-height: 1.5;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: var(--color-ink);
+  }
+
+  /* Số phiếu in đỏ như sổ phiếu in sẵn */
+  .tt-ticket__code {
+    font-family: var(--font-type);
+    font-size: 1.375rem;
+    line-height: 1.4;
+    letter-spacing: 0.06em;
+    color: var(--color-stamp-red);
+  }
+
+  .tt-ticket__body {
+    font-family: var(--font-body);
+  }
+
+  /* ---------- Dấu trạng thái: .tt-stamp (chữ luôn có trong DOM) ---------- */
+  .tt-stamp {
+    display: inline-block;
+    padding: var(--s-1) var(--s-3);
+    font-family: var(--font-type);
+    font-size: 1rem;
+    /* Chữ hoa có dấu chồng (Ờ, Ậ, Ỷ) cần dòng cao */
+    line-height: 1.7;
+    letter-spacing: 0.1em;
+    white-space: nowrap;
+    border: 3px double currentColor;
+    border-radius: var(--radius-paper);
+    transform: rotate(-4deg);
+  }
+
+  .tt-stamp--pending {
+    color: var(--color-stamp-amber);
+  }
+
+  .tt-stamp--renting {
+    color: var(--color-stamp-green);
+  }
+
+  .tt-stamp--cancelled {
+    color: var(--color-stamp-red);
+  }
+
+  /* ---------- Tem tình trạng: .tt-condition-tag (thẻ giấy treo, chữ bút) ---------- */
+  .tt-condition-tag {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--s-2);
+    max-width: 100%;
+    padding: 0 var(--s-3) 0 var(--s-2);
+    font-family: var(--font-pen);
+    font-size: 1.125rem;
+    line-height: 1.6;
+    background-color: var(--color-tape);
+    color: var(--color-ink);
+    border: 1px solid var(--color-ink-soft);
+    border-radius: var(--radius-paper);
+    box-shadow: var(--shadow-paper);
+  }
+
+  /* Lỗ xỏ dây của tem (trang trí, vẽ bằng gradient, không bo góc) */
+  .tt-condition-tag::before {
+    content: "";
+    flex: none;
+    width: var(--s-2);
+    height: var(--s-2);
+    background-image: radial-gradient(
+      circle at center,
+      var(--color-paper) 0 2px,
+      var(--color-ink-soft) 2.5px 3.5px,
+      transparent 4px
+    );
+  }
+
+  .tt-condition-tag--none {
+    background-color: var(--color-paper);
+    color: var(--color-ink-soft);
+    border-style: dashed;
+    box-shadow: none;
+  }
+
+  .tt-condition-tag--ok {
+    color: var(--color-stamp-green);
+  }
+
+  .tt-condition-tag--damaged {
+    color: var(--color-stamp-red);
+  }
+
+  /* ---------- Thẻ giấy: .tt-paper-card ---------- */
+  .tt-paper-card {
+    position: relative;
+    padding: var(--s-5);
+    background-color: var(--color-paper);
+    background-image: url("/img/paper-grain.svg");
+    background-size: 180px 180px;
+    color: var(--color-ink);
+    border: 1px solid color-mix(in srgb, var(--color-ink-soft) 35%, transparent);
+    border-radius: var(--radius-none);
+    box-shadow: var(--shadow-paper);
+  }
+
+  /* Băng dính góc trên */
+  .tt-paper-card--taped {
+    padding-top: var(--s-6);
+  }
+
+  .tt-paper-card--taped::before {
+    content: "";
+    position: absolute;
+    top: calc(-1 * var(--s-3));
+    left: 50%;
+    width: 7rem;
+    height: var(--s-5);
+    margin-left: -3.5rem;
+    background-color: color-mix(in srgb, var(--color-tape) 82%, transparent);
+    box-shadow: 0 1px 0 color-mix(in srgb, var(--color-ink) 12%, transparent);
+    transform: rotate(-3deg);
+    clip-path: polygon(
+      0 10%, 4% 0, 8% 12%, 12% 0, 88% 0, 92% 12%, 96% 0, 100% 10%,
+      100% 90%, 96% 100%, 92% 88%, 88% 100%, 12% 100%, 8% 88%, 4% 100%, 0 90%
+    );
+    pointer-events: none;
+  }
+
+  .tt-paper-card__heading {
+    margin: 0 0 var(--s-3);
+    font-family: var(--font-sign);
+    font-variation-settings: "SOFT" 100;
+    font-weight: 600;
+    font-size: 1.25rem;
+    line-height: 1.4;
+    color: var(--color-ink);
+  }
+
+  .tt-paper-card__body > :first-child {
+    margin-top: 0;
+  }
+
+  /* ---------- Bảng sổ: table.tt-ledger-table ---------- */
+  .tt-ledger-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-family: var(--font-body);
+    font-variant-numeric: tabular-nums;
+    background-color: var(--color-paper);
+    color: var(--color-ink);
+  }
+
+  .tt-ledger-table__caption {
+    caption-side: top;
+    padding-bottom: var(--s-2);
+    font-family: var(--font-type);
+    font-size: 1.125rem;
+    letter-spacing: 0.04em;
+    text-align: left;
+    color: var(--color-ink);
+  }
+
+  .tt-ledger-table th,
+  .tt-ledger-table td {
+    padding: var(--s-2) var(--s-3);
+    text-align: left;
+    vertical-align: top;
+    overflow-wrap: anywhere;
+    /* Dòng kẻ sổ xanh nhạt */
+    border-bottom: 1px solid color-mix(in srgb, var(--color-pen-blue) 30%, transparent);
+  }
+
+  .tt-ledger-table thead th {
+    font-family: var(--font-type);
+    font-weight: 400;
+    letter-spacing: 0.04em;
+    background-color: var(--color-paper-deep);
+    border-bottom: 2px solid var(--color-ink-soft);
+  }
+
+  /* Lề đỏ của sổ sau cột đầu */
+  .tt-ledger-table th:first-child,
+  .tt-ledger-table td:first-child {
+    border-right: 1px solid color-mix(in srgb, var(--color-stamp-red) 55%, transparent);
+  }
+
+  .tt-ledger-table tbody tr:nth-child(even) {
+    background-color: color-mix(in srgb, var(--color-paper-deep) 35%, var(--color-paper));
+  }
+
+  @media (max-width: 40rem) {
+    .tt-ledger-table th,
+    .tt-ledger-table td {
+      padding: var(--s-1) var(--s-2);
+    }
+  }
+
+  /* ---------- Bìa truyện: span.tt-book-cover bọc <img> (hợp đồng §3a) ---------- */
+  .tt-book-cover {
+    display: inline-block;
+    width: 100%;
+    max-width: 320px;
+    vertical-align: top;
+    background-color: var(--color-paper-deep);
+    border: 1px solid var(--color-ink-soft);
+    border-radius: var(--radius-none);
+    box-shadow: var(--shadow-paper);
+  }
+
+  .tt-book-cover img {
+    display: block;
+    width: 100%;
+    height: auto;
+    aspect-ratio: 2 / 3;
+    object-fit: cover;
+  }
+
+  .tt-book-cover--sm {
+    max-width: 160px;
+  }
+
+  .tt-book-cover--md {
+    max-width: 320px;
+  }
+
+  .tt-book-cover--lg {
+    max-width: 640px;
+  }
+
+  /* ---------- Hộp thông báo: .tt-message-box (câu nguyên văn, không thêm chữ) ---------- */
+  .tt-message-box {
+    display: block;
+    max-width: 48rem;
+    padding: var(--s-3) var(--s-4);
+    font-family: var(--font-body);
+    font-weight: 500;
+    line-height: 1.6;
+    background-color: var(--color-tape);
+    border: 1px solid currentColor;
+    border-left-width: 6px;
+    border-radius: var(--radius-paper);
+    box-shadow: var(--shadow-paper);
+  }
+
+  /* Ba loại khác nhau cả kiểu viền, không chỉ màu */
+  .tt-message-box--success {
+    color: var(--color-stamp-green);
+  }
+
+  .tt-message-box--error {
+    color: var(--color-stamp-red);
+    border-left-style: double;
+    border-left-width: 8px;
+  }
+
+  .tt-message-box--info {
+    color: var(--color-pen-blue);
+    border-style: dashed;
+    border-left-style: solid;
+  }
+}
+
+/* ---------- Chuyển động trang trí (chỉ khi không giảm chuyển động) ---------- */
+@media (prefers-reduced-motion: no-preference) {
+  @keyframes tt-stamp-in {
+    from {
+      opacity: 0;
+      transform: rotate(-4deg) scale(1.35);
+    }
+
+    to {
+      opacity: 1;
+      transform: rotate(-4deg) scale(1);
+    }
+  }
+
+  .tt-stamp {
+    animation: tt-stamp-in 220ms cubic-bezier(0.2, 0.8, 0.3, 1) both;
+  }
+
+  .tt-paper-card,
+  .tt-condition-tag {
+    transition:
+      transform 160ms ease-out,
+      box-shadow 160ms ease-out;
+  }
+
+  a.tt-paper-card:hover,
+  a .tt-paper-card:hover {
+    transform: translate(-1px, -2px);
+    box-shadow: var(--shadow-lift);
+  }
+}
+
+/* ---------- Giảm chuyển động: tắt mọi hoạt cảnh và chuyển tiếp CSS ---------- */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-delay: 0s !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    transition-delay: 0s !important;
+    scroll-behavior: auto !important;
+  }
+}

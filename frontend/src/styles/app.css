@@ -1,5 +1,10 @@
-/* Entry `src/styles/app.css` (contract.md §5). Theme tokens arrive in phase 5. */
+/* Entry `src/styles/app.css` (contract.md §5). Thứ tự nạp cố định: phase-05-ui-contract.md §2. */
 @import "tailwindcss";
+@import "./tokens.css";
+@import "./fonts.css";
+@import "./paper.css";
+@import "./components.css";
+@import "./print.css";
 
 /* Tailwind scans frontend/ on its own; the JSP pages and tag files live outside it. */
 @source "../../../src/main/webapp/**/*.{jsp,tag}";

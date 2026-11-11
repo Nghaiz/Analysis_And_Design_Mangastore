@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 512 512">
+  <!-- Vệt ố và vòng cốc trà tự vẽ ở góc tờ giấy (.tt-paper). Màu --paper-deep và --wood, rất nhạt, không chứa chữ. -->
+  <g fill="#E4CF9F">
+    <path opacity="0.55" d="M256 40c88 6 170 58 196 140 22 70-6 150-62 204-52 50-128 92-206 84-80-8-148-66-170-140-20-68 6-142 56-196C116 82 184 36 256 40z"/>
+    <path opacity="0.35" d="M300 120c56 10 104 52 108 108 4 50-28 98-74 122-48 26-110 26-152-6-40-30-56-86-38-132 20-54 92-102 156-92z"/>
+  </g>
+  <g fill="none" stroke="#6B4226" stroke-linecap="round" opacity="0.12">
+    <path stroke-width="6" d="M174 300a86 82 0 1 0 172 0a86 82 0 1 0-172 0"/>
+    <path stroke-width="2" d="M186 296a74 70 0 1 0 148 6"/>
+  </g>
+</svg>

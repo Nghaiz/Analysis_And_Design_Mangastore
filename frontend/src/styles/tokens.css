@@ -1,0 +1,114 @@
+/*
+ * Token "tiệm truyện đầu ngõ". Giá trị là SSOT ở docs/design-tokens.md; tên cố định ở
+ * plans/261111-tiem-thue-truyen/phase-05-ui-contract.md §1.
+ * Đây là file DUY NHẤT trong frontend/src được viết mã màu: mọi file khác dùng biến dưới đây.
+ * `npm run check:contrast` so mã hex ở đây với docs/design-tokens.md và đo tương phản WCAG.
+ *
+ * `static`: Tailwind in mọi biến ra :root dù chưa có tiện ích nào dùng, để CSS thường và
+ * component React đọc được bằng var().
+ */
+@theme static {
+  /* Màu (docs/design-tokens.md §1) */
+  --color-paper: #F3E6C8;
+  --color-paper-deep: #E4CF9F;
+  --color-tape: #E9DDB0;
+  --color-ink: #2B2118;
+  --color-ink-soft: #5C4A36;
+  --color-pen-blue: #1F3F8F;
+  --color-stamp-red: #A3221B;
+  --color-stamp-green: #2A6334;
+  --color-stamp-amber: #7F4B00;
+  --color-wood: #6B4226;
+  --color-lamp: #F6C453;
+
+  /* Font (docs/design-tokens.md §2; @font-face ở fonts.css) */
+  --font-body: "Be Vietnam Pro", system-ui, "Segoe UI", Roboto, sans-serif;
+  --font-type: "Xanh Mono", ui-monospace, "Cascadia Mono", Consolas, monospace;
+  --font-pen: "Patrick Hand", "Segoe Print", cursive;
+  --font-sign: "Fraunces", Georgia, "Times New Roman", serif;
+  /* Tiện ích font-sign bật trục SOFT của Fraunces (giống lớp .tt-sign) */
+  --font-sign--font-variation-settings: "SOFT" 100;
+  /* Font mặc định của preflight (html, code) trỏ về hai font chính */
+  --font-sans: var(--font-body);
+  --font-mono: var(--font-type);
+
+  /* Khoảng cách bậc 4px (docs/design-tokens.md §3); --spacing để p-4 = 16px */
+  --spacing: 4px;
+  --s-1: 4px;
+  --s-2: 8px;
+  --s-3: 12px;
+  --s-4: 16px;
+  --s-5: 24px;
+  --s-6: 32px;
+  --s-7: 48px;
+  --s-8: 64px;
+
+  /* Bo góc tối đa 2px (docs/design-tokens.md §4): mọi --radius-* của Tailwind bị ghi đè */
+  --radius-none: 0;
+  --radius-paper: 2px;
+  --radius-xs: 2px;
+  --radius-sm: 2px;
+  --radius-md: 2px;
+  --radius-lg: 2px;
+  --radius-xl: 2px;
+  --radius-2xl: 2px;
+  --radius-3xl: 2px;
+  --radius-4xl: 2px;
+
+  /* Bóng lệch kiểu giấy đặt trên bàn (docs/design-tokens.md §5); màu bóng = --color-ink */
+  --shadow-paper: 2px 3px 0 rgb(43 33 24 / 0.18);
+  --shadow-lift: 4px 6px 0 rgb(43 33 24 / 0.22);
+  /* Bóng mặc định của Tailwind (shadcn dùng shadow-xs, shadow-lg) cũng thành bóng giấy */
+  --shadow-2xs: var(--shadow-paper);
+  --shadow-xs: var(--shadow-paper);
+  --shadow-sm: var(--shadow-paper);
+  --shadow-md: var(--shadow-paper);
+  --shadow-lg: var(--shadow-lift);
+  --shadow-xl: var(--shadow-lift);
+  --shadow-2xl: var(--shadow-lift);
+}
+
+/* Biến ngữ nghĩa của shadcn/ui, trỏ về token trên (hợp đồng giao diện §1). */
+:root {
+  --background: var(--color-paper);
+  --foreground: var(--color-ink);
+  --card: var(--color-paper);
+  --card-foreground: var(--color-ink);
+  --popover: var(--color-paper);
+  --popover-foreground: var(--color-ink);
+  --primary: var(--color-pen-blue);
+  --primary-foreground: var(--color-paper);
+  --secondary: var(--color-paper-deep);
+  --secondary-foreground: var(--color-ink);
+  --muted: var(--color-paper-deep);
+  --muted-foreground: var(--color-ink-soft);
+  --accent: var(--color-tape);
+  --accent-foreground: var(--color-ink);
+  --destructive: var(--color-stamp-red);
+  --border: var(--color-ink-soft);
+  --input: var(--color-ink-soft);
+  --ring: var(--color-pen-blue);
+  --radius: 2px;
+}
+
+/* Nối biến shadcn vào Tailwind để bg-primary, border-input, ring-ring… chạy được. */
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+}

@@ -1,0 +1,65 @@
+/*
+ * In phiếu mượn (PrintRentalBillView, docs/design-tokens.md §6): khổ A5, chỉ in phiếu (.tt-ticket).
+ * Mọi phần tử không phải phiếu, không nằm trong phiếu và không chứa phiếu bị ẩn hẳn (display: none,
+ * không để lại chỗ trống); các khối cha của phiếu bỏ nền, viền, khoảng đệm để phiếu nằm sát lề trang.
+ */
+
+@page {
+  size: A5;
+  margin: 10mm;
+}
+
+@media print {
+  body *:not(.tt-ticket, .tt-ticket *, :has(.tt-ticket)) {
+    display: none !important;
+  }
+
+  html,
+  body,
+  body *:has(.tt-ticket) {
+    margin: 0 !important;
+    padding: 0 !important;
+    max-width: none !important;
+    min-height: 0 !important;
+    background: none !important;
+    border: 0 !important;
+    box-shadow: none !important;
+  }
+
+  body {
+    font-size: 11pt;
+    color: var(--color-ink);
+  }
+
+  .tt-ticket {
+    max-width: none;
+    width: 100%;
+    padding: 0;
+    background: none;
+    box-shadow: none;
+    break-inside: avoid;
+  }
+
+  /* Phiếu sau bắt đầu ở trang mới (StyleGuide có nhiều phiếu; PrintRentalBillView chỉ một) */
+  .tt-ticket + .tt-ticket {
+    break-before: page;
+  }
+
+  .tt-ticket__perf {
+    margin-inline: 0;
+    background: none;
+  }
+
+  .tt-stamp,
+  .tt-condition-tag,
+  .tt-message-box {
+    box-shadow: none;
+    print-color-adjust: exact;
+    -webkit-print-color-adjust: exact;
+  }
+
+  a {
+    color: inherit;
+    text-decoration: none;
+  }
+}
