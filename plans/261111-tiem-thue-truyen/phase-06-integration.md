@@ -68,3 +68,48 @@ Tài khoản trên seed: nhân viên `hant`, quản lí `quanli`, khách `khach0
 ## 5. Smoke
 
 `scripts/smoke/flow-m1-m2.mjs` (orchestrator) đi kịch bản ch.2 mục 2.1, 2.2 trên `http://127.0.0.1:${SMOKE_BASE_PORT:-8080}` của stack `tiemtruyen-e2e`; helper HTTP dùng chung (cookie jar, lấy token `csrf` từ HTML, gửi form, đọc câu báo) ở `scripts/smoke/lib/http.mjs` để `flow-m3.mjs` của phase 7 dùng lại. Smoke đọc trang bằng `id` của hợp đồng (`id` = `name`) và lớp `.tt-message-box`; lane giữ đúng các `id` đó.
+
+## 6. Edge case ngoài báo cáo (chủ dự án yêu cầu 11/11/2026: bao quát mọi ngoại lệ và mọi trường hợp hay gặp thực tế)
+
+Mọi ngoại lệ của ch.2 mục 2.1 (bước 6, 10) và 2.2 (bước 2, 5, 24) phải chạy và có trong smoke. Ngoài ra, mọi trang xử lí đủ các trường hợp dưới đây. **Không trường hợp nào được ra trang 500, stack trace, hay ghi DB sai.** Mục 6.1 không thêm câu báo hay luật nghiệp vụ mới (dùng câu có sẵn, C10, chuyển trang). Mục 6.2 chờ chủ dự án chốt; chưa chốt thì chưa làm.
+
+### 6.1 Làm ngay (mỗi trường hợp một test hoặc một bước kiểm trong báo cáo lane)
+
+**Chung (6A, cộng mọi trang)**
+- POST khi session đã hết hạn hoặc chưa có (không có `csrfToken` trong session, người dùng để form mở quá 60 phút): không ghi gì; trang khách/nhân viên chuyển 302 về LoginView của vai, trang công khai chuyển 302 về chính trang xem (doRegister → RegisterView). Session còn sống mà thiếu hoặc sai token: vẫn 403.
+- Trang lỗi thêm 405 (`error/405.jsp`) và mọi exception không bắt (`java.lang.Throwable` → `error/500.jsp`); không lộ stack trace. Tomcat không hiện trang lỗi tiếng Anh ở bất kì mã nào.
+- Mọi chữ do người dùng nhập khi in ra trang đều escape (`<c:out>`, `fn:escapeXml`), kể cả giá trị điền lại vào ô, ghi chú, lí do huỷ, tên khách; props island qua `JsonUtil.toScriptJson`. Smoke thử đăng kí họ tên chứa `<script>`.
+- Dữ liệu nhập: `trim()` và chuẩn hoá Unicode NFC (`java.text.Normalizer`) mọi ô chữ trước khi kiểm và lưu (bàn phím macOS và một số bộ gõ gửi NFD).
+- Bấm hai lần, F5 sau khi gửi, Back rồi gửi lại, mở trang `doXxx` hay trang xem bằng URL trực tiếp khi session thiếu thuộc tính cần đọc: không 500, không tạo bản ghi thứ hai; chuyển về trang đầu mối hợp lí (bảng ở 6C).
+- id trên nút dòng (`lnkChooseBook`, `lnkViewDetail`, `lnkCancelRentalBill`, `lnkDeleteSelectedBook`, `chkSelectedBook`) không phải số, hoặc không có trong danh sách đang ở session (sửa HTML, phiếu của khách khác): bỏ qua, hiện lại trang; không bao giờ đọc hay huỷ được phiếu ngoài `listRentalBill` của chính khách.
+
+**M1 (6B)**
+- Đăng kí: số điện thoại cho phép gõ kèm dấu cách, chấm, gạch (`0912 345 678`) rồi bỏ đi trước khi kiểm C4; email lưu chữ thường; ngày sinh không hợp lệ (`2003-02-31`), ở tương lai, hôm nay, trước 1900 → `REGISTER_INVALID`; mật khẩu dài quá 128 kí tự → `REGISTER_INVALID` (chặn băm chuỗi khổng lồ); mọi ô vượt độ dài cột → `REGISTER_INVALID`. Trùng do hai người đăng kí cùng lúc (UNIQUE) → `REGISTER_DUPLICATE`. Gửi lại form đăng kí đã thành công (F5) → `REGISTER_DUPLICATE`, không tạo tài khoản thứ hai.
+- Đăng nhập: tên đăng nhập `trim()`, ô trống thì `LOGIN_FAILED` không gọi DAO; tên đăng nhập không phân biệt hoa thường (collation `_ai_ci`). Khách đã đăng nhập mở `/LoginView.jsp` hoặc `/RegisterView.jsp` → 302 về `ClientHomeView.jsp`. Nhân viên đã đăng nhập mở trang đăng nhập khách: vẫn hiện (hai vai tách nhau).
+
+**M2 (6C)**
+| Trường hợp | Xử lí |
+|---|---|
+| `BookDetailView`, `doAddSelectedBook`, `doDeleteSelectedBook` khi session không có `book` hoặc `cart` | 302 về `SearchBookView.jsp` |
+| `ConfirmRentalBillView` khi không có `rentalBill` hoặc `listRentedBook` rỗng | 302 về `SearchBookView.jsp` |
+| `doAddRentalBill` khi không có `rentalBill` (bấm "Xác nhận" hai lần, F5 sau khi tạo) | 302 về `ClientHomeView.jsp`, không tạo phiếu thứ hai |
+| `RentalBillDetailView` khi không có `rentalBill` | 302 về `RentalBillListView.jsp` |
+| `doCancelRentalBill` khi không có `rentalBill` | 302 về trang danh sách của vai |
+| Huỷ lần hai cùng phiếu (bấm hai lần) | nhánh D9: `RENTAL_BILL_CANCELLED` |
+| `txtQuantity` trống, 0, âm, số thập phân, chữ, số lớn quá `int` | C10 (`aria-invalid`, hiện lại trang, giỏ không đổi) |
+| Thêm đầu truyện đã có trong giỏ | cộng dồn; kiểm vượt theo số quyển sẵn sàng **chưa** có trong giỏ (§10.1 ghi chú) |
+| Đầu truyện có 0 quyển sẵn sàng | vẫn hiện trong kết quả tìm với "0"; thêm thì `QUANTITY_EXCEEDED` "(hiện còn 0 quyển)" |
+| `txtExpectedDays` trống, chữ, thập phân, số lớn quá `int` | `EXPECTED_DAYS_INVALID` |
+| `txtExpectedPickupAt` trống, sai dạng, ở quá khứ, đúng bằng hiện tại | `PICKUP_TIME_INVALID` |
+| `txtNote`, `txtCancelReason` dài quá 255 | C10 (`aria-invalid`, giữ chữ đã nhập) |
+| `txtKeyword` chỉ có dấu cách | C9: `BOOK_NOT_FOUND`, không gọi DAO; dài quá 100 kí tự thì cắt còn 100 |
+| Từ khoá có `%`, `_`, `\` | tìm đúng chữ đó (DAO đã thoát, `DAO.java:166`) |
+| Từ khoá không dấu hay khác hoa thường (`tham tu`, `CONAN`) | ra kết quả như có dấu (collation `utf8mb4_0900_ai_ci`) |
+| Tích một phần giỏ rồi tạo phiếu | dòng không tích ở lại giỏ trong DB; mở lại "Tìm truyện" thấy lại |
+| Hai tab: tab B xoá dòng giỏ trong lúc tab A đang ở "Xác nhận" | tab A xác nhận → `NOT_ENOUGH_COPIES` hoặc tạo phiếu đúng theo K1, không 500 |
+| Quyển trong giỏ đã bị phiếu khác giữ | K1 đổi quyển cùng đầu truyện; không đủ thì `NOT_ENOUGH_COPIES` |
+| Nhân viên vừa xử lí hoặc huỷ phiếu trong lúc khách bấm huỷ | D9: câu theo trạng thái mới, danh sách cập nhật dòng đó |
+
+### 6.2 Chờ chủ dự án chốt (đổi hoặc thêm luật nghiệp vụ, câu báo, trang)
+
+Ghi kết quả vào `docs/contracts.md` §14 (C14 trở đi) trước khi giao lane.

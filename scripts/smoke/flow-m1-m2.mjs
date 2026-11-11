@@ -305,7 +305,7 @@ async function main() {
     page = await s.post('/doCancelRentalBill.jsp', { txtCancelReason: 'Đổi ý, chưa cần thuê nữa', from: 'client', btnConfirmCancel: '' }, { page });
     expectMessage('2.2 bước 24.8', page, M.CANCEL_SUCCESS);
     const bill = billState(117);
-    assertEq('2.2 bước 24.8 DB PM0117', '(DB)', '{"status":"Đã huỷ","cancelReason":"Đổi ý, chưa cần thuê nữa","barcodes":["DT001-02"]}', JSON.stringify(bill));
+    assertEq('2.2 bước 24.8 DB PM0117', '(DB)', '{"status":"Đã huỷ","cancelReason":"Đổi ý, chưa cần thuê nữa","barcodes":["DT020-01"]}', JSON.stringify(bill));
   });
   await step('2.2 bước 24.9 danh sách cập nhật: PM0117 "Đã huỷ", chỉ PM0125 còn nút Huỷ phiếu', async () => {
     if (!tableRows(page.html, 'tblRentalBill')) page = await s.get('/RentalBillListView.jsp');
@@ -313,12 +313,15 @@ async function main() {
     assertEq('2.2 bước 24.9 trạng thái', page.url, '["Chờ nhận","Đã huỷ","Đang cho thuê"]', JSON.stringify(rows.map((r) => r[5])));
     assertEq('2.2 bước 24.9 nút Huỷ phiếu', page.url, '["125"]', JSON.stringify(buttonValues(page.html, 'lnkCancelRentalBill')));
   });
-  await step('2.2 sau huỷ: DT001-02 trở lại sẵn sàng, DT001 còn 5 quyển (7 − PM0110 − PM0125)', async () => {
+  await step('2.2 sau huỷ: DT020-01 trở lại sẵn sàng, DT020 còn 3 quyển, DT001 còn 4 (như ch.2 2.3 ngoại lệ 11.8)', async () => {
     page = await s.get('/ClientHomeView.jsp');
     page = await s.get('/SearchBookView.jsp');
     page = await s.post('/SearchBookView.jsp', { txtKeyword: 'Doraemon', btnSearch: '' }, { page });
     const r = rowWith('sau huỷ', page, 'tblBook', 'DT001');
-    assertEq('sau huỷ số lượng DT001', page.url, '5', r[r.length - 1]);
+    assertEq('sau huỷ số lượng DT001', page.url, '4', r[r.length - 1]);
+    page = await s.post('/SearchBookView.jsp', { txtKeyword: 'Conan', btnSearch: '' }, { page });
+    const c = rowWith('sau huỷ', page, 'tblBook', 'DT020');
+    assertEq('sau huỷ số lượng DT020 (DT020-01 trả lại)', page.url, '3', c[c.length - 1]);
   });
 
   console.log(`[smoke] ALL PASS (${passed} bước, ${BASE_URL}, hôm nay ${isoDate(today)} Asia/Ho_Chi_Minh)`);

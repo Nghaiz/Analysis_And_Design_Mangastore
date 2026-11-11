@@ -79,8 +79,9 @@ ALTER TABLE tblRentalBill AUTO_INCREMENT = 125;
 
 /**
  * Hai phiếu có sẵn của khách minhanh trước ch.2 2.2 (bảng bước 24.1), id tường minh nên không làm tụt bộ đếm:
- * PM0110 "Đang cho thuê" giữ DT001-01, DT020-01 (2 quyển, 10 ngày, 60.000đ; nhân viên hant);
- * PM0117 "Chờ nhận" giữ DT001-02 (1 quyển, 7 ngày, 21.000đ). Nhờ vậy màn hình còn 5 / 4 / 2 / 3 / 2 quyển
+ * PM0110 "Đang cho thuê" giữ DT001-01, DT001-02 (2 quyển, 10 ngày, 60.000đ; nhân viên hant);
+ * PM0117 "Chờ nhận" giữ DT020-01 (1 quyển, 7 ngày, 21.000đ). Sau khi 2.2 huỷ PM0117, Doraemon - Tập 1 còn 4 quyển
+ * như ch.2 2.3 ngoại lệ 11.8 (trang in 17); ch.2 2.2 không ghi quyển của PM0117. Nhờ vậy màn hình còn 5 / 4 / 2 / 3 / 2 quyển
  * và phiếu mới được gán DT001-03, DT020-02 (Deferred #10).
  * Ngày theo ch.2 với "hôm nay" T = 23/09/2026: PM0110 tạo 19:00 T-9, hẹn 10:00 T-8, mượn T-8, trả T+2;
  * PM0117 tạo 10:30 T-1, hẹn 18:00 T+1.
@@ -98,8 +99,8 @@ INSERT INTO tblRentalBill (id, createdAt, expectedPickupAt, expectedDays, borrow
     NULL, @c, NULL);
 INSERT INTO tblRentedBook (rentalPrice, conditionNote, rentalBillId, bookCopyId, selectedBookId) VALUES
   (3000, 'Không có lỗi', 110, ${copy('DT001-01')}, NULL),
-  (3000, 'Không có lỗi', 110, ${copy('DT020-01')}, NULL),
-  (3000, NULL, 117, ${copy('DT001-02')}, NULL);
+  (3000, 'Không có lỗi', 110, ${copy('DT001-02')}, NULL),
+  (3000, NULL, 117, ${copy('DT020-01')}, NULL);
 INSERT INTO tblRentalCollateral (value, note, rentalBillId, collateralId) VALUES
   ('001203012345', NULL, 110, (SELECT id FROM tblCollateral WHERE name = 'Căn cước công dân'));
 `);
