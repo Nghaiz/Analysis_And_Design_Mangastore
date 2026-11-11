@@ -2,7 +2,7 @@
 
 Worktree `D:/Coding/mangastore-wt/06-dao-dong-gio`, nhánh `lane/06-chuc-nang-1-2/dao-dong-gio`, đã merge `799d807` (hằng `SELECTED_BOOKS_CHANGED`, C21, island 6D).
 
-**Trạng thái: DONE_WITH_CONCERNS.** Code xong, compile và Checkstyle sạch. **Test Testcontainers CHƯA chạy được**: Docker Desktop engine trả `500 Internal Server Error` cho mọi lệnh API (`docker version`, `docker info`, và Testcontainers báo `Could not find a valid Docker environment`). Vì vậy chưa có lần xanh, chưa làm bước làm đỏ có chủ đích. Mục 5 ghi đúng các lệnh cần chạy khi Docker sống lại.
+**Trạng thái: DONE_WITH_CONCERNS.** Code xong, compile và Checkstyle sạch. Lần chạy đầu hỏng vì Docker Desktop engine trả 500. Docker sống lại thì chạy lại một lần: **120/120 xanh** ở năm lớp liên quan (mục 5). **Chưa làm bước làm đỏ có chủ đích**: luật mới của orchestrator là cả máy chỉ một việc Docker nặng mỗi lúc, không chạy thêm lượt khi chưa được nhắn "lượt của 6G". Mục 4 ghi đúng hai biến thể cần chạy.
 
 ## 1. Việc đã làm
 
@@ -50,7 +50,7 @@ Thứ tự chung: **`tblBook` (id tăng dần) → `tblSelectedBook` (id tăng d
 
 Các test cũ chạy được nguyên trạng: dòng phiếu của `newBill` có `selectedBook == null` nên không qua bước kiểm.
 
-## 4. Làm đỏ có chủ đích (CHƯA CHẠY, Docker hỏng)
+## 4. Làm đỏ có chủ đích (CHƯA CHẠY: chờ lượt Docker)
 
 Kế hoạch, và dự đoán chưa kiểm:
 
@@ -63,13 +63,13 @@ Kế hoạch, và dự đoán chưa kiểm:
 | Lệnh | Kết quả |
 |---|---|
 | `node scripts/dev/mvnw.mjs -B -DskipTests verify` | `BUILD SUCCESS`, Checkstyle 0 vi phạm (lần đầu có 2 vi phạm FileLength và 2 LineLength, đã sửa) |
-| `node scripts/dev/mvnw.mjs -B verify -Dtest='RentalBillDAOTest,RentalBillConcurrencyTest,RentalBillCartLineTest,CartDAOTest,ArchitectureTest' -Dsurefire.failIfNoSpecifiedTests=false` | `ArchitectureTest` 10/10 xanh (không cần Docker). Bốn lớp DAO lỗi `initializationError`: `IllegalStateException: Could not find a valid Docker environment` |
-| `docker version`, `docker info` | `request returned 500 Internal Server Error for API route … dockerDesktopLinuxEngine/v1.55/…`: engine Docker Desktop không trả lời. Lane không khởi động lại Docker vì máy dùng chung với phiên khác |
+| Lần 1: `node scripts/dev/mvnw.mjs -B verify -Dtest='RentalBillDAOTest,RentalBillConcurrencyTest,RentalBillCartLineTest,CartDAOTest,ArchitectureTest' -Dsurefire.failIfNoSpecifiedTests=false` | `ArchitectureTest` 10/10 xanh (không cần Docker). Bốn lớp DAO lỗi `initializationError`: `IllegalStateException: Could not find a valid Docker environment` (`docker version` lúc đó trả `500 Internal Server Error … dockerDesktopLinuxEngine/v1.55/version`) |
+| Lần 2, cùng lệnh, sau khi Docker sống lại (server 29.6.2) | `BUILD SUCCESS`, 6:09 phút. `Tests run: 120, Failures: 0, Errors: 0, Skipped: 0`: ArchitectureTest 10, CartDAOTest 6 (346 giây, phần lớn là khởi động container dùng chung), RentalBillCartLineTest 35 (5 test thường cộng 2 ca lặp ×15), RentalBillConcurrencyTest 63, RentalBillDAOTest 6 |
 
-Chưa chạy: lệnh test ở trên khi Docker sống lại, rồi bước làm đỏ ở mục 4; chưa kiểm Playwright (lane không dựng stack, theo brief).
+Chưa chạy: hai biến thể làm đỏ ở mục 4 (chờ "lượt của 6G"); `mvnw verify` đủ (orchestrator chạy sau khi merge); Playwright (lane không dựng stack, theo brief).
 
 ## 6. Báo về orchestrator
 
-- Không nhắn được "verify bắt đầu" / "verify xong": lane không có kênh nhắn giữa chừng, chỉ có báo cáo cuối. Đã chạy đúng một lần lệnh test lớp liên quan (khoảng 41 giây, hỏng ngay ở bước tìm Docker nên không tạo container nào).
+- Không nhắn được "verify bắt đầu" / "verify xong": lane không có kênh nhắn giữa chừng, chỉ có báo cáo cuối. Lane chạy lệnh test lớp liên quan hai lần. Lần 1 khoảng 41 giây, hỏng ngay ở bước tìm Docker nên không tạo container. Lần 2 xong lúc 11:45 (container mysql:8.4.13 mà orchestrator thấy là của lần này). Sau đó không chạy thêm lượt nào.
 - Duyệt hoặc bỏ bước khoá dòng giỏ trong `updateCart` (mục 2), rồi sửa câu chữ §6.1 và `tiem-dao-rules.md` nếu duyệt.
 - Smoke `scripts/smoke/flow-m1-m2.mjs` không phụ thuộc nhánh đã bỏ ở doAddRentalBill (tìm theo `btnCreateRentalBill` và id, không theo câu báo cũ). Bảng phase-06 §6.1 dòng "Hai tab…" nên ghi kết quả mới: `SELECTED_BOOKS_CHANGED` ở SearchBookView, hoặc tạo phiếu đúng.
