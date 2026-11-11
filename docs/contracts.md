@@ -266,11 +266,12 @@ So khớp từ khoá dùng `LIKE '%…%'` có tham số (`PreparedStatement`, kh
 Áp cho mọi đường tạo `tblRentedBook`: `addRentalBill` và nhánh "thêm quyển mới" của `updateRentalBill`. Trong cùng transaction (READ COMMITTED, autocommit tắt):
 
 1. Khoá các đầu truyện liên quan theo id tăng dần: `SELECT id FROM tblBook WHERE id IN (…) ORDER BY id FOR UPDATE`.
+   Ngay sau đó (C21) khoá các dòng `tblSelectedBook` mà các dòng phiếu trỏ tới, theo id tăng dần (`FOR UPDATE`), rồi đếm lại bằng một lệnh đọc riêng (không gộp vào lệnh khoá: subquery trong lệnh `FOR UPDATE` đọc ảnh chụp trước lúc chờ khoá) rằng mỗi dòng còn tồn tại, thuộc giỏ của client của phiếu, không có `tblRentedBook` của phiếu chưa huỷ trỏ vào và không bị hai dòng phiếu cùng trỏ; sai thì rollback, trả `false`. Hàm khoá là hàm nội bộ package-private của `CartDAO`, không phải hàm DAO của §5.3.
 2. Với từng dòng, theo thứ tự danh sách, đọc lại quyển còn trống: `NOT EXISTS` dòng `tblRentedBook` của phiếu chưa huỷ trỏ vào quyển đó. Dòng còn lại và dòng vừa ghi của chính phiếu này cũng tính là bận, nên một quyển không vào phiếu hai lần.
 3. Quyển đã bận thì đổi sang quyển trống id nhỏ nhất cùng đầu truyện (mục 6.2, ch.9 tr.66); không đủ thì rollback và trả `false`. Chọn theo từng dòng nên dòng nào nhận quyển nào có thể khác cách chọn hai lượt; tập quyển thực giao như nhau (cùng đầu truyện, cùng giá).
 4. Ghi phiếu và dòng, commit. Quyển thực giao (sau khi đổi) được ghi lại vào `RentedBook.bookCopy` của đối tượng truyền vào để trang hiển thị đúng mã vạch.
 
-Huỷ phiếu và bỏ quyển không cần khoá (chỉ giải phóng). `updateCart` không giữ quyển nên không khoá. Không tin `book.listBookCopy` trong session.
+Huỷ phiếu và bỏ quyển không cần khoá (chỉ giải phóng). `updateCart` không giữ quyển nên không khoá quyển hay đầu truyện; nó chỉ khoá các dòng của chính giỏ theo id tăng dần trước khi đọc dòng tự do (C21), cùng thứ tự với bước 1 nên không deadlock với `addRentalBill`, và không xoá dòng vừa thuộc phiếu thiết bị khác mới xác nhận (tránh lỗi khoá ngoại 1451). Không tin `book.listBookCopy` trong session.
 
 Test bắt buộc (Testcontainers, phase 3): hai luồng tranh quyển cuối, đúng một thành công; N luồng tranh M quyển, tổng quyển được giữ bằng M; đổi quyển khi quyển đã chọn bị giữ; huỷ đúng lúc xác nhận (D9).
 
@@ -293,7 +294,7 @@ Chọn câu theo trạng thái mới: "Đã huỷ" → `RENTAL_BILL_CANCELLED`; 
 
 ## 7. Thuộc tính session
 
-Đúng 12 thuộc tính nghiệp vụ (ch.9, ch.10). Không thêm thuộc tính nghiệp vụ khác; thuộc tính kĩ thuật (token CSRF, `probeCount` của trang dev) không thuộc danh sách này.
+Đúng 12 thuộc tính nghiệp vụ (ch.9, ch.10). Không thêm thuộc tính nghiệp vụ khác; thuộc tính kĩ thuật (token CSRF `csrfToken`, `uncheckedBarcodes` của C20, `probeCount` của trang dev) không thuộc danh sách này.
 
 | Thuộc tính | Kiểu | Ghi bởi | Đọc bởi | Bỏ bởi |
 |---|---|---|---|---|
@@ -301,9 +302,9 @@ Chọn câu theo trạng thái mới: "Đã huỷ" → `RENTAL_BILL_CANCELLED`; 
 | `staff` | Staff | `/nhan-vien/LoginView.jsp` | StaffHomeView, SearchRentalBillView, ProcessRentalBillView, doUpdateRentalBill, doCancelRentalBill, AuthFilter | |
 | `cart` | Cart | SearchBookView (lần mở đầu, `getCart`), doAddSelectedBook, doDeleteSelectedBook | SearchBookView, doAddSelectedBook, doDeleteSelectedBook, doAddRentalBill | doAddRentalBill khi thành công |
 | `rentalBill` | RentalBill | SearchBookView (tạo mới khi chưa có `cart`; điền dòng khi "Tạo phiếu mượn"), RentalBillListView, SearchRentalBillView, ProcessRentalBillView, AddConditionView, AddRentalCollateralView, doUpdateRentedBookList, doUpdateRentalBill, doCancelRentalBill | ConfirmRentalBillView, doAddRentalBill, RentalBillDetailView, doCancelRentalBill, ProcessRentalBillView, EditRentedBookListView, doUpdateRentedBookList, AddRentalCollateralView, doUpdateRentalBill, PrintRentalBillView | doAddRentalBill khi thành công; trang D9 (mục 6.3) |
-| `listBook` | Book[] | SearchBookView, AddRentedBookView (tìm) | SearchBookView, AddRentedBookView | |
-| `book` | Book | SearchBookView (chọn dòng, bấm Xoá) | BookDetailView, doAddSelectedBook, doDeleteSelectedBook | |
-| `listRentalBill` | RentalBill[] | RentalBillListView (`getRentalBillList`), SearchRentalBillView (`searchRentalBill`), trang D9 | RentalBillListView, SearchRentalBillView | ClientHomeView (C6) |
+| `listBook` | Book[] | SearchBookView, AddRentedBookView (tìm); quan-tri/doAddBook (= [đầu truyện vừa thêm]), quan-tri/doUpdateBook (thay phần tử cùng id) (D6) | SearchBookView, AddRentedBookView | |
+| `book` | Book | SearchBookView (chọn dòng, bấm Xoá); quan-tri/AddBookView (nháp id 0), quan-tri/doAddBook, quan-tri/doUpdateBook (D6; bỏ sau khi lưu) | BookDetailView, doAddSelectedBook, doDeleteSelectedBook | |
+| `listRentalBill` | RentalBill[] | RentalBillListView (`getRentalBillList`), SearchRentalBillView (`searchRentalBill`), trang D9, nhan-vien/doUpdateRentalBill | RentalBillListView, SearchRentalBillView | ClientHomeView (C6) |
 | `rentedBook` | RentedBook (bản sao) | ProcessRentalBillView (bấm "Thêm tình trạng"), AddConditionView, doAddDamage | AddConditionView, doAddDamage | AddConditionView khi "Lưu tình trạng" hoặc "Quay lại" |
 | `listRentedBook` | RentedBook[] | EditRentedBookListView (chép từ `rentalBill` khi mở), AddRentedBookView | EditRentedBookListView, AddRentedBookView, doUpdateRentedBookList | doUpdateRentedBookList khi thành công; ProcessRentalBillView (C6) |
 | `listDamage` | Damage[] | AddConditionView (tìm) | AddConditionView | |
@@ -333,6 +334,8 @@ Luật chung:
 ### 9.1 Danh mục
 
 28 trang ch.9 (tên đúng brief §3), cộng bản `LoginView.jsp` thứ hai của nhân viên (D5) và 5 trang quản trị D6 (Deferred #14).
+
+Ngoài danh mục (không phải trang nghiệp vụ, không gọi DAO): trang lỗi `/error/403.jsp`, `404.jsp`, `405.jsp`, `500.jsp`, `error.jsp` (web.xml `<error-page>`, mở cho mọi người theo §12), trang lỗi tĩnh 400/413/414 của nginx (`docker/nginx/errors/`), `health.jsp` và các trang `/dev/*`.
 
 | # | Trang | Đường dẫn | Loại | Vai | DAO gọi |
 |---|---|---|---|---|---|
@@ -364,6 +367,7 @@ Luật chung:
 | 26 | `doAddCollateral.jsp` | `/nhan-vien/doAddCollateral.jsp` | xử lí | nhân viên | `CollateralDAO.addCollateral` |
 | 27 | `doUpdateRentalBill.jsp` | `/nhan-vien/doUpdateRentalBill.jsp` | xử lí | nhân viên | `RentalBillDAO.updateRentalBill` (+ D9) |
 | 28 | `PrintRentalBillView.jsp` | `/nhan-vien/PrintRentalBillView.jsp` | xem | nhân viên | không |
+| C14 | `doLogout.jsp` | `/doLogout.jsp` (dùng chung, ngoài báo cáo) | xử lí | khách hoặc nhân viên | không |
 | D6 | `ManageBookView.jsp` | `/nhan-vien/quan-tri/ManageBookView.jsp` | xem, tự gửi | quản lí | `BookDAO.searchBook` |
 | D6 | `AddBookView.jsp` | `/nhan-vien/quan-tri/AddBookView.jsp` | xem | quản lí | không |
 | D6 | `doAddBook.jsp` | `/nhan-vien/quan-tri/doAddBook.jsp` | xử lí | quản lí | `BookDAO.addBook` |
@@ -649,6 +653,22 @@ doUpdateRentalBill kiểm đủ bốn, kể cả điều kiện thứ tư dù lu
 | 3 | Phiếu đã có ít nhất một khoản đặt cọc | `COLLATERAL_MISSING` |
 | 4 | Ngày hẹn trả sau ngày mượn | `DUE_DATE_INVALID` |
 
+### 10.3 Câu ngoài báo cáo (chủ dự án duyệt 11/11/2026)
+
+Báo cáo không có câu cho các trường hợp dưới đây; chủ dự án duyệt thêm (phiên cook phase 6 và phase 7, cùng ngày). Cùng luật với §10.1: hằng của `Messages`, `MessagesTest` so từng kí tự, không sửa khi chưa duyệt. Bảng tách riêng để §10.1 giữ đúng 28 câu của báo cáo. Hai câu đề xuất của phiên phase 6 trùng ý với câu đã duyệt ở phiên phase 7 nên dùng chung (`BOOK_NOT_CHOSEN`, `QUANTITY_INVALID`).
+
+| Hằng số (ngoài báo cáo) | Câu | Dùng ở |
+|---|---|---|
+| DISCOUNT_INVALID | Giảm giá không hợp lệ, vui lòng nhập lại. | ProcessRentalBillView (`txtDiscount` trống, không phải số, âm, lớn hơn tổng) |
+| QUANTITY_INVALID | Số lượng phải là số nguyên lớn hơn hoặc bằng 1. | doAddSelectedBook, AddRentedBookView (`txtQuantity` không phải số nguyên ≥ 1) |
+| BOOK_NOT_CHOSEN | Vui lòng chọn đầu truyện. | SearchBookView ("Tạo phiếu mượn" khi không tích dòng nào), AddRentedBookView (chưa chọn đầu truyện) |
+| INPUT_TOO_LONG | Nội dung nhập quá dài, vui lòng rút gọn. | mọi ô ghi chú, lí do huỷ, giá trị cọc, từ khoá vượt độ dài cột (§2) hoặc 100 kí tự với từ khoá |
+| RENTAL_BILL_CHANGED | Phiếu mượn đang mở đã thay đổi, vui lòng chọn lại phiếu. | trang M3 khi phiếu trong session không còn khớp DB (phase 7) |
+| SESSION_EXPIRED | Phiên làm việc đã hết hạn, vui lòng đăng nhập lại. | LoginView (cả hai) khi bị chuyển về vì session hết hạn (C16) |
+| CANCEL_REASON_REQUIRED | Vui lòng nhập lí do huỷ. | doCancelRentalBill khi `txtCancelReason` trống (C17) |
+| EXPECTED_DAYS_TOO_LONG | Số ngày thuê tối đa là 30 ngày. | doAddRentalBill khi `txtExpectedDays` > `RentalBill.MAX_EXPECTED_DAYS` (C15) |
+| SELECTED_BOOKS_CHANGED | Truyện đã chọn đã thay đổi, vui lòng kiểm tra lại. | doAddRentalBill khi `addRentalBill` trả `false` vì dòng giỏ của phiếu đã bị xoá hoặc đã thuộc phiếu chưa huỷ khác (C21) |
+
 ## 11. React island (cách B)
 
 Luật chung (brainstorm §3, `contract.md` §5):
@@ -657,6 +677,8 @@ Luật chung (brainstorm §3, `contract.md` §5):
 - Không có JS hoặc island hỏng thì bảng, ô tích, nút HTML do JSP render vẫn gửi được.
 - Island được hiện số tạm (tổng tiền) ngay khi người dùng đổi giá trị, nhưng giá trị trong session chỉ đổi qua lần gửi về trang.
 - Props: field camelCase; giá trị có thể trống ghi rõ `| null`, không dùng `?:`; tiền là `number` (đồng, chưa định dạng); ngày là chuỗi ISO `yyyy-MM-dd`; island tự định dạng theo mục 13.
+- Gắn island (chốt 11/11/2026 theo lane 7C, `plans/reports/phase-07-islands-m3-261111-1057.md` §4; áp cho cả bốn island): mọi input, nút có `name` nằm **ngoài** div `data-island` (React xoá nội dung div khi gắn). Bản HTML không JS mà island thay thế bọc trong phần tử `data-island-fallback="<Tên>"`: island gắn thì đặt `hidden` (input ẩn vẫn trong form nên vẫn gửi), gỡ ra hay hỏng thì hiện lại; phần tử fallback **không** chứa div `data-island`. Phần tử JSP island không điều khiển nhưng phải đứng giữa phần island vẽ (giữ thứ tự §9.2) mang `data-island-slot="<Tên>:<chỗ>"`; island chuyển nó vào đúng chỗ, gỡ ra thì trả về.
+- `data-submit-on-change` (C3) của loader chỉ gửi form khi sự kiện do người dùng tạo (`event.isTrusted`); sự kiện island tự phát (`isTrusted === false`) bị bỏ qua, để island đã tự `requestSubmit` thì form không gửi hai lần.
 
 ### 11.1 SelectedStack
 
@@ -749,10 +771,13 @@ interface ShelfSceneProps {
   loginHref: string; // "LoginView.jsp"; bấm gáy truyện = bấm lnkLogin (D10)
   posterSrc: string; // ảnh tĩnh của kệ, hiện trước và làm bản dự phòng
   posterSrcSet: string | null; // null khi ảnh tĩnh chỉ có một cỡ
+  posterNarrowSrc: string | null; // ảnh tĩnh cho khung hẹp (chỉ tủ kệ, khớp góc máy 3D khi kệ hẹp hơn 560 px); null thì dùng posterSrc mọi cỡ
   posterAlt: string;
   categories: string[]; // nhãn thể loại đánh máy trên gáy, từ pipeline/config/categories.json
 }
 ```
+
+Ảnh tĩnh khung hẹp (phase 6, chủ dự án chọn 11/11/2026): cùng tỉ lệ 3:2 và cùng `width`/`height` với `posterSrc` để bố cục không xê dịch khi cảnh 3D phủ lên. JSP và island render cùng một cây `<picture>`: `<source media="(max-width: 599.98px)" srcset="posterNarrowSrc">` rồi `<img src="posterSrc">` (khung hẹp của cảnh 3D là `COMPACT_MAX_WIDTH_PX` = 560 px bề rộng kệ; trang chủ có lề nên ngưỡng viewport là 600 px). `posterNarrowSrc` là `null` thì không có `<source>`.
 
 Input island được đổi: không có (HomeView không có form). Bấm gáy truyện: island chạy hoạt cảnh rút quyển rồi gọi `.click()` trên link thật `#lnkLogin`; không tạo luồng mới. Không WebGL, giảm chuyển động hoặc máy yếu thì giữ ảnh tĩnh (Deferred #16).
 
@@ -765,6 +790,7 @@ Input island được đổi: không có (HomeView không có form). Bấm gáy 
 | `/HomeView.jsp`, `/RegisterView.jsp`, `/doRegister.jsp`, `/LoginView.jsp` | mọi người | |
 | `/nhan-vien/LoginView.jsp` | mọi người | |
 | `/doCancelRentalBill.jsp` | khách đã đăng nhập **hoặc** nhân viên đã đăng nhập (Deferred #13) | về `/LoginView.jsp` |
+| `/doLogout.jsp` | mọi người (C14; chưa đăng nhập thì chỉ chuyển về trang chủ) | |
 | Mọi trang khác ở gốc (`/*.jsp` ngoài các dòng trên) | khách: session có `client` với `id > 0` | về `/LoginView.jsp` |
 | `/nhan-vien/*` (trừ `LoginView.jsp`) | nhân viên: session có `staff` | về `/nhan-vien/LoginView.jsp` |
 | `/nhan-vien/quan-tri/*` | nhân viên có `staff.position = "Quản lí"` | 403 |
@@ -805,7 +831,15 @@ Báo cáo và các quyết định D1–D11 không trả lời các điểm dư�
 | C7 | Định nghĩa "đã có tình trạng khi giao"; giá trị mặc định của ngày mượn, ngày hẹn trả khi mở ProcessRentalBillView; ô ngày mượn có sửa được không | Đã có tình trạng khi `conditionNote` khác NULL (bấm "Lưu tình trạng" ghi chuỗi đã nhập, kể cả chuỗi rỗng). Khi SearchRentalBillView đưa phiếu "Chờ nhận" vào session: `borrowDate` = hôm nay, `dueDate` = hôm nay + `expectedDays` (ch.2 2.3 bước 10 hiện sẵn 25/09/2026 và 02/10/2026). `txtBorrowDate` hiển thị, chỉ đọc (ch.10 chỉ nhắc sửa ngày hẹn trả và giảm giá) | phase 7 |
 | C8 | doCancelRentalBill biết ai gọi để chọn trang quay về | Form gửi input ẩn `from` với một trong hai giá trị `client` hoặc `staff`; trang chỉ nhận giá trị khớp thuộc tính đang có trong session (`client` hoặc `staff`), không khớp thì 403 | phase 6 |
 | C9 | Cách `searchRentalBill` khớp từ khoá; tìm với từ khoá trống | Từ khoá dạng `PM` + số (không phân biệt hoa thường) → khớp id; ngược lại khớp tên khách chứa từ khoá hoặc CCCD bằng từ khoá. Từ khoá trống (cả `searchBook`, `searchDamage`, `searchCollateral`, `searchRentalBill`) → không gọi DAO, hiện câu "không tìm thấy" của trang | phase 3 |
-| C10 | Đầu vào không có câu báo trong báo cáo: "Tạo phiếu mượn" khi không tích dòng nào; `txtQuantity` không phải số nguyên dương; `txtDiscount` âm, không phải số hoặc lớn hơn tổng; `updateCart` trả `false`; trang quản trị nhập sai | Không thêm câu mới: số lượng, giảm giá không hợp lệ thì hiện lại trang với ô được đánh dấu lỗi bằng thuộc tính `aria-invalid` và giữ giá trị cũ trong session; không tích dòng nào thì nút "Tạo phiếu mượn" không làm gì (hiện lại trang). Cần chủ dự án duyệt nếu muốn thêm câu | phase 6 |
+| C10 | Đầu vào không có câu báo trong báo cáo: "Tạo phiếu mượn" khi không tích dòng nào; `txtQuantity` không phải số nguyên dương; `txtDiscount` âm, không phải số hoặc lớn hơn tổng; `updateCart` trả `false`; trang quản trị nhập sai | **Đổi 11/11/2026 (chủ dự án duyệt câu mới, §10.3):** lỗi nhập có câu riêng ở §10.3 thì hiện câu đó, đánh dấu ô bằng `aria-invalid="true"` và giữ giá trị cũ trong session (`QUANTITY_INVALID`, `DISCOUNT_INVALID`, `BOOK_NOT_CHOSEN`, `INPUT_TOO_LONG`). Trường hợp chưa có câu (`updateCart` trả `false`, trang quản trị) vẫn chỉ `aria-invalid` và hiện lại trang | phase 6 |
 | C11 | Hiển thị `publishYear` và `description` NULL | Ô để trống (không bịa chữ) | phase 6 |
-| C12 | Trang quản trị D6: thành phần, field, lối vào, sửa quyển | Như bảng ở mục 9.2. Lối vào: nút "Quản lí đầu truyện" ở StaffHomeView chỉ hiện với "Quản lí" (ghi rõ là phần ngoài báo cáo). `searchBook` chỉ trả quyển đang sẵn sàng nên `updateBook` chỉ **thêm** quyển mới (`id = 0`) và sửa cột của Book, không xoá quyển | phase 7 |
+| C12 | Trang quản trị D6: thành phần, field, lối vào, sửa quyển | Như bảng ở mục 9.2. Lối vào: nút "Quản lí đầu truyện" ở StaffHomeView chỉ hiện với "Quản lí" (ghi rõ là phần ngoài báo cáo). `searchBook` chỉ trả quyển đang sẵn sàng nên `updateBook` chỉ **thêm** quyển mới (`id = 0`) và sửa cột của Book, không xoá quyển. Field tự đặt (ch.9 không có): `lnkAddBook`, `lnkBack` (ManageBookView), input ẩn `bookId` (EditBookView). Luật nhập: `txtPublisher` không bắt buộc (trống lưu chuỗi rỗng); số quyển 0 được nhận ở AddBookView; giá tối đa 2^24 đồng (16.777.216đ) | phase 7 |
 | C13 | Kiểu Java của mảng và tiền | `List<T>` cho mọi `T[]`; tiền giữ `float` như ch.9 (không đổi sang `BigDecimal` vì đó là đổi thiết kế) | phase 3 |
+| C14 | Đăng xuất (báo cáo không có; chủ dự án duyệt thêm 11/11/2026) | Một trang `doLogout.jsp` ở gốc, khách và nhân viên dùng chung, chỉ nhận POST có CSRF: `session.invalidate()` rồi 302 về `HomeView.jsp` (khách) hoặc `/nhan-vien/LoginView.jsp` (nhân viên, đọc vai trước khi huỷ). Nút `btnLogout` "Đăng xuất" (form `method="post"` + `<t:csrf/>`, `formaction` tới `doLogout.jsp`) ở ClientHomeView và StaffHomeView, ghi rõ là phần ngoài báo cáo | phase 6 (trang, nút khách), phase 7 (nút nhân viên) |
+| C15 | Giới hạn số ngày thuê (chủ dự án chọn 11/11/2026) | `txtExpectedDays` từ 1 tới `RentalBill.MAX_EXPECTED_DAYS` = 30; lớn hơn thì `EXPECTED_DAYS_TOO_LONG`, nhỏ hơn 1 hay không phải số nguyên thì `EXPECTED_DAYS_INVALID`. Phía quầy **không** giới hạn 30 ngày: ngày hẹn trả chỉ cần sau ngày mượn (`DUE_DATE_INVALID`; chủ dự án chốt ở phiên phase 7). Không giới hạn ngày hẹn nhận, số phiếu "Chờ nhận" mỗi khách, độ dài tối thiểu của mật khẩu (chủ dự án không chọn) | phase 6 |
+| C16 | Session hết hạn giữa chừng | `AuthFilter`: trang cần đăng nhập mà request mang session id không còn hợp lệ (`getRequestedSessionId() != null && !isRequestedSessionIdValid()`) thì 302 về LoginView của vai kèm `?expired=1`; `CsrfFilter`: POST tới trang cần đăng nhập mà session không có token cũng vậy (không ghi gì). LoginView thấy `expired=1` ở GET thì hiện `SESSION_EXPIRED` (kind info). Trang công khai (đăng kí) chỉ hiện lại form với token mới, không câu báo | phase 6 |
+| C17 | Lí do huỷ trống (báo cáo không nói; ch.2 2.2 bước 24.7 khách có nhập) | `txtCancelReason` sau `trim()` trống thì `CANCEL_REASON_REQUIRED`, hộp xác nhận vẫn mở, ô `aria-invalid`; dài quá 255 thì `INPUT_TOO_LONG`. Áp cho khách và nhân viên | phase 6, phase 7 |
+| C18 | Phiếu "Chờ nhận" quá ngày giờ hẹn mà khách không đến | Không làm gì (chủ dự án chọn 11/11/2026): không nhãn, không tự huỷ; nhân viên huỷ tay như ch.2 | |
+| C19 | Edge case kĩ thuật ngoài báo cáo (dữ liệu nhập lạ, bấm hai lần, F5, Back, URL trực tiếp, session thiếu thuộc tính, id sửa tay, hai tab) | Theo `plans/261111-tiem-thue-truyen/phase-06-integration.md` §6.1: không trang nào ra 500 hay ghi đôi; thiếu thuộc tính session thì 302 về trang đầu mối; id không có trong danh sách của session thì bỏ qua | phase 6, phase 7 |
+| C20 | Trạng thái ô "Nhận" của ProcessRentalBillView khi quay về từ AddConditionView, EditRentedBookListView, AddRentalCollateralView (model không có chỗ giữ; chủ dự án chốt 11/11/2026 ở phiên phase 7, chọn thuộc tính kĩ thuật thay vì đổi model) | Thuộc tính session kĩ thuật `uncheckedBarcodes: ArrayList<String>` = mã vạch nhân viên đã bỏ tích "Nhận" của phiếu đang mở. ProcessRentalBillView ghi khi đổi ô `chkReceived`; SearchRentalBillView bỏ khi đưa phiếu "Chờ nhận" vào session; doUpdateRentalBill bỏ khi thành công. Không phải thuộc tính nghiệp vụ của §7 | phase 7 |
+| C21 | Khách mở hai thiết bị: một thiết bị xoá dòng "Truyện đã chọn" hoặc đã xác nhận phiếu từ cùng các dòng giỏ, thiết bị kia bấm "Xác nhận" với `rentalBill` cũ trong session (chủ dự án yêu cầu xử lí mọi edge case thực tế, 11/11/2026) | `RentalBillDAO.addRentalBill` trong cùng transaction K1, sau khi khoá dòng `tblBook`, khoá các dòng `tblSelectedBook` của phiếu theo id tăng dần (`FOR UPDATE`) và kiểm mỗi dòng còn tồn tại, thuộc giỏ của client của phiếu, không có `tblRentedBook` của phiếu chưa huỷ trỏ vào; sai một dòng thì rollback, trả `false` (không lỗi khoá ngoại, không 500). doAddRentalBill khi `false`: đọc lại giỏ bằng `CartDAO.getCart`; dòng của phiếu không còn là dòng tự do thì thay `cart` trong session bằng giỏ mới, bỏ `rentalBill`, báo `SELECTED_BOOKS_CHANGED` ở trang "Truyện đã chọn"; ngược lại `NOT_ENOUGH_COPIES` như cũ | phase 6 |

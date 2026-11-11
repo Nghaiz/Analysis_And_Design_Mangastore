@@ -20,7 +20,7 @@ Công nghệ bắt buộc: **JSP + DAO + MySQL**, kiến trúc JSP-DAO như báo
 
 | Cần biết | File |
 |---|---|
-| Hợp đồng nghiệp vụ và tích hợp: bảng, model, DAO, khoá K1, session, 28 trang, field form, 28 thông báo, props island, phân quyền, hiển thị, mục 14 (điểm báo cáo không trả lời, đã chốt) | `docs/contracts.md` (SSOT, thắng mọi file khác về nghiệp vụ) |
+| Hợp đồng nghiệp vụ và tích hợp: bảng, model, DAO, khoá K1, session, 28 trang, field form, 28 thông báo của báo cáo cộng 9 câu ngoài báo cáo (§10.3), props island, phân quyền, hiển thị, mục 14 (điểm báo cáo không trả lời, đã chốt) | `docs/contracts.md` (SSOT, thắng mọi file khác về nghiệp vụ) |
 | Hạ tầng: cây thư mục, service, cổng, biến môi trường, build, Accept, file dùng chung, git | `plans/261111-tiem-thue-truyen/contract.md` (thắng về hạ tầng) |
 | Kế hoạch, phase, quyết định Deferred | `plans/261111-tiem-thue-truyen/plan.md`, `phase-0N-*.md` |
 | Ai đang làm lane nào | `plans/261111-tiem-thue-truyen/agent-map.md` |
@@ -136,7 +136,7 @@ Trình duyệt ──POST form (csrf)──▶ Filter (UTF-8, Auth, CSRF, Securi
 ```
 
 - Java chỉ có bốn package `dao`, `model`, `filter`, `util`. **Không** có lớp kế thừa `HttpServlet` làm controller, **không** Spring, không framework MVC. Trang JSP là tầng điều khiển, đúng báo cáo.
-- `model`: 13 lớp thực thể, `Serializable` (session lưu trong Redis). `util`: `Db` (DataSource HikariCP), `AppConfig`, `Messages` (28 câu), `Passwords` (Argon2id), `Codes` (mã DT/PM), `JsonUtil`, `ViteManifest`, `MigrationListener` (Flyway Java API lúc khởi động).
+- `model`: 13 lớp thực thể, `Serializable` (session lưu trong Redis). `util`: `Db` (DataSource HikariCP), `AppConfig`, `Messages` (28 câu của báo cáo + 9 câu §10.3), `Passwords` (Argon2id), `Codes` (mã DT/PM), `JsonUtil`, `ViteManifest`, `MigrationListener` (Flyway Java API lúc khởi động).
 - Giao diện: JSP + JSTL + tag file (`WEB-INF/tags/`), một tag `<t:assets/>` nạp CSS/JS từ manifest Vite. **React island cách B**: JSP render form HTML thật; island mount trong form, chỉ đổi input thật rồi `form.requestSubmit()`, không `fetch`. Bốn island: `SelectedStack`, `ProcessBillDesk`, `CollateralDrawer`, `ShelfScene`. Props: `docs/contracts.md` mục 11.
 - Session Tomcat lưu trong Redis qua Redisson (cấu hình ở ảnh app, không ở code trang). Redis còn dùng để chặn đăng nhập sai. Số quyển trống luôn đọc từ MySQL.
 - Ảnh bìa: nginx phục vụ `/covers/{bookId}/cover-{w}.webp` từ volume; thiếu ảnh trả bìa giấy vẽ sẵn (D2).
@@ -198,7 +198,7 @@ Bổ sung đã chốt (bảng chi tiết ở `docs/contracts.md`, không chép l
 | D9 | `updateRentalBill` khoá dòng phiếu, chỉ ghi khi DB vẫn "Chờ nhận"; trả `false` thì trang đọc lại trạng thái bằng hàm danh sách đã có và báo "Phiếu mượn đã bị huỷ, không thể xử lí." hoặc "Phiếu mượn này đã được xử lí và đã giao truyện." (Deferred #11) | mục 6.3 |
 | Session | Đúng 12 thuộc tính: `client`, `staff`, `cart`, `rentalBill`, `listBook`, `book`, `listRentalBill`, `rentedBook`, `listRentedBook`, `listDamage`, `listCollateral`, `listRentalCollateral` | mục 7 |
 | Trang | 28 trang ch.9; `LoginView.jsp` ở cả gốc (ClientDAO) và `/nhan-vien/` (StaffDAO) (D5); `doCancelRentalBill.jsp` một file dùng chung (Deferred #13); 5 trang quản trị D6 ở `/nhan-vien/quan-tri/` (Deferred #14) | mục 9 |
-| Thông báo | 28 câu nguyên văn (brief chỉ kể 5), hằng số trong một lớp `Messages`, test so từng kí tự | mục 10 |
+| Thông báo | 28 câu nguyên văn (brief chỉ kể 5) cộng 9 câu ngoài báo cáo chủ dự án duyệt 11/11/2026 (§10.3), hằng số trong một lớp `Messages`, test so từng kí tự | mục 10 |
 | Xác nhận phiếu | Đủ bốn điều kiện: có quyển tích "Nhận"; mọi quyển tích đã có tình trạng; đã có khoản cọc; ngày hẹn trả sau ngày mượn | mục 10.2 |
 | Phân quyền | Khách: mọi trang gốc trừ Home, Register, doRegister, Login; nhân viên: `/nhan-vien/*`; quản lí: `/nhan-vien/quan-tri/*` (`position = "Quản lí"`); `/dev/*` luôn mở | mục 12 |
 | Hiển thị | `DT` + id 3 chữ số, `PM` + id 4 chữ số chỉ lúc hiển thị; barcode lưu thật `DT001-03` (D8); tiền `3.000đ`; ngày `dd/MM/yyyy`; giờ `HH:mm dd/MM/yyyy` | mục 13 |
@@ -238,7 +238,7 @@ Theo `plans/261111-tiem-thue-truyen/contract.md` §9:
 | DAO, migration | JUnit 6 + Testcontainers `mysql:8.4.13` | `src/test/java/vn/tiemtruyen/dao/` | Mọi hàm DAO; 4 test tranh chấp K1 và D9 (`RentalBillConcurrencyTest`) |
 | Schema | `SchemaConformanceTest` (so `information_schema` với `docs/contracts.md` mục 2) | `src/test/java/vn/tiemtruyen/schema/` | Đủ 13 bảng, cột, kiểu, NULL, khoá |
 | Kiến trúc | `ArchitectureTest` | `src/test/java/vn/tiemtruyen/arch/` | Không hàm đọc theo id, không DAO cho lớp trung gian, không lớp `HttpServlet`, không Spring, không cột dẫn xuất |
-| Thông báo | `MessagesTest` | `src/test/java/vn/tiemtruyen/util/` | 28 câu khớp từng kí tự với `docs/contracts.md` mục 10 |
+| Thông báo | `MessagesTest` | `src/test/java/vn/tiemtruyen/util/` | 28 câu §10.1 và 9 câu §10.3 khớp từng kí tự với `docs/contracts.md` mục 10 |
 | Session | `SerializationTest` | `src/test/java/vn/tiemtruyen/` | Tuần tự hoá đủ graph Cart, RentalBill |
 | Filter | JUnit | `src/test/java/vn/tiemtruyen/filter/` | POST thiếu CSRF → 403; phân quyền theo mục 12 |
 | Island | Vitest + jsdom | `frontend/src/islands/*/*.test.tsx` | Island chỉ đổi input đúng tên và gọi `requestSubmit`; ESLint chặn `fetch`/`XMLHttpRequest` trong `islands/` |
@@ -255,7 +255,7 @@ Không tính là xong khi chưa chạy lệnh kiểm và đọc kết quả. Tes
 - **Cấm DAO cho lớp trung gian**: không có SelectedBookDAO, RentedBookDAO, RentedDamageDAO, RentalCollateralDAO. Thao tác đi qua `CartDAO.updateCart`, `RentalBillDAO.updateRentalBill`. Không thêm DAO hay hàm DAO ngoài `docs/contracts.md` mục 5.3.
 - **Cấm gộp hàm** trông giống nhau của ch.9; mỗi đối tượng gốc chỉ một hàm cập nhật.
 - **Cấm lưu thuộc tính dẫn xuất**: không cột hay field số lượng, tổng tiền, trạng thái quyển (`quantity`, `total`, `availableCount`, `copyStatus`…); tính lúc hiển thị. `tblRentedBook.rentalPrice` là giá chốt, không phải dẫn xuất.
-- **Cấm sửa thông báo nguyên văn**: 28 câu ở `docs/contracts.md` mục 10 là hằng số; không viết lại, không thêm câu mới khi chủ dự án chưa duyệt.
+- **Cấm sửa thông báo nguyên văn**: 28 câu §10.1 và 9 câu §10.3 ở `docs/contracts.md` mục 10 là hằng số; không viết lại, không thêm câu mới khi chủ dự án chưa duyệt.
 - **Cấm Servlet điều khiển và Spring**: không lớp kế thừa `HttpServlet` làm controller, không Spring, không framework MVC, không endpoint JSON.
 - **Cấm island gọi `fetch`** (hay `XMLHttpRequest`, `WebSocket`, `navigator.sendBeacon`): island chỉ đổi input thật rồi `form.requestSubmit()`.
 - Cấm ghi DB từ trang `XxxView.jsp`; mọi lần ghi qua một `doXxx.jsp`.

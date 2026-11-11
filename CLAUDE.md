@@ -25,6 +25,8 @@ Context gần đầy: commit phần đang làm (pathspec), `/t1k:handoff save`, 
 | cua-driver (`mcp__cua-driver__*`) | Phần mềm có giao diện trên Windows, ví dụ MySQL Workbench reverse engineer schema để so ERD ch.8 (phase 3). Việc làm được bằng dòng lệnh (`mysql` trong container, Flyway) thì dùng dòng lệnh. Mở `start_session` với nhãn ngắn và truyền nhãn đó cho mọi lệnh; sau mỗi lần bấm kiểm bằng `verify_state`; `effect: "unverifiable"` chưa phải là xong | orchestrator (không agent con nào có tool cua-driver) |
 | context7 (`mcp__context7__resolve-library-id`, `mcp__context7__query-docs`) | Tra tài liệu và phiên bản thư viện; không lấy theo trí nhớ | orchestrator, hoặc agent có `mcp__context7__query-docs` (mục 4) |
 
+**Playwright MCP là MỘT trình duyệt cho cả phiên**: mọi agent con gọi `mcp__playwright__*` dùng chung tab và cookie, nên mỗi lúc chỉ một lane kiểm bằng trình duyệt (phase 6: lane 6E bấm nhầm vào form của 6F). Cookie `JSESSIONID` gắn theo host `127.0.0.1`, không theo cổng, nên hai stack ở hai cổng trong cùng trình duyệt ghi đè session của nhau. Cần nhiều bước hay context tắt JS thì giao `t1k-tester` (có `browser_run_code_unsafe`, chạy cả chuỗi Playwright API trong một lần gọi).
+
 MCP nào chưa nạp trong phiên (tool `mcp__<tên>__*` không có trong danh sách tool) thì **dừng và báo chủ dự án khởi động lại Claude Code**. Không lặng lẽ đổi sang cách yếu hơn (script PowerShell bấm GUI, đọc tài liệu theo trí nhớ, bỏ bước kiểm trên trình duyệt).
 
 ## 3. Spawn agent

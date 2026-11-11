@@ -5,16 +5,19 @@ import static org.junit.jupiter.api.Assertions.assertNotSame;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertSame;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
+import io.netty.buffer.ByteBuf;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import org.junit.jupiter.api.Test;
+import org.redisson.client.codec.Codec;
+import org.redisson.client.handler.State;
 import vn.tiemtruyen.model.Book;
 import vn.tiemtruyen.model.BookCopy;
 import vn.tiemtruyen.model.Cart;
@@ -28,8 +31,16 @@ import vn.tiemtruyen.model.RentedDamage;
 import vn.tiemtruyen.model.SelectedBook;
 import vn.tiemtruyen.model.Staff;
 
-/** Session nằm trong Redis (D7): cả đồ thị Cart và RentalBill phải tuần tự hoá rồi đọc lại được. */
+/**
+ * Session nằm trong Redis (D7): cả đồ thị Cart và RentalBill phải tuần tự hoá rồi đọc lại được bằng đúng codec mà
+ * RedissonSessionManager dùng lúc chạy, đọc từ docker/app/redisson.yaml. Không khai báo codec thì Redisson dùng
+ * Kryo5Codec, codec này không giữ vòng Book ↔ BookCopy và tràn ngăn xếp (500 khi session có listBook).
+ */
 class SerializationTest {
+
+    private static final Path REDISSON_CONFIG = Path.of("docker", "app", "redisson.yaml");
+    private static final String REDISSON_DEFAULT_CODEC = "org.redisson.codec.Kryo5Codec";
+    private static final Pattern CODEC_LINE = Pattern.compile("(?m)^codec:\\s*!<([\\w.]+)>");
 
     @Test
     void cartGraphRoundTripsWithCyclicBookAndCopy() throws Exception {
@@ -179,14 +190,21 @@ class SerializationTest {
         assertEquals("001203012345", client.getIdCard());
     }
 
+    private static Codec runtimeCodec() throws Exception {
+        String yaml = Files.readString(REDISSON_CONFIG, StandardCharsets.UTF_8);
+        Matcher codecLine = CODEC_LINE.matcher(yaml);
+        String codecClass = codecLine.find() ? codecLine.group(1) : REDISSON_DEFAULT_CODEC;
+        return (Codec) Class.forName(codecClass).getDeclaredConstructor().newInstance();
+    }
+
     @SuppressWarnings("unchecked")
-    private static <T> T roundTrip(T value) throws IOException, ClassNotFoundException {
-        ByteArrayOutputStream bytes = new ByteArrayOutputStream();
-        try (ObjectOutputStream out = new ObjectOutputStream(bytes)) {
-            out.writeObject(value);
-        }
-        try (ObjectInputStream in = new ObjectInputStream(new ByteArrayInputStream(bytes.toByteArray()))) {
-            return (T) in.readObject();
+    private static <T> T roundTrip(T value) throws Exception {
+        Codec codec = runtimeCodec();
+        ByteBuf bytes = codec.getValueEncoder().encode(value);
+        try {
+            return (T) codec.getValueDecoder().decode(bytes, new State());
+        } finally {
+            bytes.release();
         }
     }
 }

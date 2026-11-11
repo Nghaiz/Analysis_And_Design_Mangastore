@@ -1,0 +1,15 @@
+# Chồng lên compose.yaml khi chạy E2E và smoke (contract.md §3). Luôn chạy bằng compose project riêng
+# để có volume riêng, không đụng dữ liệu thường:
+#   docker compose -p tiemtruyen-e2e -f compose.yaml -f compose.e2e.yaml up --build -d --wait
+# Không chạy cùng lúc với stack thường trên cùng cổng; lane muốn stack riêng thì đặt thêm
+# NGINX_HTTP_PORT, DB_HOST_PORT, APP_IMAGE_TAG và -p riêng (phase-06-integration.md §4).
+# File dùng chung, chỉ orchestrator sửa.
+services:
+  app:
+    environment:
+      # Seed E2E dựng y hệt ch.2 (D3): catalog V10 trong classpath, không đọc volume catalog crawl.
+      FLYWAY_DATA_LOCATION: classpath:db/e2e
+      # Kịch bản ch.2 có 1 lần đăng nhập sai; smoke và E2E chạy nhiều lượt liền nhau nên ngưỡng phải cao
+      # hơn hẳn (Deferred #23). Test riêng của ngưỡng chặn nằm ở test filter, không ở luồng ch.2.
+      LOGIN_RATE_MAX_FAILS: ${E2E_LOGIN_RATE_MAX_FAILS:-1000}
+      LOGIN_RATE_WINDOW_SECONDS: ${E2E_LOGIN_RATE_WINDOW_SECONDS:-60}

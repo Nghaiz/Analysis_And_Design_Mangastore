@@ -40,6 +40,17 @@ public final class Messages {
     public static final String COLLATERAL_NAME_REQUIRED = "Vui lòng nhập tên loại tài sản.";
     public static final String COLLATERAL_EXISTS = "Loại tài sản đã tồn tại.";
 
+    // Ngoài báo cáo: docs/contracts.md §10.3 (chủ dự án duyệt 11/11/2026).
+    public static final String DISCOUNT_INVALID = "Giảm giá không hợp lệ, vui lòng nhập lại.";
+    public static final String QUANTITY_INVALID = "Số lượng phải là số nguyên lớn hơn hoặc bằng 1.";
+    public static final String BOOK_NOT_CHOSEN = "Vui lòng chọn đầu truyện.";
+    public static final String INPUT_TOO_LONG = "Nội dung nhập quá dài, vui lòng rút gọn.";
+    public static final String RENTAL_BILL_CHANGED = "Phiếu mượn đang mở đã thay đổi, vui lòng chọn lại phiếu.";
+    public static final String SESSION_EXPIRED = "Phiên làm việc đã hết hạn, vui lòng đăng nhập lại.";
+    public static final String CANCEL_REASON_REQUIRED = "Vui lòng nhập lí do huỷ.";
+    public static final String EXPECTED_DAYS_TOO_LONG = "Số ngày thuê tối đa là 30 ngày.";
+    public static final String SELECTED_BOOKS_CHANGED = "Truyện đã chọn đã thay đổi, vui lòng kiểm tra lại.";
+
     /** Đoạn chứa chữ {@code N} duy nhất cần thay trong {@link #QUANTITY_EXCEEDED}. */
     private static final String QUANTITY_PLACEHOLDER = "(hiện còn N quyển)";
 

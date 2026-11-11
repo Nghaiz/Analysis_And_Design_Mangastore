@@ -1,7 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
   Jakarta EE 11 (Servlet 6.1) trên Tomcat 11.0.27. File dùng chung: chỉ orchestrator sửa.
-  Phase 1 chưa có filter; filter (UTF-8, Auth, CSRF, SecurityHeaders, LoginRateLimit) thêm ở phase 6.
+  Filter (phase 6): thứ tự khai <filter-mapping> là thứ tự chạy, Utf8 → SecurityHeaders → Csrf → Auth →
+  LoginRateLimit (chỉ hai trang LoginView.jsp; lọc POST bên trong filter). Chỉ dispatcher REQUEST: forward
+  từ doXxx.jsp sang trang xem không đi lại qua filter. Ranh giới trang ↔ filter:
+  plans/261111-tiem-thue-truyen/phase-06-integration.md §2.
 -->
 <web-app xmlns="https://jakarta.ee/xml/ns/jakartaee"
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
@@ -11,6 +14,54 @@
 
   <request-character-encoding>UTF-8</request-character-encoding>
   <response-character-encoding>UTF-8</response-character-encoding>
+
+  <filter>
+    <filter-name>Utf8Filter</filter-name>
+    <filter-class>vn.tiemtruyen.filter.Utf8Filter</filter-class>
+  </filter>
+  <filter>
+    <filter-name>SecurityHeadersFilter</filter-name>
+    <filter-class>vn.tiemtruyen.filter.SecurityHeadersFilter</filter-class>
+  </filter>
+  <filter>
+    <filter-name>CsrfFilter</filter-name>
+    <filter-class>vn.tiemtruyen.filter.CsrfFilter</filter-class>
+  </filter>
+  <filter>
+    <filter-name>AuthFilter</filter-name>
+    <filter-class>vn.tiemtruyen.filter.AuthFilter</filter-class>
+  </filter>
+  <filter>
+    <filter-name>LoginRateLimitFilter</filter-name>
+    <filter-class>vn.tiemtruyen.filter.LoginRateLimitFilter</filter-class>
+  </filter>
+
+  <filter-mapping>
+    <filter-name>Utf8Filter</filter-name>
+    <url-pattern>/*</url-pattern>
+    <dispatcher>REQUEST</dispatcher>
+  </filter-mapping>
+  <filter-mapping>
+    <filter-name>SecurityHeadersFilter</filter-name>
+    <url-pattern>/*</url-pattern>
+    <dispatcher>REQUEST</dispatcher>
+  </filter-mapping>
+  <filter-mapping>
+    <filter-name>CsrfFilter</filter-name>
+    <url-pattern>/*</url-pattern>
+    <dispatcher>REQUEST</dispatcher>
+  </filter-mapping>
+  <filter-mapping>
+    <filter-name>AuthFilter</filter-name>
+    <url-pattern>/*</url-pattern>
+    <dispatcher>REQUEST</dispatcher>
+  </filter-mapping>
+  <filter-mapping>
+    <filter-name>LoginRateLimitFilter</filter-name>
+    <url-pattern>/LoginView.jsp</url-pattern>
+    <url-pattern>/nhan-vien/LoginView.jsp</url-pattern>
+    <dispatcher>REQUEST</dispatcher>
+  </filter-mapping>
 
   <jsp-config>
     <jsp-property-group>
@@ -32,6 +83,32 @@
     </cookie-config>
     <tracking-mode>COOKIE</tracking-mode>
   </session-config>
+
+  <!-- Trang lỗi tiếng Việt (lane 6A, src/main/webapp/error/). -->
+  <error-page>
+    <error-code>403</error-code>
+    <location>/error/403.jsp</location>
+  </error-page>
+  <error-page>
+    <error-code>404</error-code>
+    <location>/error/404.jsp</location>
+  </error-page>
+  <error-page>
+    <error-code>405</error-code>
+    <location>/error/405.jsp</location>
+  </error-page>
+  <error-page>
+    <error-code>500</error-code>
+    <location>/error/500.jsp</location>
+  </error-page>
+  <error-page>
+    <exception-type>java.lang.Throwable</exception-type>
+    <location>/error/500.jsp</location>
+  </error-page>
+  <!-- Mọi mã lỗi khác (400, 413, 414, 501…): trang chung giữ nguyên mã trạng thái. -->
+  <error-page>
+    <location>/error/error.jsp</location>
+  </error-page>
 
   <welcome-file-list>
     <welcome-file>HomeView.jsp</welcome-file>
