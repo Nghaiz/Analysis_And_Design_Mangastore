@@ -31,6 +31,10 @@ Chủ đề: tiệm cho thuê truyện đầu ngõ, giấy ố, phiếu xé từ
 
 ## Gotchas
 
+- **Cây thẻ cố định** (`plans/261111-tiem-thue-truyen/phase-05-ui-contract.md` §3a): bìa là `span.tt-book-cover` bọc `img` (lớp ở thẻ bọc); chữ trong dấu viết sẵn chữ hoa trong DOM, không `text-transform`. Tag JSP và component React phải in cùng cây.
+- **Giá trị ngoài hợp đồng thì ném lỗi**, không lặng lẽ rơi về mặc định: `stamp` nhận đúng ba trạng thái (cả "Đã hủy" sai dấu cũng là lỗi), `message-box` đúng ba `kind`.
+- **Font không `@import "@fontsource/..."`**: tên file có hash nên không preload được. Woff2 chép vào `frontend/public/fonts/` bằng `node frontend/scripts/check-font-subsets.mjs --sync` (ADR-0011 mục Cập nhật).
+- **Màu cảnh 3D** nằm trong `frontend/src/three/` dưới dạng số (WebGL không đọc biến CSS); đó là chỗ duy nhất được có hex ngoài `tokens.css` (Accept phase 5 bước 4b).
 - shadcn/ui mặc định `rounded-md`/`rounded-lg`: đặt `--radius` và các `--radius-*` của `@theme` ≤ 2px để component shadcn không lọt góc tròn; soát lại sau mỗi lần `shadcn add`.
 - Chữ tiếng Việt chồng dấu (ố, ẫ, ặ) bị cắt khi `line-height` quá thấp hoặc `overflow: hidden`; thử chuỗi có dấu ở cỡ nhỏ nhất của component.
 - Chữ xoay trong dấu đỏ vẫn phải đọc được bằng trình đọc màn hình: chữ thật trong DOM, không vẽ chữ bằng ảnh.

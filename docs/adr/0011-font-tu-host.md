@@ -25,5 +25,11 @@ Toàn bộ chữ trên giao diện là tiếng Việt có dấu; font thiếu gl
 | Phương án | Lí do loại |
 |---|---|
 | Nhúng Google Fonts CDN | Gọi ra ngoài lúc chạy, phải nới CSP |
-| Tải tay file woff2 vào `frontend/public/fonts/` | Không có phiên bản ghim; giữ làm cách đảo lại |
+| Tải tay file woff2 vào `frontend/public/fonts/` | Không có phiên bản ghim (phase 5 dùng cách gần giống nhưng chép từ gói Fontsource đã ghim, xem mục Cập nhật) |
 | Special Elite, Courier Prime, Cutive Mono (chữ đánh máy) | Không có subset vietnamese |
+
+## Cập nhật 11/11/2026 (phase 5)
+
+- Không `@import "@fontsource/..."` trong CSS: Vite đổi tên file font theo hash, nên `layout.tag` không biết URL để preload.
+- Thay vào đó, `frontend/scripts/check-font-subsets.mjs --sync` chép từng byte các file woff2 (subset latin và vietnamese) cùng giấy phép OFL từ gói Fontsource đã ghim vào `frontend/public/fonts/` với tên cố định; `fonts.css` tự viết `@font-face` trỏ tới `/static/fonts/...`. `npm --prefix frontend run check:fonts` báo lỗi khi bản chép lệch gói đã cài, và kiểm `unicode-range` vietnamese trên CSS đã build.
+- Preload bốn file: Be Vietnam Pro 400 và Xanh Mono 400, mỗi font hai subset latin và vietnamese.

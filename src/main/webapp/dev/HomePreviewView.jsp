@@ -42,18 +42,25 @@
     shelfProps.put("posterSrcSet", null);
     shelfProps.put("posterAlt", posterAlt);
     shelfProps.put("categories", categories);
+
+    // Thân của layout.tag là scriptless (cấm biểu thức Java), nên giá trị đi qua thuộc tính trang và EL.
+    pageContext.setAttribute("loginHref", loginHref);
+    pageContext.setAttribute("registerHref", registerHref);
+    pageContext.setAttribute("posterSrc", posterSrc);
+    pageContext.setAttribute("posterAlt", posterAlt);
+    pageContext.setAttribute("shelfPropsJson", JsonUtil.toScriptJson(shelfProps));
 %>
 <t:layout title="Trang chủ">
   <section class="mx-auto flex max-w-5xl flex-col gap-6 px-4 py-8">
     <h1 class="font-sign text-ink">Trang chủ</h1>
     <p class="text-ink">Chào mừng bạn đến với cửa hàng cho thuê truyện!</p>
     <p class="flex flex-wrap gap-4">
-      <a id="lnkLogin" href="<%= loginHref %>" class="rounded-paper bg-primary px-4 py-2 text-primary-foreground shadow-paper">Đăng nhập</a>
-      <a id="lnkRegister" href="<%= registerHref %>" class="rounded-paper border border-ink-soft bg-paper px-4 py-2 text-ink shadow-paper">Đăng kí</a>
+      <a id="lnkLogin" href="${loginHref}" class="rounded-paper bg-primary px-4 py-2 text-primary-foreground shadow-paper">Đăng nhập</a>
+      <a id="lnkRegister" href="${registerHref}" class="rounded-paper border border-ink-soft bg-paper px-4 py-2 text-ink shadow-paper">Đăng kí</a>
     </p>
     <div data-island="ShelfScene" data-props="shelf-scene-props" class="w-full overflow-hidden rounded-paper bg-wood shadow-paper">
-      <div class="relative"><a href="<%= loginHref %>" class="block"><img src="<%= posterSrc %>" alt="<%= posterAlt %>" width="1200" height="800" class="block h-auto w-full" decoding="async" fetchpriority="high"></a></div>
+      <div class="relative"><a href="${loginHref}" class="block"><img src="${posterSrc}" alt="${posterAlt}" width="1200" height="800" class="block h-auto w-full" decoding="async" fetchpriority="high"></a></div>
     </div>
-    <script type="application/json" id="shelf-scene-props"><%= JsonUtil.toScriptJson(shelfProps) %></script>
+    <script type="application/json" id="shelf-scene-props">${shelfPropsJson}</script>
   </section>
 </t:layout>

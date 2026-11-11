@@ -1,8 +1,8 @@
 # Design token: "tiệm truyện đầu ngõ"
 
-<!-- updated 261111 -->
+<!-- updated 261111 (phase 5: token đã cài vào frontend/src/styles/tokens.css) -->
 
-Chủ đề: tiệm thuê truyện đầu ngõ ở Việt Nam cuối thập niên 90, đầu 2000: giấy ố vàng, mép giấy sờn, chữ đánh máy, nét bút bi xanh, con dấu đỏ, băng dính giấy. Nguồn: brief §5, brainstorm §7. Phase 5 cài token vào `frontend/src/styles/tokens.css` qua `@theme` của Tailwind v4; tên token dưới đây là tên biến CSS. Dòng ghi **đề xuất** chưa có trong brainstorm, phase 5 chốt rồi sửa file này.
+Chủ đề: tiệm thuê truyện đầu ngõ ở Việt Nam cuối thập niên 90, đầu 2000: giấy ố vàng, mép giấy sờn, chữ đánh máy, nét bút bi xanh, con dấu đỏ, băng dính giấy. Nguồn: brief §5, brainstorm §7. Phase 5 cài token vào `frontend/src/styles/tokens.css` qua `@theme` của Tailwind v4; tên token dưới đây là tên biến CSS. Phase 5 đã cài nguyên văn mọi giá trị dưới đây; tên tiện ích Tailwind sinh ra: `plans/261111-tiem-thue-truyen/phase-05-ui-contract.md` §1.
 
 ## 1. Màu
 
@@ -29,18 +29,18 @@ Tương phản theo WCAG 2.x, đo trên ba nền `paper` / `paper-deep` / `tape`
 
 Cả bốn có subset `vietnamese` (Google Fonts metadata, kiểm 11/11/2026). Tự host bằng Fontsource, chỉ subset latin và vietnamese, không gọi Google Fonts lúc chạy ([ADR-0011](adr/0011-font-tu-host.md)).
 
-| Token (đề xuất tên) | Font | Độ đậm | Nạp | Dùng cho |
+| Token | Font | Độ đậm | Nạp | Dùng cho |
 |---|---|---|---|---|
 | `--font-body` | Be Vietnam Pro | 400, 500, 600 | preload | Bảng, form, đoạn văn |
 | `--font-type` | Xanh Mono | 400 | preload | Số phiếu, mã vạch, tiêu đề phiếu, chữ trong dấu |
 | `--font-pen` | Patrick Hand | 400 | lười | Ghi chú tay, tình trạng truyện, chữ kí nhân viên |
 | `--font-sign` | Fraunces (variable, trục SOFT) | variable | lười | Tên tiệm, tiêu đề lớn |
 
-Đã loại: Special Elite (không có subset vietnamese). Kiểm chữ: chụp màn hình chuỗi "Đã huỷ · Ố vàng · Nguyễn Thu Hà · Thám tử lừng danh Conan" ở cả bốn font (phase 5).
+Nạp font: woff2 chép từ gói Fontsource đã ghim vào `frontend/public/fonts/` (tên cố định, để preload), xem [ADR-0011](adr/0011-font-tu-host.md) mục Cập nhật. Đã loại: Special Elite (không có subset vietnamese). Kiểm chữ: chụp màn hình chuỗi "Đã huỷ · Ố vàng · Nguyễn Thu Hà · Thám tử lừng danh Conan" ở cả bốn font (phase 5).
 
 ## 3. Khoảng cách
 
-Bậc theo bội số 4px, tám bậc từ `--s-1` = 4px tới `--s-8` = 64px (brainstorm §7). Các bậc giữa là **đề xuất**:
+Bậc theo bội số 4px, tám bậc từ `--s-1` = 4px tới `--s-8` = 64px (brainstorm §7). Các bậc giữa do phase 5 chốt:
 
 | Token | `--s-1` | `--s-2` | `--s-3` | `--s-4` | `--s-5` | `--s-6` | `--s-7` | `--s-8` |
 |---|---|---|---|---|---|---|---|---|
@@ -50,7 +50,7 @@ Bậc theo bội số 4px, tám bậc từ `--s-1` = 4px tới `--s-8` = 64px (b
 
 Giấy không bo tròn: bo góc **tối đa 2px**.
 
-| Token (đề xuất tên) | Giá trị | Dùng cho |
+| Token | Giá trị | Dùng cho |
 |---|---|---|
 | `--radius-none` | 0 | Tờ phiếu, thẻ giấy, bảng |
 | `--radius-paper` | 2px | Nút, ô nhập, tem dán |
@@ -59,9 +59,9 @@ Không token nào lớn hơn 2px; component shadcn bọc lại theo chủ đề 
 
 ## 5. Bóng đổ
 
-Bóng đổ lệch, cứng, kiểu tờ giấy đặt trên bàn, thay cho bóng mờ lan rộng (brainstorm §7). Giá trị là **đề xuất**:
+Bóng đổ lệch, cứng, kiểu tờ giấy đặt trên bàn, thay cho bóng mờ lan rộng (brainstorm §7). Giá trị do phase 5 chốt:
 
-| Token | Giá trị đề xuất | Dùng cho |
+| Token | Giá trị | Dùng cho |
 |---|---|---|
 | `--shadow-paper` | `2px 3px 0 rgb(43 33 24 / 0.18)` | Tờ phiếu, thẻ trên nền |
 | `--shadow-lift` | `4px 6px 0 rgb(43 33 24 / 0.22)` | Phần tử đang nhấc lên (gáy truyện rê chuột, ngăn kéo mở) |

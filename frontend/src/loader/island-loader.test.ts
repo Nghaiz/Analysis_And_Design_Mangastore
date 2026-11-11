@@ -219,6 +219,7 @@ describe('error boundary (default runtime)', () => {
     expect(document.getElementById('host')?.textContent).toContain('Bản HTML của JSP')
     expect(consoleError).toHaveBeenCalledTimes(1)
     expect(String(consoleError.mock.calls[0]?.[0])).toContain('[island-loader] Island "Broken" crashed while rendering')
+    expect(document.getElementById('host')?.getAttribute('data-island-state')).toBe('failed')
   })
 
   it('keeps a healthy island mounted next to a crashed one', async () => {
@@ -238,6 +239,17 @@ describe('error boundary (default runtime)', () => {
 
     await vi.waitFor(() => expect(document.getElementById('good')?.textContent).toBe('chạy'))
     await vi.waitFor(() => expect(document.getElementById('bad')?.textContent).toBe('giữ'))
+    expect(document.getElementById('good')?.getAttribute('data-island-state')).toBe('mounted')
+    await vi.waitFor(() => expect(document.getElementById('bad')?.getAttribute('data-island-state')).toBe('failed'))
+  })
+
+  it('marks an island that fails its checks as failed and never as mounted', async () => {
+    setBody('<div id="ghost" data-island="Ghost"></div>')
+    vi.spyOn(console, 'error').mockImplementation(() => {})
+
+    await mountIslands({ registry: registryOf({}) })
+
+    expect(document.getElementById('ghost')?.getAttribute('data-island-state')).toBe('failed')
   })
 })
 

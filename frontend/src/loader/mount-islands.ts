@@ -55,6 +55,12 @@ export interface MountReport {
 
 export const ISLAND_ATTRIBUTE = 'data-island'
 export const PROPS_ATTRIBUTE = 'data-props'
+/**
+ * Set on every `[data-island]` once the loader is done with it, so E2E tests can wait for it:
+ * `mounted` after the first render was scheduled, `failed` when the island was rejected, did not
+ * load or crashed (a crash may land after `mounted` and overrides it; `mounted` never overrides `failed`).
+ */
+export const STATE_ATTRIBUTE = 'data-island-state'
 
 const LOG_PREFIX = '[island-loader]'
 const GLOB_KEY_PATTERN = /\/islands\/([^/]+)\/index\.tsx$/
@@ -101,6 +107,7 @@ export async function mountIslands(options: MountOptions): Promise<MountReport> 
 
   const fail = (name: string, element: HTMLElement, message: string, cause?: unknown): void => {
     report.failed.push({ name, element, message })
+    element.setAttribute(STATE_ATTRIBUTE, 'failed')
     reportError(`${LOG_PREFIX} ${message}`, cause)
   }
 
@@ -127,6 +134,7 @@ export async function mountIslands(options: MountOptions): Promise<MountReport> 
     if (!island) return
     if (outcome.status === 'fulfilled') {
       report.mounted.push(island.name)
+      if (island.element.getAttribute(STATE_ATTRIBUTE) !== 'failed') island.element.setAttribute(STATE_ATTRIBUTE, 'mounted')
       return
     }
     fail(island.name, island.element, `Island "${island.name}" failed to mount.`, outcome.reason)

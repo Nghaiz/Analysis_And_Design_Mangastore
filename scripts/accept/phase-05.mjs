@@ -81,6 +81,20 @@ await step('4 check-font-subsets + không fonts.googleapis.com trong build', () 
   if (hits.length) throw new Error(`build gọi Google Fonts ở ${hits.map((f) => f.slice(ROOT.length + 1)).join(', ')} → dùng Fontsource tự host`);
 });
 
+// 4b. Màu chỉ khai ở tokens.css. Ngoại lệ: src/three/ (vật liệu WebGL cần màu dạng số, không đọc được
+// biến CSS), và file test.
+const HEX = /#[0-9a-fA-F]{3}(?:[0-9a-fA-F]{3})?(?:[0-9a-fA-F]{2})?\b/;
+await step('4b không mã màu hex ngoài tokens.css (trừ src/three/)', () => {
+  const src = join(FRONTEND, 'src');
+  const hits = walk(src)
+    .filter((f) => /\.(css|tsx?)$/.test(f) && !/\.test\.tsx?$/.test(f))
+    .filter((f) => !f.startsWith(join(src, 'three')) && f !== join(src, 'styles', 'tokens.css'))
+    .flatMap((f) => readFileSync(f, 'utf8').split('\n')
+      .map((line, i) => (HEX.test(line) ? `${f.slice(ROOT.length + 1)}:${i + 1}` : null))
+      .filter(Boolean));
+  if (hits.length) throw new Error(`mã màu gõ tay ở ${hits.slice(0, 5).join(', ')}${hits.length > 5 ? ` (+${hits.length - 5})` : ''} → dùng token trong tokens.css`);
+});
+
 // 5. Ngân sách JS và CSS (gzip)
 await step('5 check-budget: loader ≤ 3 KB, CSS đầu trang ≤ 30 KB, chunk ngoài ShelfScene ≤ 120 KB', () => {
   npm(['run', 'check:budget'], 'tách chunk hoặc bỏ phụ thuộc nặng khỏi chunk bị báo');
