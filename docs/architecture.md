@@ -184,7 +184,7 @@ SSOT: `plans/261111-tiem-thue-truyen/contract.md` §2. Cột phải ghi trạng 
 | Script | `scripts/accept/{_lib.mjs, phase-01.mjs, phase-02.mjs}`, `scripts/check/*`, `scripts/dev/{make-env.mjs, mvnw.mjs}` | `scripts/smoke/` (6, 7) |
 | Khác | | `pipeline/` (4), `e2e/`, `.github/workflows/` (8) |
 
-Lệch so với cây chuẩn, đã ghi ở phase 1: có thêm `frontend/tsconfig.node.json`, `scripts/dev/mvnw.mjs`, `scripts/accept/_lib.mjs`, `util/JsonReader` (đọc manifest khi chưa có Jackson, phase 3 thay), `util/DbShutdownListener`. Ảnh `db` và `redis` dùng ảnh chính thức, thư mục `docker/mysql/`, `docker/redis/` chỉ chứa file cấu hình.
+Lệch so với cây chuẩn, đã ghi ở phase 1: có thêm `frontend/tsconfig.node.json`, `scripts/dev/mvnw.mjs`, `scripts/accept/_lib.mjs`, `util/JsonReader` (giữ lâu dài: bộ đọc JSON chặt cho manifest Vite và `categories.json` (phase 5); `JsonUtil` (Jackson) chỉ dùng để ghi props island), `util/DbShutdownListener`. Ảnh `db` và `redis` dùng ảnh chính thức, thư mục `docker/mysql/`, `docker/redis/` chỉ chứa file cấu hình.
 
 ## 8. Bảo mật tối thiểu
 

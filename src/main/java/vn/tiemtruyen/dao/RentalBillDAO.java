@@ -58,9 +58,7 @@ public class RentalBillDAO extends DAO {
     private static final String INSERT_COLLATERAL = "INSERT INTO tblRentalCollateral (value, note, rentalBillId,"
             + " collateralId) VALUES (?, ?, ?, ?)";
     private static final String ISO_TIME = ", '%Y-%m-%dT%H:%i:%s')";
-    private static final String BOOK_JSON = "JSON_OBJECT('id', b.id, 'name', b.name, 'author', b.author,"
-            + " 'publisher', b.publisher, 'publishYear', b.publishYear, 'category', b.category,"
-            + " 'description', b.description, 'rentalPrice', b.rentalPrice)";
+    private static final String BOOK_JSON = bookJson("b");
     private static final String DAMAGES_JSON = "(SELECT COALESCE(JSON_ARRAYAGG(JSON_OBJECT('id', rd.id, 'note',"
             + " rd.note, 'damage', JSON_OBJECT('id', d.id, 'name', d.name, 'description', d.description))),"
             + " JSON_ARRAY()) FROM tblRentedDamage rd JOIN tblDamage d ON d.id = rd.damageId"

@@ -26,7 +26,7 @@ Cột "Tra bởi": **R** = researcher, `plans/reports/researcher-261111-stack-ve
 | JDK (Temurin) | 25.0.5 | máy dev (winget), ảnh `app` | https://endoflife.date/oracle-jdk | R |
 | Tomcat | 11.0.27 | `docker/app/Dockerfile` | https://tomcat.apache.org/whichversion.html · https://repo1.maven.org/maven2/org/apache/tomcat/tomcat-catalina/maven-metadata.xml | R |
 | Ảnh runtime app | `tomcat:11.0.27-jre25-temurin-noble` | `docker/app/Dockerfile` | https://hub.docker.com/_/tomcat | O |
-| Ảnh build WAR | `maven:3.9.16-eclipse-temurin-25` | `docker/app/Dockerfile` | https://hub.docker.com/_/maven | O (tra bản `-noble`), L |
+| Ảnh build WAR | `maven:3.9.16-eclipse-temurin-25-noble` (tag có thật, `docker manifest inspect` ngày 2026-11-11: amd64, arm64) | `docker/app/Dockerfile` | https://hub.docker.com/_/maven | O, L |
 | Ảnh build frontend | `node:24.22.2-bookworm-slim` | `docker/app/Dockerfile` | https://hub.docker.com/_/node | L |
 | MySQL | `mysql:8.4.13` | `compose.yaml` | https://hub.docker.com/_/mysql · https://dev.mysql.com/doc/relnotes/mysql/8.4/en/ | O, R |
 | Redis | `redis:8.10.3` | `compose.yaml` | https://hub.docker.com/_/redis · https://github.com/redis/redis/releases | O, R |

@@ -23,8 +23,7 @@ public class BookDAO extends DAO {
      * Mỗi dòng là một đầu truyện khớp từ khoá ghép với một quyển đang sẵn sàng (không có {@code tblRentedBook} của
      * phiếu chưa huỷ trỏ vào, contracts §1); đầu truyện hết quyển ra một dòng với cột quyển NULL.
      */
-    private static final String SEARCH = "SELECT b.id, b.name, b.author, b.publisher, b.publishYear, b.category,"
-            + " b.description, b.rentalPrice, c.id AS copyId, c.barcode"
+    private static final String SEARCH = "SELECT b.id, " + bookColumns("b") + ", c.id AS copyId, c.barcode"
             + " FROM tblBook b"
             + " LEFT JOIN tblBookCopy c ON c.bookId = b.id AND NOT EXISTS ("
             + "   SELECT 1 FROM tblRentedBook rb JOIN tblRentalBill r ON r.id = rb.rentalBillId"
@@ -36,7 +35,8 @@ public class BookDAO extends DAO {
             + " VALUES (?, ?, ?, ?, ?, ?, ?)";
     private static final String UPDATE_BOOK = "UPDATE tblBook SET name = ?, author = ?, publisher = ?,"
             + " publishYear = ?, category = ?, description = ?, rentalPrice = ? WHERE id = ?";
-    private static final String COUNT_COPIES = "SELECT COUNT(*) FROM tblBookCopy WHERE bookId = ?";
+    /** Mã vạch mang tiền tố D8 của một đầu truyện, ở bất kì đầu truyện nào (UNIQUE tính trên cả bảng). */
+    private static final String PREFIXED_BARCODES = "SELECT barcode FROM tblBookCopy WHERE barcode LIKE ?";
     private static final String INSERT_COPY = "INSERT INTO tblBookCopy (barcode, bookId) VALUES (?, ?)";
 
     /**
@@ -79,7 +79,7 @@ public class BookDAO extends DAO {
                 while (rs.next()) {
                     int bookId = rs.getInt("id");
                     if (current == null || current.getId() != bookId) {
-                        current = readBook(rs, bookId);
+                        current = readBook(rs, "id");
                         result.add(current);
                     }
                     int copyId = rs.getInt("copyId");
@@ -130,7 +130,8 @@ public class BookDAO extends DAO {
     /**
      * Sửa các cột của đầu truyện và thêm các quyển mới ({@code id = 0}) trong {@code listBookCopy}, trong một
      * transaction. Không sửa, không xoá quyển đã có (C12: {@code listBookCopy} đọc từ {@code searchBook} chỉ gồm
-     * quyển đang sẵn sàng). Mã vạch trống được sinh theo D8, nối tiếp số quyển hiện có của đầu truyện.
+     * quyển đang sẵn sàng). Mã vạch trống được sinh theo D8, nối tiếp số lớn nhất trong các mã D8 đang có của đầu
+     * truyện, không theo số quyển: có {@code -01} và {@code -05} thì quyển mới là {@code -06}.
      *
      * @param book đầu truyện đã lưu ({@code id > 0})
      * @return {@code false} khi không có đầu truyện mang id đó hoặc một mã vạch mới đã tồn tại
@@ -151,11 +152,11 @@ public class BookDAO extends DAO {
         String[] barcodes = new String[newCopies.size()];
         boolean saved = inWriteTransaction(() -> {
             try {
-                // UPDATE khoá dòng tblBook trước khi đếm quyển: hai updateBook cùng đầu truyện không sinh trùng số.
+                // UPDATE khoá dòng tblBook trước khi đọc số lớn nhất: hai updateBook cùng đầu truyện không sinh trùng.
                 if (!updateBookRow(book)) {
                     return false;
                 }
-                insertCopies(book.getId(), newCopies, countCopies(book.getId()), newCopyIds, barcodes);
+                insertCopies(book.getId(), newCopies, highestCopyNumber(book.getId()), newCopyIds, barcodes);
                 return true;
             } catch (SQLException e) {
                 return falseOnDuplicate(e);
@@ -204,14 +205,21 @@ public class BookDAO extends DAO {
         return p;
     }
 
-    private int countCopies(int bookId) throws SQLException {
-        try (PreparedStatement ps = con().prepareStatement(COUNT_COPIES)) {
-            ps.setInt(1, bookId);
+    /**
+     * Số thứ tự lớn nhất trong các mã vạch dạng D8 của đầu truyện ({@code DT001-05} → 5), 0 khi chưa có. Mã không
+     * theo D8 ({@code SHIN-TAY-01}) không thể trùng mã sinh ra nên bỏ qua.
+     */
+    private int highestCopyNumber(int bookId) throws SQLException {
+        int highest = 0;
+        try (PreparedStatement ps = con().prepareStatement(PREFIXED_BARCODES)) {
+            ps.setString(1, Codes.bookCode(bookId) + "-%");
             try (ResultSet rs = ps.executeQuery()) {
-                rs.next();
-                return rs.getInt(1);
+                while (rs.next()) {
+                    highest = Math.max(highest, Codes.copyNumber(bookId, rs.getString(1)).orElse(0));
+                }
             }
         }
+        return highest;
     }
 
     /**
@@ -251,19 +259,6 @@ public class BookDAO extends DAO {
             }
             return keys.getInt(1);
         }
-    }
-
-    private static Book readBook(ResultSet rs, int bookId) throws SQLException {
-        Book book = new Book();
-        book.setId(bookId);
-        book.setName(rs.getString("name"));
-        book.setAuthor(rs.getString("author"));
-        book.setPublisher(rs.getString("publisher"));
-        book.setPublishYear(rs.getObject("publishYear", Integer.class));
-        book.setCategory(rs.getString("category"));
-        book.setDescription(rs.getString("description"));
-        book.setRentalPrice(rs.getFloat("rentalPrice"));
-        return book;
     }
 
     private static BookCopy newCopy(int id, String barcode, Book book) {
