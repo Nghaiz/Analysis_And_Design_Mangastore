@@ -92,6 +92,10 @@ services:
     image: tiemtruyen-nginx:local
     environment:
       <<: *tz
+      # Cùng công tắc với app: docker/nginx/docker-entrypoint.d/30-tiem-csp.sh chọn CSP lúc khởi động
+      # (false → CSP phase 1 của contract.md §10; true → thêm đúng origin của Vite dev server).
+      APP_VITE_DEV: ${APP_VITE_DEV:-false}
+      APP_VITE_DEV_ORIGIN: ${APP_VITE_DEV_ORIGIN:-http://localhost:5173}
     ports:
       - "127.0.0.1:${NGINX_HTTP_PORT:-8080}:80"
     volumes:
