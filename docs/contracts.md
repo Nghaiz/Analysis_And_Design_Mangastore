@@ -749,10 +749,13 @@ interface ShelfSceneProps {
   loginHref: string; // "LoginView.jsp"; bấm gáy truyện = bấm lnkLogin (D10)
   posterSrc: string; // ảnh tĩnh của kệ, hiện trước và làm bản dự phòng
   posterSrcSet: string | null; // null khi ảnh tĩnh chỉ có một cỡ
+  posterNarrowSrc: string | null; // ảnh tĩnh cho khung hẹp (chỉ tủ kệ, khớp góc máy 3D khi kệ hẹp hơn 560 px); null thì dùng posterSrc mọi cỡ
   posterAlt: string;
   categories: string[]; // nhãn thể loại đánh máy trên gáy, từ pipeline/config/categories.json
 }
 ```
+
+Ảnh tĩnh khung hẹp (phase 6, chủ dự án chọn 11/11/2026): cùng tỉ lệ 3:2 và cùng `width`/`height` với `posterSrc` để bố cục không xê dịch khi cảnh 3D phủ lên. JSP và island render cùng một cây `<picture>`: `<source media="(max-width: 599.98px)" srcset="posterNarrowSrc">` rồi `<img src="posterSrc">` (khung hẹp của cảnh 3D là `COMPACT_MAX_WIDTH_PX` = 560 px bề rộng kệ; trang chủ có lề nên ngưỡng viewport là 600 px). `posterNarrowSrc` là `null` thì không có `<source>`.
 
 Input island được đổi: không có (HomeView không có form). Bấm gáy truyện: island chạy hoạt cảnh rút quyển rồi gọi `.click()` trên link thật `#lnkLogin`; không tạo luồng mới. Không WebGL, giảm chuyển động hoặc máy yếu thì giữ ảnh tĩnh (Deferred #16).
 
