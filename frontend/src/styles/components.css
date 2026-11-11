@@ -216,7 +216,10 @@
     padding: var(--s-2) var(--s-3);
     text-align: left;
     vertical-align: top;
-    overflow-wrap: anywhere;
+    /* break-word, không phải anywhere: anywhere hạ min-content nên bảng co lại và mã, tiền vỡ giữa chừng
+       ("PM/012/6", "30./00/0đ" ở 390, lane 6H); break-word giữ từ nguyên, bảng rộng hơn khung thì
+       khung bọc overflow-x-auto của trang cuộn ngang, trang vẫn không tràn. */
+    overflow-wrap: break-word;
     /* Dòng kẻ sổ xanh nhạt */
     border-bottom: 1px solid color-mix(in srgb, var(--color-pen-blue) 30%, transparent);
   }
