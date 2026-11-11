@@ -58,6 +58,7 @@ Chạy từ gốc repo. Cột "Có từ" là phase đầu tiên mà lệnh chạ
 | Accept phase 2 | `node scripts/accept/phase-02.mjs` | phase 2 |
 | Accept phase 3 (migration, DAO, test tranh chấp, kiến trúc) | `node scripts/accept/phase-03.mjs` | phase 3 |
 | Cài gói pipeline dữ liệu | `npm --prefix pipeline ci` | phase 4 |
+| Test pipeline (Vitest, không gọi mạng) | `npm --prefix pipeline test` | phase 4 |
 | Đếm ứng viên từng bộ truyện (≤ 40 request) | `node pipeline/cli.mjs census` | phase 4 |
 | Chạy thử 10 đầu truyện (HARD STOP: chủ dự án duyệt rồi mới chạy hết) | `node pipeline/cli.mjs run --limit 10` | phase 4 |
 | Crawl và xử lí đầy đủ | `node pipeline/cli.mjs run` | phase 4 |
