@@ -2,7 +2,7 @@
 
 <!-- updated 261111 -->
 
-Tài liệu yêu cầu sản phẩm. Nguồn: brief `prompt-web-tiem-thue-truyen.md` §2–§7, brainstorm `plans/reports/brainstorm-261111-web-tiem-thue-truyen.md` (D1–D11, §10), kế hoạch `plans/261111-tiem-thue-truyen/plan.md`. Hợp đồng nghiệp vụ chi tiết: [`docs/contracts.md`](contracts.md). Phase 8 cập nhật file này theo những gì đã làm.
+Tài liệu yêu cầu sản phẩm. Nguồn: brief `prompt-web-tiem-thue-truyen.md` §2–§7, brainstorm `plans/reports/brainstorm-261111-web-tiem-thue-truyen.md` (D1–D11, §10), kế hoạch `plans/261111-tiem-thue-truyen/plan.md`. Hợp đồng nghiệp vụ chi tiết: [`docs/contracts.md`](contracts.md). Trạng thái thực tế ở mục 7 và 8 (cập nhật ở phase 8).
 
 ## 1. Mục tiêu
 
@@ -54,7 +54,7 @@ Chi tiết từng trang (thành phần, field, session, DAO, trang kế, thông 
 | F11 | Phiếu bị huỷ hoặc đã giao trong lúc bên kia đang thao tác thì báo theo trạng thái mới, không ghi đè (D9) | mục 6.3 |
 | F12 | Quản lí thêm và sửa đầu truyện, thêm quyển (D6) | mục 9.2 "Trang quản trị D6", C12 |
 
-Mọi câu thông báo lấy nguyên văn từ báo cáo (28 câu, `docs/contracts.md` mục 10); không thêm câu mới khi chủ dự án chưa duyệt.
+Mọi câu thông báo lấy nguyên văn từ báo cáo (28 câu, `docs/contracts.md` mục 10.1), cộng 9 câu ngoài báo cáo chủ dự án duyệt 11/11/2026 (mục 10.3); không thêm câu mới khi chủ dự án chưa duyệt.
 
 ## 5. Yêu cầu phi chức năng
 
@@ -83,29 +83,38 @@ Mọi câu thông báo lấy nguyên văn từ báo cáo (28 câu, `docs/contrac
 
 ## 7. Tiêu chí nghiệm thu
 
-Theo brainstorm §10:
+Theo brainstorm §10. Cột trạng thái cập nhật 11/11/2026, trong lúc làm phase 8.
 
-1. Ba kịch bản chuẩn và mọi ngoại lệ ở ch.2 chạy đúng trên Playwright, dùng seed E2E, cả khổ điện thoại lẫn máy tính, console sạch, không request hỏng.
-2. 28 thông báo khớp từng chữ.
-3. Schema qua Flyway khớp ch.8 (trừ D1), có test so cột với tài liệu.
-4. Không có getById, không DAO cho SelectedBook, RentedBook, RentedDamage, RentalCollateral, không cột dẫn xuất (test kiến trúc).
-5. Test tranh chấp quyển đều xanh.
-6. Mọi POST thiếu token CSRF bị chặn 403.
-7. Lighthouse điện thoại ≥ 90 cả bốn hạng mục; tương phản AA; có `prefers-reduced-motion`; cảnh 3D có bản tĩnh.
-8. Kho 300–500 Book thật, có bìa, có manifest nguồn; báo cáo validate không lỗi chặn.
-9. CI xanh: lint, build, unit, integration, E2E, quét image.
+<!-- updated 261111 -->
+
+
+| # | Tiêu chí | Kiểm bằng | Trạng thái |
+|---|---|---|---|
+| 1 | Ba kịch bản chuẩn và mọi ngoại lệ ở ch.2 chạy đúng trên Playwright, dùng seed E2E, cả khổ điện thoại lẫn máy tính, console sạch, không request hỏng | `e2e/tests/`, Accept phase 8 bước 4 | Smoke M1–M3 xanh ở phase 6, 7; bộ Playwright đang viết ở phase 8. <!-- 8E: chờ số --> |
+| 2 | 28 thông báo khớp từng chữ (cộng 9 câu §10.3) | `MessagesTest`, E2E | Đạt từ phase 3 (`MessagesTest`); E2E so lại ở phase 8 |
+| 3 | Schema qua Flyway khớp ch.8 (trừ D1), có test so cột với tài liệu | `SchemaConformanceTest` | Đạt (phase 3) |
+| 4 | Không có getById, không DAO cho SelectedBook, RentedBook, RentedDamage, RentalCollateral, không cột dẫn xuất | `ArchitectureTest` | Đạt (phase 3) |
+| 5 | Test tranh chấp quyển đều xanh | `RentalBillConcurrencyTest` | Đạt (phase 3, thêm dòng giỏ C21 ở phase 6) |
+| 6 | Mọi POST thiếu token CSRF bị chặn 403 | test filter, smoke, `e2e/tests/bao-mat.spec.ts` | Đạt ở test filter và smoke (phase 6); E2E ở phase 8 |
+| 7 | Lighthouse điện thoại ≥ 90 cả bốn hạng mục; tương phản AA; có `prefers-reduced-motion`; cảnh 3D có bản tĩnh | `e2e/lighthouse/run-lighthouse.mjs`, axe | Tương phản, giảm chuyển động, ảnh tĩnh của kệ có từ phase 5; điểm Lighthouse: <!-- 8E: chờ số --> chưa có |
+| 8 | Kho 300–500 Book thật, có bìa, có manifest nguồn; báo cáo validate không lỗi chặn | `node pipeline/cli.mjs validate --json` | Đạt (phase 4, 4b) |
+| 9 | CI xanh: lint, build, unit, integration, E2E, quét image | `.github/workflows/ci.yml` trên PR của phase 8 | Workflow đang viết ở phase 8. <!-- 8E: chờ số --> |
 
 ## 8. Lộ trình
 
+<!-- updated 261111 -->
+
 | Phase | Nội dung | Trạng thái (11/11/2026) |
 |---|---|---|
-| 1 | Khung dự án và hạ tầng | Đạt (Accept 8/8) |
-| 2 | Bộ công cụ AI: `AGENTS.md`, rule, skill, agent, `docs/` | Đang làm |
-| 3 | Schema, DAO và test DAO | |
-| 4 | Pipeline crawl và seed (dừng chờ chủ dự án sau chạy thử 10 đầu truyện) | |
-| 5 | Hệ thiết kế giao diện (song song với phase 4) | |
-| 6 | Chức năng 1 và 2 (M1, M2) | |
-| 7 | Chức năng 3 (M3) và trang quản trị D6 | |
-| 8 | E2E, CI và hoàn thiện | |
+| 1 | Khung dự án và hạ tầng | Xong, vào `main` (Accept 8/8) |
+| 2 | Bộ công cụ AI: `AGENTS.md`, rule, skill, agent, `docs/` | Xong, vào `main` |
+| 3 | Schema, DAO và test DAO | Xong, vào `main` |
+| 4 | Pipeline crawl và seed; chạy thử 10 đầu truyện đạt 10/10 rồi crawl hết | Xong, vào `main`; phase 4b dọn mục sót của phase 1–4 (PR #8) |
+| 5 | Hệ thiết kế giao diện (song song với phase 4) | Xong, vào `main` (PR #7) |
+| 6 | Chức năng 1 và 2 (M1, M2) | Xong, Accept ALL PASS, vào `main` (PR #10) |
+| 7 | Chức năng 3 (M3) và trang quản trị D6 | Xong, Accept ALL PASS, vào `main` (PR #11) |
+| 8 | E2E, CI, Lighthouse và tài liệu cuối; cổng: Accept phase 8 và CI xanh trên PR | Đang làm <!-- 8E: chờ số --> |
+
+Phần để sau, ngoài phạm vi: trả truyện, phí phạt, thống kê, deploy và cấu hình prod (Deferred #28, [ADR-0013](adr/0013-chi-chay-localhost.md)).
 
 Chi tiết từng phase: `plans/261111-tiem-thue-truyen/phase-0N-*.md`.

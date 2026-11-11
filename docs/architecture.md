@@ -2,7 +2,7 @@
 
 <!-- updated 261111 -->
 
-Trạng thái: sau phase 1 (khung, hạ tầng). Phase 8 cập nhật lại file này theo những gì đã làm. Hạ tầng chi tiết (cổng, volume, biến môi trường, build) là của `plans/261111-tiem-thue-truyen/contract.md` §3–§5, §10; nghiệp vụ là của [`docs/contracts.md`](contracts.md). File này giải thích các mảnh ghép với nhau thế nào.
+Trạng thái: phase 1–7 đã vào `main` (chức năng 1, 2, 3 và trang quản trị D6 chạy được); phase 8 thêm E2E, CI, Lighthouse và tài liệu cuối (mục 9). Hạ tầng chi tiết (cổng, volume, biến môi trường, build) là của `plans/261111-tiem-thue-truyen/contract.md` §3–§5, §10; nghiệp vụ là của [`docs/contracts.md`](contracts.md). File này giải thích các mảnh ghép với nhau thế nào.
 
 ## 1. Tổng thể
 
@@ -50,13 +50,14 @@ Không có Servlet điều khiển, không Spring ([ADR-0001](adr/0001-jsp-dao-k
 
 | Tầng | Ở đâu | Việc |
 |---|---|---|
-| Filter | `vn.tiemtruyen.filter` | UTF-8, đăng nhập và phân quyền (ma trận `docs/contracts.md` mục 12), CSRF cho mọi POST tới `*.jsp`, security header, chặn đăng nhập sai. Có từ phase 6; phase 1 chưa khai filter nào trong `web.xml` |
+| Filter | `vn.tiemtruyen.filter` | Năm filter khai trong `web.xml` theo thứ tự `Utf8Filter`, `SecurityHeadersFilter`, `CsrfFilter`, `AuthFilter` (phân quyền theo ma trận `docs/contracts.md` mục 12), `LoginRateLimitFilter` (đếm lần sai trong Redis). Có từ phase 6 |
 | Trang xem | `src/main/webapp/**/XxxView.jsp` | Đọc session, gọi DAO **đọc**, render HTML; tự gửi về chính nó khi tìm, đăng nhập, sửa bản sao trong session |
 | Trang xử lí | `src/main/webapp/**/doXxx.jsp` | Không giao diện; đọc form và session, gán vào model, gọi DAO **ghi**, đặt thông báo rồi forward |
 | Tag file | `WEB-INF/tags/`, `WEB-INF/tags/ui/` | `<t:assets/>` (nạp CSS/JS từ manifest Vite), `<t:csrf/>`, component giao diện (phase 5) |
+| Trang lỗi | `src/main/webapp/error/` | `403.jsp`, `404.jsp`, `405.jsp`, `500.jsp`, `error.jsp` chung (phase 6) |
 | Model | `vn.tiemtruyen.model` | 13 lớp thực thể, `Serializable`, không thuộc tính dẫn xuất |
 | DAO | `vn.tiemtruyen.dao` | Lớp cha `DAO` giữ `Connection` mượn từ HikariCP, `AutoCloseable`; 8 DAO, chữ kí đúng `docs/contracts.md` mục 5.3 |
-| Util | `vn.tiemtruyen.util` | `AppConfig`, `Db` (DataSource), `ViteManifest`, `AssetTags`, `JsonReader`, `DbShutdownListener` (đã có); `Messages`, `Passwords`, `Codes`, `JsonUtil`, `MigrationListener` (phase 3) |
+| Util | `vn.tiemtruyen.util` | `AppConfig`, `Db` (DataSource), `ViteManifest`, `AssetTags`, `JsonReader`, `DbShutdownListener` (phase 1); `Messages`, `Passwords`, `Codes`, `JsonUtil`, `MigrationListener` (phase 3); `Display` (định dạng mã, tiền, ngày lúc hiển thị) |
 
 Luật cứng (bản đủ ở `docs/contracts.md` mục 5, 8 và `AGENTS.md` mục 10): không getById; không DAO cho SelectedBook, RentedBook, RentedDamage, RentalCollateral; mỗi đối tượng gốc một hàm cập nhật; mọi ghi DB qua `doXxx.jsp`; chỉ `PreparedStatement`.
 
@@ -138,7 +139,7 @@ sequenceDiagram
 
 ## 7. Cây thư mục
 
-SSOT: `plans/261111-tiem-thue-truyen/contract.md` §2. Cột phải ghi trạng thái sau phase 1.
+SSOT: `plans/261111-tiem-thue-truyen/contract.md` §2. Bảng dưới cây ghi phase tạo ra từng phần.
 
 ```
 /
@@ -173,22 +174,41 @@ SSOT: `plans/261111-tiem-thue-truyen/contract.md` §2. Cột phải ghi trạng 
 └─ plans/  plans/reports/
 ```
 
-| Phần | Đã có sau phase 1 | Phase tạo phần còn lại |
+<!-- updated 261111 -->
+
+| Phần | Phase 1 | Phase sau |
 |---|---|---|
-| Gốc | `AGENTS.md`, `CLAUDE.md` (phase 2), `pom.xml`, `mvnw*`, `.mvn/wrapper/`, `compose.yaml`, `.env.example`, `.gitignore`, `.gitattributes`, `.editorconfig`, `config/checkstyle/` | `compose.e2e.yaml` (6), `README.md` (8) |
-| Java | `util/{AppConfig, AssetTags, Db, DbShutdownListener, JsonReader, ViteManifest}`; test `util/` | `dao`, `model`, `Messages`, `Passwords`, `Codes`, `JsonUtil`, `MigrationListener` (3); `filter` (6) |
+| Gốc | `pom.xml`, `mvnw*`, `.mvn/wrapper/`, `compose.yaml`, `.env.example`, `.gitignore`, `.gitattributes`, `.editorconfig`, `config/checkstyle/` | `AGENTS.md`, `CLAUDE.md` (2); `compose.e2e.yaml` (6); `README.md` (8) |
+| Java | `util/{AppConfig, AssetTags, Db, DbShutdownListener, JsonReader, ViteManifest}`; test `util/` | 13 model, 8 DAO, `Messages`, `Passwords`, `Codes`, `JsonUtil`, `MigrationListener`, test DAO, schema, kiến trúc (3); 5 filter, `Display` (6) |
 | Migration | | `db/migration`, `db/e2e` (3) |
-| Webapp | `HomeView.jsp` tạm, `health.jsp`, `dev/session-probe.jsp`, `WEB-INF/web.xml`, `WEB-INF/tags/assets.tag` | `tags/ui/`, trang dev (5); trang M1, M2 (6); M3, D6 (7) |
-| Frontend | `package.json`, `vite.config.ts`, `tsconfig.json`, `tsconfig.app.json`, `tsconfig.node.json`, `eslint.config.js`, `components.json`, `src/loader/`, `src/styles/app.css`, `src/lib/utils.ts`, `public/img/{cover-fallback.svg, favicon.svg}` | `islands`, `components`, `hooks`, `three`, token (5) |
-| Docker | `docker/app/` (Dockerfile, `context.xml`, `redisson.yaml`), `docker/nginx/` (Dockerfile, `nginx.conf`, `conf.d/`, `snippets/`), `docker/mysql/conf.d/utf8mb4.cnf`, `docker/redis/redis.conf` | |
-| Script | `scripts/accept/{_lib.mjs, phase-01.mjs, phase-02.mjs}`, `scripts/check/*`, `scripts/dev/{make-env.mjs, mvnw.mjs}` | `scripts/smoke/` (6, 7) |
-| Khác | | `pipeline/` (4), `e2e/`, `.github/workflows/` (8) |
+| Webapp | `health.jsp`, `dev/session-probe.jsp`, `WEB-INF/web.xml`, `WEB-INF/tags/assets.tag` | `tags/ui/`, trang dev (5); trang M1, M2, `error/` (6); trang M3, D6 (7) |
+| Frontend | `package.json`, `vite.config.ts`, `tsconfig*.json`, `eslint.config.js`, `components.json`, `src/loader/`, `src/styles/app.css`, `src/lib/utils.ts`, `public/img/` | token, component, `three/`, island `ShelfScene` (5); `SelectedStack` (6); `ProcessBillDesk`, `CollateralDrawer`, helper chung `src/lib/` (7) |
+| Docker | `docker/app/`, `docker/nginx/`, `docker/mysql/conf.d/utf8mb4.cnf`, `docker/redis/redis.conf` | CSP sinh lúc nginx khởi động theo `APP_VITE_DEV` (4b) |
+| Script | `scripts/accept/{_lib.mjs, phase-01.mjs, phase-02.mjs}`, `scripts/check/*`, `scripts/dev/{make-env.mjs, mvnw.mjs}` | Accept từng phase (3–8); `scripts/smoke/` (6, 7); `scripts/check/csp-page-check.mjs` (4b) |
+| Khác | | `pipeline/` (4); `e2e/` (8: config, fixture, test ch.2, `lighthouse/`), `.github/workflows/ci.yml` (8) |
 
 Lệch so với cây chuẩn, đã ghi ở phase 1: có thêm `frontend/tsconfig.node.json`, `scripts/dev/mvnw.mjs`, `scripts/accept/_lib.mjs`, `util/JsonReader` (giữ lâu dài: bộ đọc JSON chặt cho manifest Vite và `categories.json` (phase 5); `JsonUtil` (Jackson) chỉ dùng để ghi props island), `util/DbShutdownListener`. Ảnh `db` và `redis` dùng ảnh chính thức, thư mục `docker/mysql/`, `docker/redis/` chỉ chứa file cấu hình.
 
 ## 8. Bảo mật tối thiểu
 
 - Mọi cổng chỉ mở trên `127.0.0.1`; `app` và `redis` không mở cổng ra máy.
-- CSP phase 1: `default-src 'self'`, `script-src 'self'`, `font-src 'self'`, `frame-ancestors 'none'`… (`contract.md` §10); font tự host nên không cần nới ([ADR-0011](adr/0011-font-tu-host.md)).
+- CSP: `default-src 'self'`, `script-src 'self'`, `font-src 'self'`, `frame-ancestors 'none'`… (`contract.md` §10). Script `docker/nginx/docker-entrypoint.d/30-tiem-csp.sh` sinh header lúc nginx khởi động; chỉ khi `APP_VITE_DEV=true` mới nới cho Vite dev server (phase 4b). Kiểm một trang: `node scripts/check/csp-page-check.mjs`. Font tự host nên không cần nới ([ADR-0011](adr/0011-font-tu-host.md)).
+- Mọi POST tới `*.jsp` cần token CSRF (`<t:csrf/>`), thiếu hoặc sai trả 403; đăng nhập sai nhiều lần bị chặn tạm (Deferred #23).
 - Mật khẩu băm Argon2id ([ADR-0007](adr/0007-password4j-argon2id.md)); bí mật chỉ nằm trong `.env` (bị ignore); `AppConfig` thiếu `APP_DB_PASSWORD` hoặc `REDIS_PASSWORD` thì ném lỗi nêu tên biến.
 - Ảnh app chạy bằng user không phải root; jar Redisson và Maven kiểm checksum lúc build.
+
+## 9. Kiểm và cổng nghiệm thu
+
+<!-- updated 261111 -->
+
+| Cổng | Kiểm gì | Có từ |
+|---|---|---|
+| `node scripts/dev/mvnw.mjs -B verify` | Checkstyle; JUnit và Testcontainers: DAO, tranh chấp K1 và D9, `SchemaConformanceTest`, `ArchitectureTest`, `MessagesTest`, filter | phase 3, 6 |
+| Vitest, ESLint, typecheck của `frontend/` | Island chỉ đổi input thật rồi `requestSubmit`; ESLint chặn `fetch` trong `islands/` | phase 5 |
+| `scripts/smoke/` | Đi hết M1–M2, M3 trên compose | phase 6, 7 |
+| `e2e/` (Playwright) | 3 kịch bản ch.2 và mọi ngoại lệ, bảo mật, axe AA; hai khổ 390×844 và 1440×900; console sạch | phase 8 |
+| `e2e/lighthouse/run-lighthouse.mjs` | Lighthouse điện thoại ≥ 90 bốn hạng mục, mọi trang có giao diện | phase 8 |
+| `.github/workflows/ci.yml` | lint, build và unit, integration, E2E, build image, Trivy, kiểm tài liệu; không job deploy | phase 8 |
+| `scripts/accept/phase-0N.mjs` | Accept từng phase; phase 8 chạy lại phase 1–7 | phase 1–8 |
+
+Kết quả của phase 8 (số test, điểm Lighthouse, lần chạy CI): <!-- 8E: chờ số --> chưa có số, ghi ở `plans/261111-tiem-thue-truyen/phase-08-e2e-ci-hoan-thien.md` khi xong.
