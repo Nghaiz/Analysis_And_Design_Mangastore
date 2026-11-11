@@ -4,7 +4,7 @@ Nguồn sự thật cho việc giao lane của mọi phiên cook. Đọc lại �
 
 Phase 1–5 xong: phase 1–4 vào `main` qua PR #1–#6, phase 5 qua PR #7, phase 4b (dọn mục bỏ sót của phase 1–4, `phase-04-don-no.md`) qua PR #8. Phase tiếp theo: 6
 Cập nhật lần cuối: 2026-11-11 (phiên cook phase 3–4, sau khi gộp phase 5)
-Nhánh phase: chưa có (phase 6 tạo `phase/06-...` từ `origin/main`)
+Nhánh phase: `phase/06-chuc-nang-1-2` (phiên 55) và `phase/07-chuc-nang-3` (phiên 93, worktree `07-orch`) chạy song song từ 11/11/2026
 
 ## Luật (tóm tắt, bản đủ ở `plan.md` và `contract.md` §1)
 
@@ -19,11 +19,15 @@ Nhánh phase: chưa có (phase 6 tạo `phase/06-...` từ `origin/main`)
 
 | Lane | Agent | Bắt đầu | Worktree / nhánh | Báo cáo |
 |---|---|---|---|---|
+| 7C `islands-m3` (phiên 93) | `t1k-web-core-developer` | 2026-11-11 | `07-islands-m3` / `lane/07-chuc-nang-3/islands-m3` | |
+| 7A `quay-xu-li` (phiên 93) | `t1k-web-core-developer` | 2026-11-11 | `07-quay-xu-li` / `lane/07-chuc-nang-3/quay-xu-li` | |
+| 7B `tinh-trang-coc` (phiên 93) | `t1k-web-core-developer` | 2026-11-11 | `07-tinh-trang-coc` / `lane/07-chuc-nang-3/tinh-trang-coc` | |
 
 ## Hàng đợi
 
 | Thứ tự | Lane | Chờ gì |
 |---|---|---|
+| 1 | 7D `quan-tri` (phiên 93) | chỗ trống đầu tiên của phiên 93 |
 
 ## Bảng lane
 
@@ -64,10 +68,10 @@ Nhánh phase: chưa có (phase 6 tạo `phase/06-...` từ `origin/main`)
 | 6 | 6E `xac-minh-m1` | Playwright MCP chức năng 1 | `t1k-web-testing-tester` | `plans/reports/` | 6A, 6B | chờ | |
 | 6 | 6F `xac-minh-m2` | Playwright MCP chức năng 2 | `t1k-web-testing-tester` | `plans/reports/` | 6C, 6D | chờ | |
 | 7 | 7.0 orchestrator | smoke M3, Accept | phiên chính | xem `phase-07` | phase 6 | chờ | |
-| 7 | 7A `quay-xu-li` | đăng nhập NV, tìm, xử lí, xác nhận, in | `t1k-web-core-developer` | xem `phase-07` | 7.0 | chờ | |
-| 7 | 7B `tinh-trang-coc` | sửa danh sách, tình trạng, lỗi, cọc | `t1k-web-core-developer` | xem `phase-07` | 7.0 | chờ | |
-| 7 | 7C `islands-m3` | ProcessBillDesk, CollateralDrawer | `t1k-web-core-developer` | xem `phase-07` | 7.0 | chờ | |
-| 7 | 7D `quan-tri` | 5 trang quản trị D6 | `t1k-web-core-developer` | `nhan-vien/quan-tri/**` | 7.0, chỗ trống | chờ | |
+| 7 | 7A `quay-xu-li` | đăng nhập NV, tìm, xử lí, xác nhận, in | `t1k-web-core-developer` | xem `phase-07` | hợp đồng (chạy trước 7.0); csrf.tag, filter của 6A khi kiểm | đang chạy | |
+| 7 | 7B `tinh-trang-coc` | sửa danh sách, tình trạng, lỗi, cọc | `t1k-web-core-developer` | xem `phase-07` | hợp đồng (chạy trước 7.0); csrf.tag, filter của 6A khi kiểm | đang chạy | |
+| 7 | 7C `islands-m3` | ProcessBillDesk, CollateralDrawer | `t1k-web-core-developer` | xem `phase-07` | hợp đồng §11.2, §11.3 | đang chạy | |
+| 7 | 7D `quan-tri` | 5 trang quản trị D6 | `t1k-web-core-developer` | `nhan-vien/quan-tri/**` | chỗ trống | xếp hàng | |
 | 7 | 7E `xac-minh-m3` | Playwright MCP chức năng 3 | `t1k-web-testing-tester` | `plans/reports/` | 7A, 7B, 7C | chờ | |
 | 7 | 7F `xac-minh-quan-tri` | Playwright MCP quản trị | `t1k-web-testing-tester` | `plans/reports/` | 7D | chờ | |
 | 8 | 8.0 orchestrator | gói e2e, trình duyệt, Accept | phiên chính | xem `phase-08` | phase 7 | chờ | |
@@ -105,3 +109,4 @@ Nhánh phase: chưa có (phase 6 tạo `phase/06-...` từ `origin/main`)
 | 2026-11-11 | 5C xong (DONE_WITH_CONCERNS: chưa soi trình duyệt, HomePreview cần layout.tag của 5A), merge (289a89e); đổi import sang `@/hooks/useReducedMotion`, xoá hook tạm (a46b254); 88 test xanh, check:budget PASS (loader 2,36 kB, ShelfCanvas 247 kB gzip chỉ ShelfScene); đề xuất `posterAvifSrcSet` trong contracts §11.4 để sau số Lighthouse |
 | 2026-11-11 | 5A dừng ở giới hạn 75 lượt, nhắn làm tiếp, xong (5660371), merge (c419293); áp đề xuất tài liệu, Accept thêm bước 4b chặn hex; loader thêm `data-island-state` (mục phiên 9b mang từ phase 1); Accept lần 1 FAIL bước 6 (HomePreviewView 500: `<%= %>` trong thân scriptless), sửa (c3af339), lần 2 ALL PASS; spawn 5D. Stack compose do phase 5 giữ tới khi xong 5.5 (đã hẹn phiên 9b) |
 | 2026-11-11 | 5D lần 1: L1 (CSS ảnh thiếu lớp JSP) sửa ở Dockerfile + Accept bước 6; chủ dự án đổi font (Fuzzy Bubbles + Momo), lane 5E và lane tài liệu làm; 5C sửa ánh sáng, chuyển mờ, nhãn 390, lọc warning THREE.Clock; 5D đo lại PASS; chủ dự án giao chọn font số → Nunito (`--font-num`); Accept ALL PASS (0908); Lighthouse HomePreview 96, StyleGuide 98; ảnh tĩnh kệ cho điện thoại ghi sang phase 6 |
+| 2026-11-11 | Phase 7 chạy song song phase 6 (chủ dự án yêu cầu): phiên 93 tạo `phase/07-chuc-nang-3` từ `origin/main` 34879ed; mở 7A, 7B, 7C trước 7.0 vì Owns không chồng phase 6 và hợp đồng đã đủ; phụ thuộc csrf.tag và filter của 6A sẽ merge vào khi phiên 55 báo SHA; phiên 93 không chạy compose khi chưa hỏi phiên 55 |
