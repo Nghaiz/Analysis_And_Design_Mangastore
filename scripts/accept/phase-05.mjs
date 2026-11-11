@@ -101,7 +101,7 @@ await step('5 check-budget: loader ≤ 3 KB, CSS đầu trang ≤ 30 KB, chunk n
 });
 
 // 6. Trang công cụ qua compose (nginx → Tomcat)
-await step('6 compose: /dev/StyleGuideView.jsp và /dev/HomePreviewView.jsp trả 200', async () => {
+await step('6 compose: /dev/StyleGuideView.jsp và /dev/HomePreviewView.jsp trả 200, CSS phục vụ = bản build', async () => {
   requireDocker(runner);
   mustRun(runner, 'docker', ['compose', 'up', '--build', '-d', '--wait', '--wait-timeout', '300'], {
     fix: 'docker compose logs app',
@@ -114,6 +114,17 @@ await step('6 compose: /dev/StyleGuideView.jsp và /dev/HomePreviewView.jsp tr�
     else if (!/<script type="module" src="\/static\//.test(html)) bad.push(`${page} thiếu <t:assets/>`);
   }
   if (bad.length) throw new Error(`${bad.join(', ')} → docker compose logs app`);
+  // CSS mà stack phục vụ phải là đúng bản build cục bộ (cùng hash nội dung): ảnh app build lại frontend
+  // trong Docker, thiếu file nguồn nào (JSP cho @source của Tailwind) thì CSS lệch mà trang vẫn 200.
+  const manifest = JSON.parse(readFileSync(join(STATIC_DIR, '.vite', 'manifest.json'), 'utf8'));
+  const localCss = manifest['src/styles/app.css']?.file;
+  if (!localCss) throw new Error('manifest cục bộ thiếu src/styles/app.css → npm --prefix frontend run build');
+  const html = (await httpGet(`${BASE}${DEV_PAGES[0]}`)).body.toString('utf8');
+  const servedCss = [...html.matchAll(/href="\/static\/(assets\/app-[^"]+\.css)"/g)].map((m) => m[1]);
+  if (!servedCss.includes(localCss)) {
+    throw new Error(`stack phục vụ ${servedCss.join(', ') || '(không có app-*.css)'}, bản build cục bộ là ${localCss} → kiểm tầng frontend của docker/app/Dockerfile chép đủ nguồn`);
+  }
+  return `CSS phục vụ = ${localCss}`;
 });
 
 // 8. Chống thoái lui phase 1–3 (phần nhanh)

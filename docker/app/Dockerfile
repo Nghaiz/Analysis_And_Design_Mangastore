@@ -18,6 +18,9 @@ RUN --mount=type=cache,target=/root/.npm npm ci --no-audit --no-fund
 COPY frontend/ ./
 # vite.config.ts phát thể loại ra static/data/categories.json (SSOT ở pipeline/config, contract.md §6).
 COPY pipeline/config/categories.json /src/pipeline/config/categories.json
+# Tailwind quét JSP và tag file (`@source` trong frontend/src/styles/app.css); thiếu bước này thì CSS
+# của ảnh mất mọi lớp chỉ dùng trong JSP (lỗi L1, plans/reports/phase-05-xac-minh-261111-0828.md).
+COPY src/main/webapp/ /src/src/main/webapp/
 RUN npm run build && test -f /src/src/main/webapp/static/.vite/manifest.json
 
 FROM ${MAVEN_IMAGE} AS war
