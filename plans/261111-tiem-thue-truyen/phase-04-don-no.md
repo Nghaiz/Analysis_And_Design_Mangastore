@@ -25,5 +25,5 @@ Lane chỉ commit tại máy (pathspec), không push, không đổi nhánh, ghi 
 - [x] Lane P (ff4e2af; thêm crawl bù Thần Đồng Đất Việt 164)
 - [x] Lane D (code a6b5178; chạy thử 11/11/2026 trên nhánh đã gộp phase 5 (94e4007): build mode CSP đúng §10 và `csp-page-check --mode build` PASS; `APP_VITE_DEV=true` + `npm run dev`: `csp-page-check --mode dev` PASS 12/12, Playwright `/dev/HomePreviewView.jsp` 0 lỗi console, `[vite] connected` (WebSocket HMR), `ShelfScene` `data-island-state=mounted`, `$RefreshReg$` có; 4 cảnh báo preload font chỉ có ở dev (Vite chèn CSS bằng JS), build mode 0 cảnh báo; stack trả về `APP_VITE_DEV=false`, `/health.jsp` ok)
 - [x] Phần orchestrator (1f636a0, 479e1d2, bf83876, 1e9685c, d4d05a5)
-- [ ] Nạp lại DB: `mysqldump` sao lưu, DROP + CREATE database `tiemtruyen` (không xoá volume), publish V10 mới
-- [ ] Merge, Accept 1–4 trên `main`
+- [x] Nạp lại DB (chủ dự án duyệt 11/11/2026): sao lưu `data/db-backup/tiemtruyen-truoc-phase4b-261111-0911.sql`, DROP + CREATE database `tiemtruyen` (không xoá volume), publish V10 `38f090234fb1`; Flyway nạp V1, V2, V10, V11: 396 Book, 1164 quyển, 3 phiếu mẫu
+- [x] Merge (PR #8, f9d7502); Accept 1–5 ALL PASS trên nhánh và trên `main`
