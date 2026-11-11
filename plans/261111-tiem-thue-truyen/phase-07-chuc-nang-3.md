@@ -18,7 +18,7 @@ Hợp đồng: `docs/contracts.md` (trang, field, session, DAO, props `ProcessBi
 
 - [x] **7.0 Orchestrator, tuần tự (test trước):** (xong 11/11/2026, 7debd3f; `web.xml` không cần đổi: chuỗi filter và trang lỗi của phase 6 a96abb6 đã đủ; smoke dùng lại `scripts/smoke/lib/http.mjs` của phase 6. Chạy song song phase 6 nên 7A, 7B, 7C mở trước 7.0 khi hợp đồng đã đủ) `scripts/smoke/flow-m3.mjs` (HTTP thuần với cookie jar, chạy sau phần M2 của smoke phase 6 để có PM0125: đăng nhập nhân viên sai rồi đúng, tìm "PM0152" không thấy rồi tìm theo CCCD, xử lí PM0125: thêm tình trạng "Rách bìa" và "Vết bẩn, viết vẽ" cho DT001-03, "Truyện còn mới, không có lỗi" cho DT020-02, thêm cọc "Căn cước công dân" và "Tiền mặt 100.000đ", xác nhận ra trạng thái "Đang cho thuê", trang in; mọi câu khớp từng chữ; thử từng điều kiện xác nhận bị vi phạm; trang quản trị chặn nhân viên không phải "Quản lí"); sửa `web.xml` nếu cần; `scripts/accept/phase-07.mjs`. Commit; smoke đỏ lúc này là đúng.
 - [ ] **7.1 Lane 7A `quay-xu-li`**, **7.2 Lane 7B `tinh-trang-coc`**, **7.3 Lane 7C `islands-m3`** song song (3 chỗ).
-- [ ] **7.4 Lane 7D `quan-tri`** xếp hàng, mở khi có chỗ trống.
+- [x] **7.4 Lane 7D `quan-tri`** xếp hàng, mở khi có chỗ trống. (mở 11/11/2026 sau khi 7C xong)
 - [ ] **7.5 Orchestrator:** merge 7A, 7B, 7C; chạy nền compose e2e; mở **7.6 Lane 7E `xac-minh-m3`**.
 - [ ] **7.7 Orchestrator:** merge 7D; mở **7.8 Lane 7F `xac-minh-quan-tri`**.
 - [ ] **7.9 Orchestrator:** `tiem-contract-guard` trên diff của phase; chạy Accept, đánh dấu, push nhánh phase, mở PR vào `main` và merge bằng merge commit (`contract.md` §9).
