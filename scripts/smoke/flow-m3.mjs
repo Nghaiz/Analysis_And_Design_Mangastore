@@ -38,7 +38,16 @@ const M = {
   COLLATERAL_EXISTS: 'Loại tài sản đã tồn tại.',
   CANCEL_CONFIRM: 'Bạn có chắc chắn muốn huỷ phiếu mượn này?',
   CANCEL_SUCCESS: 'Huỷ phiếu mượn thành công!',
+  NO_COPY_IN_LIST: 'Chưa chọn quyển truyện nào để giao cho khách hàng.',
+  // Ngoài báo cáo, chủ dự án duyệt 11/11/2026 (phase-07-edge-cases.md §1)
+  DISCOUNT_INVALID: 'Giảm giá không hợp lệ, vui lòng nhập lại.',
+  QUANTITY_INVALID: 'Số lượng phải là số nguyên lớn hơn hoặc bằng 1.',
+  BOOK_NOT_CHOSEN: 'Vui lòng chọn đầu truyện.',
+  INPUT_TOO_LONG: 'Nội dung nhập quá dài, vui lòng rút gọn.',
+  RENTAL_BILL_CHANGED: 'Phiếu mượn đang mở đã thay đổi, vui lòng chọn lại phiếu.',
 };
+const LONG_255 = 'x'.repeat(256);
+const LONG_100 = 'x'.repeat(101);
 
 const PAGE = {
   login: `${NV}/LoginView.jsp`,
@@ -93,6 +102,9 @@ function inputValues(html, name, { checkedOnly = false } = {}) {
 /** POST kèm token csrf của `page`; field là mảng thì gửi nhiều giá trị cùng tên (ô trên nhiều dòng). */
 function send(s, page, action, fields, { withCsrf = true, follow = true } = {}) {
   const params = new URLSearchParams();
+  // Form M3 mang input ẩn rentalBillId (chống hai thẻ, phase-07-edge-cases.md §3.1): gửi lại đúng giá trị trên trang.
+  const billId = valueOf(page.html, 'rentalBillId');
+  if (billId !== null && !('rentalBillId' in fields)) params.append('rentalBillId', billId);
   for (const [k, v] of Object.entries(fields)) {
     for (const item of Array.isArray(v) ? v : [v]) params.append(k, item);
   }
@@ -128,8 +140,13 @@ async function openBill(s, keyword, id, no) {
 }
 
 /** Gửi bàn quầy về chính trang (không nút: cập nhật rentalBill từ các ô, C3). */
-function deskUpdate(s, page, { received, dueDate, discount = '0', note = '' }) {
-  return send(s, page, PAGE.process, { chkReceived: received, txtDueDate: dueDate, txtDiscount: discount, txtNote: note });
+function deskUpdate(s, page, { received, dueDate, discount = '0', note = '', extra = {} }) {
+  return send(s, page, PAGE.process, { chkReceived: received, txtDueDate: dueDate, txtDiscount: discount, txtNote: note, ...extra });
+}
+
+function expectRedirect(no, what, page, path, targets) {
+  const ok = page.status === 302 && targets.some((t) => String(page.location ?? '').endsWith(t));
+  if (!ok) throw new StepError(stepOf(no, what), path, `302 → ${targets.join(' | ')}`, `${page.status} → ${page.location}`);
 }
 
 function deskState(page) {
@@ -219,6 +236,37 @@ async function main() {
   expectMessage('đk 4', 'ngày hẹn trả không sau ngày mượn', page, PAGE.process, M.DUE_DATE_INVALID);
   assertEq(stepOf('đk 4', 'giữ ngày hẹn trả cũ'), PAGE.process, due, deskState(page).dueDate);
 
+  // Ngoài báo cáo (phase-07-edge-cases.md §3): ô nhập sai, hai thẻ, mã vạch sửa tay, session thiếu phiếu
+  const both = ['DT001-03', 'DT020-02'];
+  page = await deskUpdate(a, page, { received: both, dueDate: due, discount: 'abc' });
+  expectMessage('EC', 'giảm giá là chữ', page, PAGE.process, M.DISCOUNT_INVALID);
+  expectText('EC', 'giữ giảm giá cũ', page, PAGE.process, /Tổng tiền thuê:? 42\.000đ/);
+  page = await deskUpdate(a, page, { received: both, dueDate: due, discount: '-1000' });
+  expectMessage('EC', 'giảm giá âm', page, PAGE.process, M.DISCOUNT_INVALID);
+  page = await deskUpdate(a, page, { received: both, dueDate: due, discount: '50000' });
+  expectMessage('EC', 'giảm giá lớn hơn tổng', page, PAGE.process, M.DISCOUNT_INVALID);
+  page = await deskUpdate(a, page, { received: both, dueDate: due, discount: '2.000' });
+  expectText('EC', 'giảm giá viết "2.000"', page, PAGE.process, /Tổng tiền thuê:? 40\.000đ/);
+  page = await deskUpdate(a, page, { received: both, dueDate: due, discount: '' });
+  expectText('EC', 'giảm giá trống = 0', page, PAGE.process, /Tổng tiền thuê:? 42\.000đ/);
+  page = await deskUpdate(a, page, { received: both, dueDate: '2026-02-30' });
+  expectMessage('EC', 'ngày hẹn trả không có thật', page, PAGE.process, M.DUE_DATE_INVALID);
+  assertEq(stepOf('EC', 'giữ ngày hẹn trả cũ'), PAGE.process, due, deskState(page).dueDate);
+  page = await deskUpdate(a, page, { received: both, dueDate: due, note: LONG_255 });
+  expectMessage('EC', 'ghi chú quá 255 kí tự', page, PAGE.process, M.INPUT_TOO_LONG);
+  page = await deskUpdate(a, page, { received: [...both, 'DT999-99'], dueDate: due });
+  assertEq(stepOf('EC', 'mã vạch sửa tay bị bỏ qua'), PAGE.process, both, deskState(page).received);
+  page = await deskUpdate(a, page, { received: both, dueDate: due, discount: '1000', extra: { rentalBillId: '126' } });
+  expectMessage('EC', 'form của thẻ khác (rentalBillId lệch)', page, PAGE.process, M.RENTAL_BILL_CHANGED);
+  expectText('EC', 'không ghi gì khi lệch phiếu', page, PAGE.process, /Tổng tiền thuê:? 42\.000đ/);
+  const d = new Session(BASE);
+  await login(d, 'hant', 'hant@123', 'EC');
+  expectRedirect('EC', 'mở Xử lí phiếu khi session chưa có phiếu', await d.get(PAGE.process, { follow: false }), PAGE.process, [PAGE.search]);
+  expectRedirect('EC', 'mở Thêm tình trạng khi session chưa có phiếu', await d.get(PAGE.condition, { follow: false }), PAGE.condition, [PAGE.search, PAGE.process]);
+  expectRedirect('EC', 'mở trang in khi session chưa có phiếu', await d.get(PAGE.print, { follow: false }), PAGE.print, [PAGE.search]);
+  const dHome = await d.get(PAGE.home);
+  expectRedirect('EC', 'POST doUpdateRentalBill khi session chưa có phiếu', await send(d, dHome, PAGE.doConfirm, { btnConfirm: '' }, { follow: false }), PAGE.doConfirm, [PAGE.search]);
+
   // Điều kiện 1: bỏ tích mọi quyển rồi xác nhận
   page = await deskUpdate(a, page, { received: [], dueDate: due });
   assertEq(stepOf('đk 1', 'bỏ tích'), PAGE.process, [], deskState(page).received);
@@ -253,6 +301,10 @@ async function main() {
   expectMessage('19.4', 'tên lỗi trống', dmg, PAGE.doDamage, M.DAMAGE_NAME_REQUIRED);
   dmg = await send(a, dmg, PAGE.doDamage, { txtName: 'Rách bìa', txtDescription: 'trùng', btnSave: '' });
   expectMessage('19.4', 'tên lỗi trùng', dmg, PAGE.doDamage, M.DAMAGE_EXISTS);
+  dmg = await send(a, dmg, PAGE.doDamage, { txtName: 'rach bia', txtDescription: '', btnSave: '' });
+  expectMessage('EC', 'tên lỗi trùng khi khác dấu, hoa thường', dmg, PAGE.doDamage, M.DAMAGE_EXISTS);
+  dmg = await send(a, dmg, PAGE.doDamage, { txtName: LONG_100, txtDescription: '', btnSave: '' });
+  expectMessage('EC', 'tên lỗi quá 100 kí tự', dmg, PAGE.doDamage, M.INPUT_TOO_LONG);
   page = await send(a, dmg, PAGE.doDamage, { txtName: 'Ố vàng', txtDescription: 'Giấy bị ố vàng do để lâu', btnSave: '' });
   assertEq(stepOf('19.5', 'lỗi mới vào bảng đã ghi nhận'), PAGE.condition, ['Rách bìa', 'Ố vàng'], firstColumn(page.html, 'tblRentedDamage'));
   assertEq(stepOf('19.5', 'ghi chú dòng cũ còn nguyên'), PAGE.condition, note1, inputValues(page.html, 'txtDamageNote')[0]);
@@ -271,6 +323,8 @@ async function main() {
   // Bước 25–28: DT020-02 không có lỗi
   page = await send(a, page, PAGE.process, { lnkAddCondition: 'DT020-02' });
   assertEq(stepOf('26', 'bảng lỗi rỗng'), PAGE.condition, [], firstColumn(page.html, 'tblRentedDamage'));
+  page = await send(a, page, PAGE.condition, { btnSave: '', txtConditionNote: LONG_255 });
+  expectMessage('EC', 'ghi chú tình trạng quá 255 kí tự', page, PAGE.condition, M.INPUT_TOO_LONG);
   page = await send(a, page, PAGE.condition, { btnSave: '', txtConditionNote: 'Truyện còn mới, không có lỗi' });
   expectText('28', 'tình trạng DT020-02', page, PAGE.process, 'Không có lỗi');
 
@@ -286,6 +340,10 @@ async function main() {
   page = await send(a, page, PAGE.collateral, { lnkChooseCollateral: rowButton(page.html, 'tblCollateral', 'lnkChooseCollateral', 'Căn cước công dân') });
   let save = await send(a, page, PAGE.collateral, { btnSave: '', txtCollateralValue: [''], txtCollateralNote: [''] });
   expectMessage('42', 'lưu khi chưa nhập giá trị', save, PAGE.collateral, M.COLLATERAL_VALUE_REQUIRED);
+  save = await send(a, save, PAGE.collateral, { btnSave: '', txtCollateralValue: ['   '], txtCollateralNote: [''] });
+  expectMessage('EC', 'giá trị cọc toàn dấu cách', save, PAGE.collateral, M.COLLATERAL_VALUE_REQUIRED);
+  save = await send(a, save, PAGE.collateral, { btnSave: '', txtCollateralValue: [LONG_100], txtCollateralNote: [''] });
+  expectMessage('EC', 'giá trị cọc quá 100 kí tự', save, PAGE.collateral, M.INPUT_TOO_LONG);
   const v1 = ['001203012345'];
   const n1 = ['Giữ bản gốc'];
   page = await send(a, save, PAGE.collateral, { txtKeyword: 'Tiền mặt', btnSearch: '', txtCollateralValue: v1, txtCollateralNote: n1 });
@@ -335,7 +393,13 @@ async function main() {
   assertEq(stepOf('46', 'DB: tình trạng từng quyển'), 'tblRentedBook', [['DT001-03', '', 'Rách bìa, Vết bẩn, viết vẽ'], ['DT020-02', 'Truyện còn mới, không có lỗi', 'NULL']], conds);
   const cols = sql("SELECT c.name, rc.value, rc.note FROM tblRentalCollateral rc JOIN tblCollateral c ON c.id = rc.collateralId WHERE rc.rentalBillId = 125 ORDER BY rc.id;");
   assertEq(stepOf('46', 'DB: khoản cọc'), 'tblRentalCollateral', [['Căn cước công dân', '001203012345', 'Giữ bản gốc'], ['Tiền mặt', '100.000đ', 'Cọc tiền mặt']], cols);
-  const printed = await send(a, page, PAGE.home, { btnPrint: '' });
+  const again = await a.get(PAGE.print);
+  expectText('EC', 'F5 trang in (PRG) không ghi lại', again, PAGE.print, 'PHIẾU MƯỢN PM0125');
+  const resend = await send(a, page, PAGE.doConfirm, { chkReceived: ['DT001-03', 'DT020-02'], txtNote: '', btnConfirm: '', rentalBillId: '125' });
+  expectMessage('EC', 'Back rồi gửi lại xác nhận', resend, PAGE.doConfirm, M.PROCESSED);
+  const backView = await a.get(PAGE.process);
+  expectMessage('EC', 'mở lại Xử lí phiếu đã giao', backView, PAGE.process, M.PROCESSED);
+  const printed = await send(a, again, PAGE.home, { btnPrint: '' });
   expectText('48', '"In phiếu" về trang chính nhân viên (không JS)', printed, PAGE.home, 'Trang chủ nhân viên');
 
   // D9 "đã giao": phiên B vẫn giữ PM0125 "Chờ nhận" cũ, lưu danh sách truyện sau khi A đã giao
@@ -354,13 +418,21 @@ async function main() {
   assertEq(stepOf('11.2', 'Chỉnh sửa danh sách truyện'), PAGE.editList, ['DT021-01'], firstColumn(page.html, 'tblRentedBook'));
   page = await send(a, page, PAGE.editList, { lnkDeleteRentedBook: 'DT021-01' });
   assertEq(stepOf('11.4', 'xoá DT021-01'), PAGE.editList, [], firstColumn(page.html, 'tblRentedBook'));
+  const emptySave = await send(a, page, PAGE.doList, { btnSave: '' });
+  expectMessage('EC', 'lưu danh sách rỗng', emptySave, PAGE.doList, M.NO_COPY_IN_LIST);
   page = await a.get(PAGE.addBook);
   expectText('11.6', 'Thêm truyện vào phiếu mượn', page, PAGE.addBook, 'Thêm truyện vào phiếu mượn');
   page = await send(a, page, PAGE.addBook, { txtKeyword: 'Doraemon', btnSearch: '' });
   const books = tableRows(page.html, 'tblBook') ?? [];
   assertEq(stepOf('11.8', 'mã đầu truyện tìm "Doraemon"'), PAGE.addBook, ['DT001', 'DT002', 'DT015'], books.map((r) => r.find((cell) => /^DT\d{3}$/.test(cell))));
   assertEq(stepOf('11.8', 'số lượng hiện có'), PAGE.addBook, ['4', '4', '2'], books.map((r) => r[r.length - 1]));
-  const add = await send(a, page, PAGE.addBook, { lnkChooseBook: '2', txtQuantity: '5', btnAddToRentalBill: '' });
+  let bad = await send(a, page, PAGE.addBook, { txtQuantity: '1', btnAddToRentalBill: '' });
+  expectMessage('EC', 'chưa chọn đầu truyện', bad, PAGE.addBook, M.BOOK_NOT_CHOSEN);
+  for (const q of ['0', '-1', '1.5', 'abc', '']) {
+    bad = await send(a, bad, PAGE.addBook, { lnkChooseBook: '2', txtQuantity: q, btnAddToRentalBill: '' });
+    expectMessage('EC', `số lượng "${q}"`, bad, PAGE.addBook, M.QUANTITY_INVALID);
+  }
+  const add = await send(a, bad, PAGE.addBook, { lnkChooseBook: '2', txtQuantity: '5', btnAddToRentalBill: '' });
   expectMessage('11.10', 'số lượng vượt quá', add, PAGE.addBook, M.QUANTITY_EXCEEDED_4);
   page = await send(a, add, PAGE.addBook, { lnkChooseBook: '2', txtQuantity: '1', btnAddToRentalBill: '' });
   assertEq(stepOf('11.10', 'gán DT002-01'), PAGE.editList, ['DT002-01'], firstColumn(page.html, 'tblRentedBook'));
@@ -389,7 +461,7 @@ async function main() {
   const admin = await q.get(PAGE.admin);
   expectStatus('D6', 'Quản lí mở ManageBookView', admin, PAGE.admin, 200);
 
-  return 'kịch bản 2.3, ngoại lệ 2, 6, 11, 12, 19, 37, bốn điều kiện, D9, D6';
+  return 'kịch bản 2.3, ngoại lệ 2, 6, 11, 12, 19, 37, bốn điều kiện, D9, D6, edge case §3';
 }
 
 try {
