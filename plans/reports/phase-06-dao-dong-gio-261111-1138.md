@@ -2,7 +2,7 @@
 
 Worktree `D:/Coding/mangastore-wt/06-dao-dong-gio`, nhánh `lane/06-chuc-nang-1-2/dao-dong-gio`, đã merge `799d807` (hằng `SELECTED_BOOKS_CHANGED`, C21, island 6D).
 
-**Trạng thái: DONE_WITH_CONCERNS.** Code xong, compile và Checkstyle sạch. Lần chạy đầu hỏng vì Docker Desktop engine trả 500. Docker sống lại thì chạy lại một lần: **120/120 xanh** ở năm lớp liên quan (mục 5). **Chưa làm bước làm đỏ có chủ đích**: luật mới của orchestrator là cả máy chỉ một việc Docker nặng mỗi lúc, không chạy thêm lượt khi chưa được nhắn "lượt của 6G". Mục 4 ghi đúng hai biến thể cần chạy.
+**Trạng thái: DONE.** Orchestrator đã duyệt khoá dòng giỏ trong updateCart (ab66866); phần làm đỏ đã chạy, xem mục 4. Ghi chú cũ: Code xong, compile và Checkstyle sạch. Lần chạy đầu hỏng vì Docker Desktop engine trả 500. Docker sống lại thì chạy lại một lần: **120/120 xanh** ở năm lớp liên quan (mục 5). **Chưa làm bước làm đỏ có chủ đích**: luật mới của orchestrator là cả máy chỉ một việc Docker nặng mỗi lúc, không chạy thêm lượt khi chưa được nhắn "lượt của 6G". Mục 4 ghi đúng hai biến thể cần chạy.
 
 ## 1. Việc đã làm
 
@@ -50,13 +50,15 @@ Thứ tự chung: **`tblBook` (id tăng dần) → `tblSelectedBook` (id tăng d
 
 Các test cũ chạy được nguyên trạng: dòng phiếu của `newBill` có `selectedBook == null` nên không qua bước kiểm.
 
-## 4. Làm đỏ có chủ đích (CHƯA CHẠY: chờ lượt Docker)
+## 4. Làm đỏ có chủ đích (đã chạy theo "lượt của 6G", không commit bản đỏ)
 
-Kế hoạch, và dự đoán chưa kiểm:
+Mỗi biến thể chỉ chạy `-Dtest='RentalBillCartLineTest,CartDAOTest'`, rồi `git checkout --` để khôi phục.
 
-1. Trong `RentalBillDAO.reserveCopies` thay `if (!CartDAO.lockFreeLines(...)) return false;` bằng không làm gì. Dự đoán: `cartLineDeletedBeforeConfirm…` đỏ vì `SQLException` 1452 (khoá ngoại `selectedBookId` trỏ dòng đã xoá); `confirmingTheSameCartLinesTwice…` đỏ vì lần 2 trả `true` và có 2 phiếu; ca song song (b) đỏ vì có 2 phiếu; `cartLineOfAnotherClient…` và `sameCartLineTwice…` đỏ vì trả `true`.
-2. Trong `CartDAO.saveLines` bỏ khối `LOCK_LINES`. Dự đoán: `updateCartWaitsForAnInFlightBillAndKeepsItsLine` đỏ vì `SQLException` 1451 khi `DELETE` sau lúc bên kia commit. Ca song song (a) có thể đỏ thưa, tuỳ thời điểm.
-3. Khôi phục, chạy lại, phải xanh.
+| Biến thể | Kết quả |
+|---|---|
+| 1. Bỏ lời gọi `CartDAO.lockFreeLines` trong `RentalBillDAO.reserveCopies` | Đỏ 34/41 (18 failure, 16 error). `cartLineDeletedBeforeConfirm…` và `deletingACartLineWhileConfirmingNeverFails` ×15 ra `SQLIntegrityConstraintViolationException` (khoá ngoại `selectedBookId` trỏ dòng đã xoá: đúng lỗi 500 của ca a). `confirmingTheSameCartLinesTwice…`, `cartLineOfAnotherClient…`, `sameCartLineTwice…` báo `expected: <false> but was: <true>`. `twoDevicesConfirming…` ×15 báo `kết quả: [true, true] ==> expected: <1> but was: <2>` (ca b). CartDAOTest 6/6 xanh |
+| 2. Bỏ khối `LOCK_LINES` trong `CartDAO.saveLines` | Đỏ 1/41: `CartDAOTest.updateCartWaitsForAnInFlightBillAndKeepsItsLine` ra `SQLIntegrityConstraintViolationException: Cannot delete or update a parent row … fk_tblRentedBook_selectedBook` (1451, đúng như dự đoán). Ca song song (a) ×15 vẫn xanh: thứ tự xấu này hẹp, chỉ test tất định bắt được |
+| Khôi phục, chạy năm lớp liên quan | `BUILD SUCCESS`, `Tests run: 120, Failures: 0, Errors: 0, Skipped: 0`, Checkstyle sạch |
 
 ## 5. Kết quả lệnh
 
