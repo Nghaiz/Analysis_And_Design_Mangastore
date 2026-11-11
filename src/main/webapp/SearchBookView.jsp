@@ -175,101 +175,127 @@
     pageContext.setAttribute("selectedStackJson", JsonUtil.toScriptJson(selectedStackProps));
 %>
 <t:layout title="Tìm truyện">
-  <h1>Tìm truyện</h1>
+  <div class="flex flex-col gap-6">
+    <header class="flex flex-col gap-1">
+      <p class="tt-hero__eyebrow">Kệ truyện của tiệm</p>
+      <h1 class="m-0">Tìm truyện</h1>
+      <p class="m-0 text-ink-soft">Tìm đầu truyện, mở chi tiết để thêm các tập muốn mượn vào "Truyện đã chọn", rồi tạo phiếu mượn ở cuối trang.</p>
+    </header>
 
-  <c:if test="${not empty message}">
-    <div class="mb-6"><ui:message-box kind="${messageKind}" text="${message}"/></div>
-  </c:if>
+    <c:if test="${not empty message}">
+      <div><ui:message-box kind="${messageKind}" text="${message}"/></div>
+    </c:if>
 
-  <form method="post" action="${ctx}/SearchBookView.jsp" class="mb-8" role="search">
-    <t:csrf/>
-    <div class="flex flex-wrap items-stretch gap-2">
-      <label for="txtKeyword" class="sr-only">Từ khoá tìm truyện</label>
-      <input type="search" name="txtKeyword" id="txtKeyword" value="${fn:escapeXml(keyword)}" maxlength="100"${keywordInvalid ? ' aria-invalid="true"' : ''}
-             placeholder="Nhập tên đầu truyện hoặc tên tác giả…"
-             class="min-w-0 flex-1 rounded-paper border border-ink-soft bg-paper px-3 py-2 text-ink focus-visible:outline-2 focus-visible:outline-pen-blue aria-invalid:border-2 aria-invalid:border-stamp-red">
-      <button type="submit" name="btnSearch" id="btnSearch"
-              class="rounded-paper border-2 border-ink bg-paper-deep px-6 py-2 font-type text-ink shadow-paper hover:bg-tape focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-pen-blue">Tìm</button>
-    </div>
+    <form method="post" action="${ctx}/SearchBookView.jsp" class="flex flex-col gap-5" role="search">
+      <t:csrf/>
+      <div class="tt-paper-card tt-worn flex flex-col gap-2">
+        <label for="txtKeyword" class="font-type text-ink">Từ khoá tìm truyện</label>
+        <div class="flex flex-wrap items-stretch gap-2">
+          <input type="search" name="txtKeyword" id="txtKeyword" value="${fn:escapeXml(keyword)}" maxlength="100"${keywordInvalid ? ' aria-invalid="true"' : ''}
+                 placeholder="Nhập tên đầu truyện hoặc tên tác giả…" aria-describedby="txtKeywordHint"
+                 class="min-w-0 flex-1 basis-56 rounded-paper border border-ink-soft bg-paper px-3 py-2 text-ink focus-visible:outline-2 focus-visible:outline-pen-blue aria-invalid:border-2 aria-invalid:border-stamp-red">
+          <button type="submit" name="btnSearch" id="btnSearch" class="tt-btn tt-btn--primary">
+            <svg aria-hidden="true" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg>
+            <span>Tìm</span>
+          </button>
+        </div>
+        <p id="txtKeywordHint" class="m-0 text-sm text-ink-soft">Ví dụ: Doraemon, Conan. Tìm theo tên đầu truyện hoặc tên tác giả, tối đa 100 kí tự.</p>
+      </div>
 
-    <div class="mt-6 overflow-x-auto">
-      <table class="tt-ledger-table" id="tblBook">
-        <caption class="tt-ledger-table__caption sr-only">Danh sách đầu truyện</caption>
-        <thead>
-          <tr>
-            <th scope="col">Mã đầu truyện</th>
-            <th scope="col">Tên đầu truyện</th>
-            <th scope="col">Tác giả</th>
-            <th scope="col">Thể loại</th>
-            <th scope="col">Giá thuê theo ngày</th>
-            <th scope="col">Số lượng hiện có</th>
-          </tr>
-        </thead>
-        <tbody>
-          <c:forEach var="b" items="${bookRows}">
-            <tr>
-              <td class="font-num"><c:out value="${b.code}"/></td>
-              <td>
-                <div class="flex items-center gap-3">
-                  <ui:book-cover bookId="${b.id}" name="${b.name}" size="sm"/>
-                  <button type="submit" name="lnkChooseBook" value="${b.id}"
-                          class="cursor-pointer border-0 bg-transparent p-0 text-left text-pen-blue underline hover:text-ink focus-visible:outline-2 focus-visible:outline-pen-blue"><c:out value="${b.name}"/></button>
-                </div>
-              </td>
-              <td><c:out value="${b.author}"/></td>
-              <td><c:out value="${b.category}"/></td>
-              <td class="font-num"><c:out value="${b.price}"/></td>
-              <td class="font-num"><c:out value="${b.available}"/></td>
-            </tr>
-          </c:forEach>
-        </tbody>
-      </table>
-    </div>
-  </form>
-
-  <form method="post" action="${ctx}/SearchBookView.jsp" id="frmSelectedBook">
-    <t:csrf/>
-    <ui:paper-card heading="Truyện đã chọn" taped="true">
-      <div class="overflow-x-auto" id="selectedBookFallback" data-island-fallback="SelectedStack">
-        <table class="tt-ledger-table" id="tblSelectedBook">
-          <caption class="tt-ledger-table__caption sr-only">Truyện đã chọn</caption>
-          <thead>
-            <tr>
-              <th scope="col">Chọn</th>
-              <th scope="col">Tên đầu truyện</th>
-              <th scope="col">Số lượng</th>
-              <th scope="col">Thao tác</th>
-            </tr>
-          </thead>
-          <tbody>
-            <c:forEach var="s" items="${selectedRows}">
+      <section aria-labelledby="search-result-h" class="flex flex-col gap-3">
+        <div class="flex flex-wrap items-baseline justify-between gap-2">
+          <h2 id="search-result-h" class="m-0">Kết quả tìm</h2>
+          <c:if test="${not empty bookRows}">
+            <p class="m-0 text-sm text-ink-soft"><span class="font-num">${fn:length(bookRows)}</span> đầu truyện. Bấm tên truyện để xem chi tiết.</p>
+          </c:if>
+        </div>
+        <div class="overflow-x-auto">
+          <table class="tt-ledger-table" id="tblBook">
+            <caption class="tt-ledger-table__caption sr-only">Danh sách đầu truyện</caption>
+            <thead>
               <tr>
-                <td>
-                  <input type="checkbox" name="chkSelectedBook" value="${s.bookId}"
-                         aria-label="Chọn ${fn:escapeXml(s.name)}"${s.checked ? ' checked' : ''}
-                         class="size-5 accent-pen-blue focus-visible:outline-2 focus-visible:outline-pen-blue">
-                </td>
-                <td><c:out value="${s.name}"/></td>
-                <td class="font-num"><c:out value="${s.quantity}"/></td>
-                <td>
-                  <button type="submit" name="lnkDeleteSelectedBook" value="${s.bookId}"
-                          aria-label="Xoá ${fn:escapeXml(s.name)} khỏi truyện đã chọn"
-                          class="rounded-paper border border-ink-soft bg-paper px-3 py-1 font-type text-sm text-ink hover:bg-tape focus-visible:outline-2 focus-visible:outline-pen-blue">Xoá</button>
-                </td>
+                <th scope="col">Mã đầu truyện</th>
+                <th scope="col">Tên đầu truyện</th>
+                <th scope="col">Tác giả</th>
+                <th scope="col">Thể loại</th>
+                <th scope="col">Giá thuê theo ngày</th>
+                <th scope="col">Số lượng hiện có</th>
               </tr>
-            </c:forEach>
-          </tbody>
-        </table>
+            </thead>
+            <tbody>
+              <c:forEach var="b" items="${bookRows}">
+                <tr>
+                  <td class="font-num"><c:out value="${b.code}"/></td>
+                  <td>
+                    <div class="flex min-w-48 items-center gap-3">
+                      <span class="block w-16 flex-none"><ui:book-cover bookId="${b.id}" name="${b.name}" size="sm"/></span>
+                      <button type="submit" name="lnkChooseBook" value="${b.id}"
+                              class="cursor-pointer border-0 bg-transparent p-0 text-left text-pen-blue underline underline-offset-2 hover:text-ink focus-visible:outline-2 focus-visible:outline-pen-blue"><c:out value="${b.name}"/></button>
+                    </div>
+                  </td>
+                  <td><c:out value="${b.author}"/></td>
+                  <td><c:out value="${b.category}"/></td>
+                  <td class="font-num whitespace-nowrap"><c:out value="${b.price}"/></td>
+                  <td class="font-num"><c:out value="${b.available}"/></td>
+                </tr>
+              </c:forEach>
+            </tbody>
+          </table>
+        </div>
+        <c:if test="${empty bookRows}">
+          <p class="m-0 border border-dashed border-ink-soft px-4 py-3 text-ink-soft">Chưa có kết quả. Gõ tên truyện hoặc tên tác giả vào ô phía trên rồi bấm "Tìm".</p>
+        </c:if>
+      </section>
+    </form>
+
+    <form method="post" action="${ctx}/SearchBookView.jsp" id="frmSelectedBook">
+      <t:csrf/>
+      <ui:paper-card taped="true">
+        <h2 class="tt-paper-card__heading">Truyện đã chọn</h2>
+        <p class="m-0 mb-3 text-sm text-ink-soft">Tích ô "Chọn" ở các đầu truyện muốn mượn lần này rồi bấm "Tạo phiếu mượn". Bấm "Xoá" để bỏ một đầu truyện khỏi danh sách.</p>
+        <div class="overflow-x-auto" id="selectedBookFallback" data-island-fallback="SelectedStack">
+          <table class="tt-ledger-table" id="tblSelectedBook">
+            <caption class="tt-ledger-table__caption sr-only">Truyện đã chọn</caption>
+            <thead>
+              <tr>
+                <th scope="col">Chọn</th>
+                <th scope="col">Tên đầu truyện</th>
+                <th scope="col">Số lượng</th>
+                <th scope="col">Thao tác</th>
+              </tr>
+            </thead>
+            <tbody>
+              <c:forEach var="s" items="${selectedRows}">
+                <tr>
+                  <td>
+                    <input type="checkbox" name="chkSelectedBook" value="${s.bookId}"
+                           aria-label="Chọn ${fn:escapeXml(s.name)}"${s.checked ? ' checked' : ''}
+                           class="size-5 accent-pen-blue focus-visible:outline-2 focus-visible:outline-pen-blue">
+                  </td>
+                  <td><c:out value="${s.name}"/></td>
+                  <td class="font-num"><c:out value="${s.quantity}"/></td>
+                  <td>
+                    <button type="submit" name="lnkDeleteSelectedBook" value="${s.bookId}"
+                            aria-label="Xoá ${fn:escapeXml(s.name)} khỏi truyện đã chọn"
+                            class="tt-btn tt-btn--ghost tt-btn--sm">Xoá</button>
+                  </td>
+                </tr>
+              </c:forEach>
+            </tbody>
+          </table>
+        </div>
+        <div data-island="SelectedStack" data-props="selected-stack-props"></div>
+        <script type="application/json" id="selected-stack-props">${selectedStackJson}</script>
+        <c:if test="${empty selectedRows}">
+          <p class="m-0 mt-3 border border-dashed border-ink-soft px-4 py-3 text-ink-soft">Chưa có truyện nào. Tìm truyện ở trên, bấm tên truyện, nhập số lượng rồi bấm "Thêm vào truyện đã chọn".</p>
+        </c:if>
+      </ui:paper-card>
+      <%-- Bọc ngoài, không lớp hiển thị: island gắn thì đặt hidden lên phần tử này (§11), lớp flex không đè được. --%>
+      <div id="createRentalBillFallback" data-island-fallback="SelectedStack">
+        <div class="mt-6 flex justify-center">
+          <button type="submit" name="btnCreateRentalBill" id="btnCreateRentalBill" class="tt-btn tt-btn--primary">Tạo phiếu mượn</button>
+        </div>
       </div>
-      <div data-island="SelectedStack" data-props="selected-stack-props"></div>
-      <script type="application/json" id="selected-stack-props">${selectedStackJson}</script>
-    </ui:paper-card>
-    <%-- Bọc ngoài, không lớp hiển thị: island gắn thì đặt hidden lên phần tử này (§11), lớp flex không đè được. --%>
-    <div id="createRentalBillFallback" data-island-fallback="SelectedStack">
-      <div class="mt-6 flex justify-center">
-        <button type="submit" name="btnCreateRentalBill" id="btnCreateRentalBill"
-                class="rounded-paper border-2 border-ink bg-paper-deep px-6 py-2 font-type text-ink shadow-paper hover:bg-tape focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-pen-blue">Tạo phiếu mượn</button>
-      </div>
-    </div>
-  </form>
+    </form>
+  </div>
 </t:layout>

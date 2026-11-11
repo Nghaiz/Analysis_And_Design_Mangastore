@@ -97,102 +97,113 @@
     pageContext.setAttribute("totalRentalPrice", Display.money(linesTotal - rentalBill.getDiscount()));
 %>
 <t:layout title="Chi tiết phiếu mượn">
-  <h1>Chi tiết phiếu mượn</h1>
+  <div class="mx-auto flex w-full max-w-160 flex-col gap-6">
+    <header class="flex flex-col gap-1">
+      <nav aria-label="Đường dẫn" class="text-sm">
+        <ol class="m-0 flex list-none flex-wrap items-center gap-x-2 p-0 text-ink-soft">
+          <li><a href="${ctx}/RentalBillListView.jsp">Danh sách phiếu mượn</a></li>
+          <li aria-hidden="true">›</li>
+          <li aria-current="page">Chi tiết phiếu mượn</li>
+        </ol>
+      </nav>
+      <h1 class="m-0">Chi tiết phiếu mượn</h1>
+      <p class="m-0 text-ink-soft">Thông tin của một phiếu mượn: các quyển tiệm giữ cho bạn, tiền thuê và trạng thái hiện tại.</p>
+    </header>
 
-  <ui:ticket title="PHIẾU MƯỢN" code="${billCode}">
-    <div class="mb-2 flex justify-end" aria-hidden="true"><ui:stamp status="${status}"/></div>
-    <div class="grid gap-x-8 gap-y-1 md:grid-cols-2">
-      <dl class="m-0 grid gap-y-1">
-        <div><dt class="inline font-type text-ink-soft">Tên khách hàng:</dt> <dd class="m-0 inline"><c:out value="${clientName}"/></dd></div>
-        <div><dt class="inline font-type text-ink-soft">Ngày giờ tạo phiếu:</dt> <dd class="m-0 inline font-num"><c:out value="${createdAt}"/></dd></div>
-        <div><dt class="inline font-type text-ink-soft">Ngày giờ dự kiến đến nhận:</dt> <dd class="m-0 inline font-num"><c:out value="${expectedPickupAt}"/></dd></div>
-        <div><dt class="inline font-type text-ink-soft">Số ngày thuê dự kiến:</dt> <dd class="m-0 inline font-num"><c:out value="${expectedDays}"/></dd></div>
-        <div><dt class="inline font-type text-ink-soft">Trạng thái:</dt> <dd class="m-0 inline" id="status"><c:out value="${status}"/></dd></div>
-      </dl>
-      <dl class="m-0 grid content-start gap-y-1">
-        <c:if test="${renting}">
-          <div><dt class="inline font-type text-ink-soft">Ngày mượn:</dt> <dd class="m-0 inline font-num"><c:out value="${borrowDate}"/></dd></div>
-          <div><dt class="inline font-type text-ink-soft">Ngày hẹn trả:</dt> <dd class="m-0 inline font-num"><c:out value="${dueDate}"/></dd></div>
-          <div><dt class="inline font-type text-ink-soft">Nhân viên xử lí:</dt> <dd class="m-0 inline"><c:out value="${staffName}"/></dd></div>
-        </c:if>
-        <div><dt class="inline font-type text-ink-soft">Ghi chú:</dt> <dd class="m-0 inline"><c:out value="${note}"/></dd></div>
-        <c:if test="${cancelled}">
-          <div><dt class="inline font-type text-ink-soft">Lí do huỷ:</dt> <dd class="m-0 inline" id="cancelReason"><c:out value="${cancelReason}"/></dd></div>
-        </c:if>
-      </dl>
-    </div>
+    <ui:ticket title="PHIẾU MƯỢN" code="${billCode}">
+      <div class="mb-2 flex justify-end" aria-hidden="true"><ui:stamp status="${status}"/></div>
+      <div class="grid gap-x-8 gap-y-1 md:grid-cols-2">
+        <dl class="m-0 grid content-start gap-y-1">
+          <div><dt class="inline font-type text-ink-soft">Tên khách hàng:</dt> <dd class="m-0 inline"><c:out value="${clientName}"/></dd></div>
+          <div><dt class="inline font-type text-ink-soft">Ngày giờ tạo phiếu:</dt> <dd class="m-0 inline font-num"><c:out value="${createdAt}"/></dd></div>
+          <div><dt class="inline font-type text-ink-soft">Ngày giờ dự kiến đến nhận:</dt> <dd class="m-0 inline font-num"><c:out value="${expectedPickupAt}"/></dd></div>
+          <div><dt class="inline font-type text-ink-soft">Số ngày thuê dự kiến:</dt> <dd class="m-0 inline font-num"><c:out value="${expectedDays}"/></dd></div>
+          <div><dt class="inline font-type text-ink-soft">Trạng thái:</dt> <dd class="m-0 inline font-type" id="status"><c:out value="${status}"/></dd></div>
+        </dl>
+        <dl class="m-0 grid content-start gap-y-1">
+          <c:if test="${renting}">
+            <div><dt class="inline font-type text-ink-soft">Ngày mượn:</dt> <dd class="m-0 inline font-num"><c:out value="${borrowDate}"/></dd></div>
+            <div><dt class="inline font-type text-ink-soft">Ngày hẹn trả:</dt> <dd class="m-0 inline font-num"><c:out value="${dueDate}"/></dd></div>
+            <div><dt class="inline font-type text-ink-soft">Nhân viên xử lí:</dt> <dd class="m-0 inline"><c:out value="${staffName}"/></dd></div>
+          </c:if>
+          <div class="min-w-0 break-words"><dt class="inline font-type text-ink-soft">Ghi chú:</dt> <dd class="m-0 inline"><c:out value="${note}"/></dd></div>
+          <c:if test="${cancelled}">
+            <div class="min-w-0 break-words"><dt class="inline font-type text-ink-soft">Lí do huỷ:</dt> <dd class="m-0 inline" id="cancelReason"><c:out value="${cancelReason}"/></dd></div>
+          </c:if>
+        </dl>
+      </div>
 
-    <div class="mt-4 overflow-x-auto">
-      <table class="tt-ledger-table" id="tblRentedBook">
-        <caption class="tt-ledger-table__caption">Các quyển truyện được giữ chỗ:</caption>
-        <thead>
-          <tr>
-            <th scope="col">Mã vạch</th>
-            <th scope="col">Tên đầu truyện</th>
-            <th scope="col">Giá thuê theo ngày</th>
-            <th scope="col">Số lượng</th>
-            <c:if test="${renting}"><th scope="col">Tình trạng khi giao</th></c:if>
-            <th scope="col">Tổng tiền</th>
-          </tr>
-        </thead>
-        <tbody>
-          <c:forEach var="r" items="${rows}">
-            <tr>
-              <td class="font-num">
-                <ul class="m-0 list-none p-0">
-                  <c:forEach var="code" items="${r.barcodes}"><li><c:out value="${code}"/></li></c:forEach>
-                </ul>
-              </td>
-              <td><c:out value="${r.name}"/></td>
-              <td class="font-num"><c:out value="${r.price}"/></td>
-              <td class="font-num"><c:out value="${r.quantity}"/></td>
-              <c:if test="${renting}">
-                <td>
-                  <ul class="m-0 flex list-none flex-col gap-1 p-0">
-                    <c:forEach var="condition" items="${r.conditions}"><li><ui:condition-tag text="${condition}"/></li></c:forEach>
-                  </ul>
-                </td>
-              </c:if>
-              <td class="font-num"><c:out value="${r.total}"/></td>
-            </tr>
-          </c:forEach>
-        </tbody>
-      </table>
-    </div>
-
-    <c:if test="${renting}">
-      <div class="mt-4 overflow-x-auto">
-        <table class="tt-ledger-table" id="tblRentalCollateral">
-          <caption class="tt-ledger-table__caption">Các khoản đặt cọc:</caption>
+      <div class="mt-5 overflow-x-auto">
+        <table class="tt-ledger-table" id="tblRentedBook">
+          <caption class="tt-ledger-table__caption">Các quyển truyện được giữ chỗ:</caption>
           <thead>
             <tr>
-              <th scope="col">STT</th>
-              <th scope="col">Loại tài sản</th>
-              <th scope="col">Giá trị</th>
+              <th scope="col">Mã vạch</th>
+              <th scope="col">Tên đầu truyện</th>
+              <th scope="col">Giá thuê theo ngày</th>
+              <th scope="col">Số lượng</th>
+              <c:if test="${renting}"><th scope="col">Tình trạng khi giao</th></c:if>
+              <th scope="col">Tổng tiền</th>
             </tr>
           </thead>
           <tbody>
-            <c:forEach var="r" items="${collaterals}">
+            <c:forEach var="r" items="${rows}">
               <tr>
-                <td class="font-num"><c:out value="${r.index}"/></td>
+                <td class="font-num whitespace-nowrap">
+                  <ul class="m-0 list-none p-0">
+                    <c:forEach var="code" items="${r.barcodes}"><li><c:out value="${code}"/></li></c:forEach>
+                  </ul>
+                </td>
                 <td><c:out value="${r.name}"/></td>
-                <td><c:out value="${r.value}"/></td>
+                <td class="font-num whitespace-nowrap"><c:out value="${r.price}"/></td>
+                <td class="font-num"><c:out value="${r.quantity}"/></td>
+                <c:if test="${renting}">
+                  <td>
+                    <ul class="m-0 flex list-none flex-col gap-1 p-0">
+                      <c:forEach var="condition" items="${r.conditions}"><li><ui:condition-tag text="${condition}"/></li></c:forEach>
+                    </ul>
+                  </td>
+                </c:if>
+                <td class="font-num whitespace-nowrap"><c:out value="${r.total}"/></td>
               </tr>
             </c:forEach>
           </tbody>
         </table>
       </div>
-    </c:if>
 
-    <dl class="mt-4 grid gap-y-1">
-      <div><dt class="inline font-type text-ink-soft">Tổng số quyển:</dt> <dd class="m-0 inline font-num" id="totalCopies"><c:out value="${totalCopies}"/></dd></div>
-      <div><dt class="inline font-type text-ink-soft">Giảm giá:</dt> <dd class="m-0 inline font-num" id="discount"><c:out value="${discount}"/></dd></div>
-      <div><dt class="inline font-type text-ink-soft">Tổng tiền thuê:</dt> <dd class="m-0 inline font-num font-bold" id="totalRentalPrice"><c:out value="${totalRentalPrice}"/></dd></div>
-    </dl>
-  </ui:ticket>
+      <c:if test="${renting}">
+        <div class="mt-5 overflow-x-auto">
+          <table class="tt-ledger-table" id="tblRentalCollateral">
+            <caption class="tt-ledger-table__caption">Các khoản đặt cọc:</caption>
+            <thead>
+              <tr>
+                <th scope="col">STT</th>
+                <th scope="col">Loại tài sản</th>
+                <th scope="col">Giá trị</th>
+              </tr>
+            </thead>
+            <tbody>
+              <c:forEach var="r" items="${collaterals}">
+                <tr>
+                  <td class="font-num"><c:out value="${r.index}"/></td>
+                  <td><c:out value="${r.name}"/></td>
+                  <td><c:out value="${r.value}"/></td>
+                </tr>
+              </c:forEach>
+            </tbody>
+          </table>
+        </div>
+      </c:if>
 
-  <div class="mt-6 flex justify-center">
-    <a href="${ctx}/RentalBillListView.jsp" id="lnkBack"
-       class="inline-block rounded-paper border-2 border-ink bg-paper px-6 py-2 font-type text-ink no-underline shadow-paper hover:bg-tape focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-pen-blue">Quay lại</a>
+      <dl class="m-0 mt-5 ml-auto grid w-full max-w-sm gap-y-1 border-t-2 border-double border-ink-soft pt-3">
+        <div class="flex items-baseline justify-between gap-4"><dt class="font-type text-ink-soft">Tổng số quyển:</dt> <dd class="m-0 font-num" id="totalCopies"><c:out value="${totalCopies}"/></dd></div>
+        <div class="flex items-baseline justify-between gap-4"><dt class="font-type text-ink-soft">Giảm giá:</dt> <dd class="m-0 font-num" id="discount"><c:out value="${discount}"/></dd></div>
+        <div class="flex items-baseline justify-between gap-4"><dt class="font-type text-ink">Tổng tiền thuê:</dt> <dd class="m-0 font-num text-xl font-bold text-stamp-red" id="totalRentalPrice"><c:out value="${totalRentalPrice}"/></dd></div>
+      </dl>
+    </ui:ticket>
+
+    <div class="flex flex-col gap-3 sm:flex-row">
+      <a href="${ctx}/RentalBillListView.jsp" id="lnkBack" class="tt-btn tt-btn--ghost">Quay lại</a>
+    </div>
   </div>
 </t:layout>
