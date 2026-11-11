@@ -211,3 +211,51 @@ Trang mở và trang lỗi:
 - Đăng nhập đúng tài khoản khác (bộ đếm khác) → 302 `/ClientHomeView.jsp`, cookie session mới, form kế tiếp gửi được (token mới có trong session mới).
 - Log app không có dòng SEVERE "Không nối được Redis" lúc khởi động.
 
+## 6. Vòng 3 (sau merge `5c71b71`: nhánh phase đã có 6A–6D)
+
+Orchestrator chạy checklist §5.3 trên stack `tiemtruyen-e2e`: 18/19 PASS. Vòng này sửa hai lỗi edge case orchestrator tìm ra. Lane không dựng stack, không down stack.
+
+### 6.1 Query hoặc thân form có %-encoding hỏng ra 500
+
+**Nguyên nhân** (đọc mã nguồn Tomcat 11.0.27 `tomcat-catalina`, `tomcat-coyote`, bản sources tải từ Maven Central; context7 cho hợp đồng Servlet 6.1): `Request.parseParameters()` lưu lỗi phân tích vào `parametersParseException` rồi **ném lại ở mọi lần** `getParameter*`. Lớp lỗi là `org.apache.tomcat.util.http.InvalidParameterException extends IllegalStateException`; Javadoc Servlet 6.1 quy định `getParameter*` ném `IllegalStateException` khi gặp %nn hỏng, byte sai bảng mã, lỗi đọc thân hay chạm giới hạn số tham số. Trang JSP gọi `getParameter` mà không bắt, nên lỗi rơi vào `<exception-type>java.lang.Throwable</exception-type>` → `500.jsp`. HomeView không đọc tham số nên ra 200.
+
+**Sửa** `filter/Utf8Filter.java`: ngay sau khi đặt UTF-8, gọi `request.getParameterMap()` để ép phân tích query và thân `application/x-www-form-urlencoded`. Bắt `IllegalStateException` (đúng hợp đồng Servlet; không tham chiếu lớp nội bộ của Tomcat, nên WAR không phụ thuộc Tomcat lúc biên dịch), log mức FINE, rồi `sendError(400)`. Trang không chạy; `error.jsp` hiện "400 · Yêu cầu không hợp lệ". Utf8Filter đứng đầu chuỗi nên CsrfFilter, LoginRateLimitFilter và trang không bao giờ gặp lỗi này.
+
+Ghi chú: Tomcat gắn mã 413 cho lỗi vượt `maxPostSize` (2 MiB), filter trả 400 cho mọi lỗi phân tích. Đi qua nginx thì không tới được trường hợp đó, vì `client_max_body_size` mặc định 1 MiB và nginx trả 413 trước (trang tĩnh ở 6.2).
+
+**Test** (`BasicFiltersTest`): GET và POST có tham số hỏng → 400, trang không chạy; tham số đúng (chữ có dấu) tới được trang. `FakeHttp` giả lại đúng hành vi Tomcat: `brokenParameters()` làm mọi `getParameter*` ném `IllegalStateException`.
+
+### 6.2 Đường dẫn hỏng ra trang 400 tiếng Anh của nginx
+
+**Sửa**:
+- `docker/nginx/errors/400.html`, `413.html`, `414.html`: trang tĩnh tiếng Việt, chữ trùng nhánh tương ứng của `error.jsp`, có link về trang chủ, không `style=`, không `<script>`.
+- `docker/nginx/errors/loi.css`: dựng lại khung của `error.jsp` (nền giấy, thẻ có băng dính, tiêu đề Momo Trust Display, chữ Fuzzy Bubbles). Font và ảnh giấy lấy từ `/static/` của app (tên cố định, không hash); app không chạy thì trang vẫn đọc được bằng font hệ thống.
+- `docker/nginx/conf.d/app.conf`: `error_page 400`, `413`, `414` (giữ nguyên mã vì không có `=`) và `error_page 494 =400` (mã nội bộ của nginx cho header quá lớn) trỏ tới `location ^~ /__tiem-loi/`. Location này `alias /usr/share/nginx/tiem-loi/`, include lại `security-headers.conf` (vì có `add_header` riêng) và đặt `Cache-Control: no-store`.
+- `docker/nginx/Dockerfile`: `COPY errors/ /usr/share/nginx/tiem-loi/`.
+- `server_tokens off` có sẵn trong `nginx.conf`, nên header `Server` không lộ phiên bản.
+- Lỗi 4xx/5xx do Tomcat trả vẫn do `error/*.jsp` lo; nginx không chặn (không bật `proxy_intercept_errors`).
+
+**Test** `NginxErrorPagesTest` (đọc file, không cần Docker):
+- Mọi `error_page` trỏ tới file có thật, đủ mã 400, 413, 414, 494.
+- Trang có `lang="vi"` và mã trong `<h1>`, không có `style=`, `<script>` hay chuỗi `nginx/<số>`.
+- Tiêu đề và lời trùng nhánh tương ứng của `error.jsp`.
+- Mọi biến `--color-*`, `--shadow-paper`, `--s-*` khai trong `loi.css` trùng `frontend/src/styles/tokens.css`.
+
+### 6.3 Kết quả lệnh kiểm (vòng 3)
+
+| Lệnh | Kết quả |
+|---|---|
+| `node scripts/dev/mvnw.mjs -B verify "-Dtest=vn.tiemtruyen.filter.**" -Dsurefire.failIfNoSpecifiedTests=false` | **BUILD SUCCESS**, 93 test, 0 fail (Auth 33, Csrf 31, LoginRateLimit 18, BasicFilters 7, NginxErrorPages 4); 0 vi phạm Checkstyle |
+| `node scripts/dev/mvnw.mjs -B -DskipTests verify` | **BUILD SUCCESS**, 0 vi phạm Checkstyle, không cảnh báo biên dịch |
+| Làm đỏ có chủ đích | Bỏ dòng ép phân tích trong `Utf8Filter` và đổi `--color-paper` trong `loi.css`: **2 fail** (`brokenQueryOrFormEncodingIs400AndThePageDoesNotRun`, `tokenValuesMatchTheDesignTokens`). Đã trả lại hai file, `grep` cho 0 dòng còn bản hỏng |
+| Cấu hình nginx trên stack thật | **Chưa kiểm**: lane không dựng stack. Không chạy được `nginx -t` tại máy vì không có nginx ngoài container |
+
+### 6.4 Checklist cho orchestrator sau khi dựng lại stack (cần build lại ảnh nginx và app)
+
+- `curl -s -g -o /dev/null -w '%{http_code}' 'http://127.0.0.1:8080/LoginView.jsp?expired=%'` và `?expired=%zz` → 400. Thân có "400 · Yêu cầu không hợp lệ" (error.jsp); log app không có `DecodeException` ở mức SEVERE.
+- POST `/LoginView.jsp` với `--data 'txtUsername=%zz'` (có cookie session) → 400 như trên, không 500, không 403.
+- `curl -s -g -D - 'http://127.0.0.1:8080/HomeView%.jsp'` và `/%zz` → 400. Thân có "400 · Yêu cầu không hợp lệ" và `<html lang="vi">`, không có chữ "nginx". `Server: nginx` không kèm số phiên bản. Header bảo mật có mặt.
+- `curl -s -o /dev/null -w '%{http_code}' "http://127.0.0.1:8080/$(head -c 9000 /dev/zero | tr '\0' a)"` → 414 kèm trang tiếng Việt.
+- `head -c 2000000 /dev/zero | curl -s -o /dev/null -w '%{http_code}' --data-binary @- http://127.0.0.1:8080/doRegister.jsp` → 413 kèm trang tiếng Việt.
+- `/__tiem-loi/loi.css` → 200, `Content-Type: text/css`. Trang lỗi trên trình duyệt không có lỗi CSP trong console.
+
