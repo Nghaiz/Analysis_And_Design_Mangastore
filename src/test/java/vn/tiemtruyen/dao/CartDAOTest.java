@@ -17,12 +17,23 @@ import static vn.tiemtruyen.dao.RentalBillDAOTest.row;
 import static vn.tiemtruyen.dao.RentalBillDAOTest.text;
 import static vn.tiemtruyen.dao.RentalBillDAOTest.update;
 
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
+import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.List;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.Timeout;
 import vn.tiemtruyen.model.Cart;
 import vn.tiemtruyen.model.Client;
 import vn.tiemtruyen.model.RentalBill;
@@ -32,6 +43,9 @@ import vn.tiemtruyen.support.TestDatabase;
 
 /** {@link CartDAO}: giỏ chỉ hiện dòng tự do, lưu giỏ thêm và xoá dòng, không đụng dòng đã thuộc phiếu chưa huỷ. */
 class CartDAOTest {
+
+    private static final long WAIT_SECONDS = 30;
+    private static final long LOCK_WAIT_POLL_MS = 20;
 
     private static TestDatabase db;
 
@@ -123,6 +137,73 @@ class CartDAOTest {
         assertEquals(0, number(db, "SELECT COUNT(*) FROM tblSelectedBook"));
         assertNull(text(db, "SELECT selectedBookId FROM tblRentedBook WHERE rentalBillId = ?", bill.getId()),
                 "dòng phiếu đã huỷ được gỡ liên kết trước khi xoá dòng giỏ");
+    }
+
+    /**
+     * Thứ tự xấu nhất của C21, dựng tất định: một transaction đang tạo phiếu (đã khoá dòng giỏ và ghi dòng phiếu, chưa
+     * commit) trong lúc {@code updateCart} xoá dòng đó. {@code updateCart} phải chờ, rồi thấy dòng đã thuộc phiếu và
+     * để yên, thay vì xoá và vỡ khoá ngoại sau khi transaction kia commit.
+     */
+    @Test
+    @Timeout(60)
+    void updateCartWaitsForAnInFlightBillAndKeepsItsLine() throws Exception {
+        Cart cart = cartWith(NAM, "DT001-01");
+        int lineId = cart.getListSelectedBook().get(0).getId();
+        Cart deviceB = getCart(client(NAM));
+        deviceB.getListSelectedBook().clear();
+        ExecutorService pool = Executors.newSingleThreadExecutor();
+        try (Connection deviceA = db.connection()) {
+            deviceA.setTransactionIsolation(Connection.TRANSACTION_READ_COMMITTED);
+            deviceA.setAutoCommit(false);
+            insertBillHoldingLine(deviceA, lineId, copy(db, "DT001-01").getId());
+            Future<Boolean> deleting = pool.submit(() -> updateCart(deviceB));
+            awaitLockWait(deleting);
+            deviceA.commit();
+            assertTrue(deleting.get(WAIT_SECONDS, TimeUnit.SECONDS));
+        } finally {
+            pool.shutdownNow();
+        }
+        assertEquals(1, number(db, "SELECT COUNT(*) FROM tblSelectedBook WHERE id = ?", lineId));
+        assertEquals(1, number(db, "SELECT COUNT(*) FROM tblRentedBook WHERE selectedBookId = ?", lineId));
+    }
+
+    /** Ghi tay phần đầu của một {@code addRentalBill}: khoá dòng giỏ, ghi phiếu và dòng phiếu trỏ dòng giỏ đó. */
+    private static void insertBillHoldingLine(Connection con, int lineId, int copyId) throws SQLException {
+        try (PreparedStatement lock = con.prepareStatement("SELECT id FROM tblSelectedBook WHERE id = ? FOR UPDATE")) {
+            lock.setInt(1, lineId);
+            lock.executeQuery();
+        }
+        int billId;
+        try (PreparedStatement bill = con.prepareStatement("INSERT INTO tblRentalBill (expectedPickupAt,"
+                + " expectedDays, status, clientId) VALUES (?, 7, ?, ?)", Statement.RETURN_GENERATED_KEYS)) {
+            bill.setObject(1, LocalDateTime.now().plusDays(1).truncatedTo(ChronoUnit.SECONDS));
+            bill.setString(2, RentalBill.STATUS_PENDING);
+            bill.setInt(3, NAM);
+            bill.executeUpdate();
+            try (ResultSet keys = bill.getGeneratedKeys()) {
+                keys.next();
+                billId = keys.getInt(1);
+            }
+        }
+        try (PreparedStatement row = con.prepareStatement("INSERT INTO tblRentedBook (rentalPrice, rentalBillId,"
+                + " bookCopyId, selectedBookId) VALUES (3000, ?, ?, ?)")) {
+            row.setInt(1, billId);
+            row.setInt(2, copyId);
+            row.setInt(3, lineId);
+            row.executeUpdate();
+        }
+    }
+
+    /** Chờ tới khi có transaction của database test đang đợi khoá (luồng {@code updateCart} đã bị chặn). */
+    private static void awaitLockWait(Future<?> blocked) throws Exception {
+        long deadline = System.nanoTime() + TimeUnit.SECONDS.toNanos(WAIT_SECONDS);
+        String waiting = "SELECT COUNT(*) FROM performance_schema.data_locks WHERE OBJECT_SCHEMA = ?"
+                + " AND LOCK_STATUS = 'WAITING'";
+        while (number(db, waiting, db.name()) == 0) {
+            assertFalse(blocked.isDone(), "updateCart xong trước khi phải chờ khoá: kịch bản không dựng được");
+            assertTrue(System.nanoTime() < deadline, "không thấy updateCart chờ khoá");
+            Thread.sleep(LOCK_WAIT_POLL_MS);
+        }
     }
 
     private static Cart cartWith(int clientId, String... barcodes) throws SQLException {
