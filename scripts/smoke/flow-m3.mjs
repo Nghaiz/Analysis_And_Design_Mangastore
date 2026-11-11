@@ -175,8 +175,8 @@ async function main() {
   sql([
     'DELETE FROM tblRentedBook WHERE rentalBillId = 126;',
     'DELETE FROM tblRentalBill WHERE id = 126;',
-    "INSERT INTO tblRentalBill (id, createdAt, expectedPickupAt, expectedDays, discount, status, clientId)" +
-      " SELECT 126, NOW(), NOW() + INTERVAL 1 DAY, 3, 0, 'Chờ nhận', id FROM tblUser WHERE username = 'khach01';",
+    "INSERT INTO tblRentalBill (id, createdAt, expectedPickupAt, expectedDays, discount, note, status, clientId)" +
+      " SELECT 126, NOW(), NOW() + INTERVAL 1 DAY, 3, 0, 'Khách hẹn lấy buổi chiều', 'Chờ nhận', id FROM tblUser WHERE username = 'khach01';",
     "INSERT INTO tblRentedBook (rentalPrice, rentalBillId, bookCopyId) SELECT 3000, 126, id FROM tblBookCopy WHERE barcode = 'DT021-01';",
   ].join('\n'));
 
@@ -468,6 +468,8 @@ async function main() {
   assertEq(stepOf('11.12', 'quyển của phiếu'), PAGE.process, ['DT002-01'], deskState(page).received);
   const held = sql("SELECT c.barcode FROM tblRentedBook r JOIN tblBookCopy c ON c.id = r.bookCopyId WHERE r.rentalBillId = 126;").map((r) => r[0]);
   assertEq(stepOf('11.12', 'DB giữ DT002-01, bỏ DT021-01'), 'tblRentedBook', ['DT002-01'], held);
+  assertEq(stepOf('EC', 'lưu danh sách quyển giữ ghi chú của khách'), 'tblRentalBill', 'Khách hẹn lấy buổi chiều',
+    sql('SELECT note FROM tblRentalBill WHERE id = 126;')[0]?.[0]);
 
   // Ngoại lệ 12: huỷ tại quầy
   page = await send(a, page, PAGE.process, { btnCancel: '', chkReceived: ['DT002-01'] });

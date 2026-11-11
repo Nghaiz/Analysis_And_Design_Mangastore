@@ -21,9 +21,10 @@
 <%!
     /**
      * Bản phiếu chỉ mang danh sách quyển (quyết định của orchestrator 11/11/2026, theo docs/contracts.md §2 và §9.2
-     * AddConditionView): ngày mượn, ngày hẹn trả, nhân viên NULL, giảm giá 0, ghi chú NULL, không khoản cọc; mỗi dòng
-     * giữ id, quyển, giá chốt, dòng giỏ, bỏ tình trạng và lỗi. Phiếu "Chờ nhận" trong DB luôn mang đúng các giá trị
-     * này (chưa đường nào ghi chúng trước khi xác nhận), nên updateRentalBill với bản này chỉ đổi danh sách quyển.
+     * AddConditionView): ngày mượn, ngày hẹn trả, nhân viên NULL, giảm giá 0, không khoản cọc; mỗi dòng giữ id, quyển,
+     * giá chốt, dòng giỏ, bỏ tình trạng và lỗi. Phiếu "Chờ nhận" trong DB luôn mang đúng các giá trị này (chưa đường
+     * nào ghi chúng trước khi xác nhận). Ghi chú thì khác: khách đã nhập ở ConfirmRentalBillView (doAddRentalBill ghi)
+     * và UPDATE_BILL ghi đè cột note, nên bản sao giữ note của phiếu trong session (cùng giá trị bàn quầy đang hiện).
      */
     private static RentalBill listOnlyCopy(RentalBill bill, List<RentedBook> rows) {
         RentalBill copy = new RentalBill();
@@ -33,6 +34,7 @@
         copy.setExpectedDays(bill.getExpectedDays());
         copy.setStatus(bill.getStatus());
         copy.setCancelReason(bill.getCancelReason());
+        copy.setNote(bill.getNote());
         copy.setClient(bill.getClient());
         List<RentedBook> copyRows = new ArrayList<>();
         for (RentedBook row : rows) {
