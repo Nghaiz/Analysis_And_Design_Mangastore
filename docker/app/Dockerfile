@@ -16,6 +16,8 @@ WORKDIR /src/frontend
 COPY frontend/package.json frontend/package-lock.json ./
 RUN --mount=type=cache,target=/root/.npm npm ci --no-audit --no-fund
 COPY frontend/ ./
+# Tailwind @source quét JSP/tag (frontend/src/styles/app.css); thiếu dòng này CSS mất mọi lớp chỉ dùng trong JSP.
+COPY src/main/webapp/ /src/src/main/webapp/
 RUN npm run build && test -f /src/src/main/webapp/static/.vite/manifest.json
 
 FROM ${MAVEN_IMAGE} AS war
