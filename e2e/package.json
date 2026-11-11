@@ -1,0 +1,19 @@
+{
+  "name": "tiemtruyen-e2e",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "engines": {
+    "node": ">=24"
+  },
+  "scripts": {
+    "test": "playwright test",
+    "lighthouse": "node lighthouse/run-lighthouse.mjs"
+  },
+  "devDependencies": {
+    "@axe-core/playwright": "4.14.0",
+    "@playwright/test": "1.65.0",
+    "chrome-launcher": "1.2.3",
+    "lighthouse": "13.6.0"
+  }
+}
