@@ -17,9 +17,9 @@ Nguồn: tiêu chí nghiệm thu brainstorm §10, brief §7, ch.2 (trang in 5–
 ## Các bước
 
 - [x] **8.0 Orchestrator, tuần tự (file dùng chung):** `e2e/package.json` (Playwright 1.65.0, `@axe-core/playwright`, Lighthouse; phiên bản tra npm lúc ghim) và lockfile; cài trình duyệt Playwright; chỉnh `compose.e2e.yaml` nếu cần cho CI; `scripts/accept/phase-08.mjs`. Commit trước khi spawn. Hợp đồng lane: `phase-08-integration.md`.
-- [ ] **8.1 Lane 8A `e2e`**, **8.2 Lane 8B `ci`**, **8.3 Lane 8C `lighthouse-do`** song song (3 chỗ).
+- [x] **8.1 Lane 8A `e2e`** (tách 8A1–8A3; 8A4 bảo mật bỏ theo chủ dự án 11/11; cả bộ 98/98 xanh, mobile 49 + desktop 49, 3,2 phút),, **8.2 Lane 8B `ci`** (xong, merge; Trivy còn đỏ, phần sửa bỏ),, **8.3 Lane 8C `lighthouse-do`** (bỏ theo chủ dự án 11/11).
 - [ ] **8.4 Orchestrator:** đọc báo cáo Lighthouse của 8C; lập danh sách file cần sửa (thường là tag và CSS của phase 5, trang của phase 6, 7) và ghi vào `agent-map.md`; mở **8.5 Lane 8D `sua-lighthouse`** với đúng danh sách đó. Lặp 8C → 8D tối đa 3 vòng; vòng thứ 3 vẫn dưới 90 thì dừng và hỏi chủ dự án.
-- [ ] **8.6 Lane 8E `tai-lieu`** xếp hàng, mở khi có chỗ.
+- [x] **8.6 Lane 8E `tai-lieu`** (README, architecture, pdr; số CI/Lighthouse/Trivy còn để trống) xếp hàng, mở khi có chỗ.
 - [ ] **8.7 Orchestrator:** chạy Accept; chạy `tiem-contract-guard` trên toàn bộ diff từ commit gốc; đánh dấu; push nhánh phase và mở PR vào `main` (`contract.md` §9).
 - [ ] **8.8 Orchestrator:** PR của phase 8 chạy workflow vừa thêm trên GitHub; chờ check xong bằng lệnh chạy nền `gh pr checks <số PR> --watch`; đỏ thì brief lại lane sở hữu; chỉ merge bằng merge commit khi Accept PASS và mọi check xanh (Deferred #25).
 
