@@ -18,12 +18,11 @@ interface RenderCall {
 /** A React stand-in that records what would have been rendered where. */
 function fakeRuntime(): { runtime: ReactRuntime; renders: RenderCall[] } {
   const renders: RenderCall[] = []
-  const runtime = {
-    createElement: (_type: unknown, props: IslandProps) => ({ props }),
-    createRoot: (container: Element) => ({
-      render: (node: { props: IslandProps }) => renders.push({ container, props: node.props }),
-    }),
-  } as unknown as ReactRuntime
+  const runtime: ReactRuntime = {
+    mount: (container, _component, props) => {
+      renders.push({ container, props })
+    },
+  }
   return { runtime, renders }
 }
 
@@ -195,6 +194,77 @@ describe('mountIslands', () => {
 
     expect(report.mounted).toEqual(['Greeting'])
     await vi.waitFor(() => expect(document.querySelector('[data-island] p')?.textContent).toBe('Chào Nobita'))
+  })
+})
+
+describe('error boundary (default runtime)', () => {
+  it('puts the server HTML back and logs exactly once when the island throws while rendering', async () => {
+    setBody(`
+      <form>
+        <div id="host" data-island="Broken">
+          <table id="server-table"><tbody><tr><td>Bản HTML của JSP</td></tr></tbody></table>
+        </div>
+      </form>
+    `)
+    const serverTable = document.getElementById('server-table')
+    const Broken = (): never => {
+      throw new Error('props sai')
+    }
+    const consoleError = vi.spyOn(console, 'error').mockImplementation(() => {})
+
+    const report = await mountIslands({ registry: registryOf({ Broken: () => Promise.resolve({ default: Broken }) }) })
+
+    await vi.waitFor(() => expect(report.failed.map((failure) => failure.name)).toEqual(['Broken']))
+    await vi.waitFor(() => expect(document.getElementById('server-table')).toBe(serverTable))
+    expect(document.getElementById('host')?.textContent).toContain('Bản HTML của JSP')
+    expect(consoleError).toHaveBeenCalledTimes(1)
+    expect(String(consoleError.mock.calls[0]?.[0])).toContain('[island-loader] Island "Broken" crashed while rendering')
+    expect(document.getElementById('host')?.getAttribute('data-island-state')).toBe('failed')
+  })
+
+  it('keeps a healthy island mounted next to a crashed one', async () => {
+    setBody('<div id="bad" data-island="Bad">giữ</div><div id="good" data-island="Good"></div>')
+    const Bad = (): never => {
+      throw new Error('hỏng')
+    }
+    const Good = () => reactCreateElement('p', null, 'chạy')
+    vi.spyOn(console, 'error').mockImplementation(() => {})
+
+    await mountIslands({
+      registry: registryOf({
+        Bad: () => Promise.resolve({ default: Bad }),
+        Good: () => Promise.resolve({ default: Good }),
+      }),
+    })
+
+    await vi.waitFor(() => expect(document.getElementById('good')?.textContent).toBe('chạy'))
+    await vi.waitFor(() => expect(document.getElementById('bad')?.textContent).toBe('giữ'))
+    expect(document.getElementById('good')?.getAttribute('data-island-state')).toBe('mounted')
+    await vi.waitFor(() => expect(document.getElementById('bad')?.getAttribute('data-island-state')).toBe('failed'))
+  })
+
+  it('marks an island that fails its checks as failed and never as mounted', async () => {
+    setBody('<div id="ghost" data-island="Ghost"></div>')
+    vi.spyOn(console, 'error').mockImplementation(() => {})
+
+    await mountIslands({ registry: registryOf({}) })
+
+    expect(document.getElementById('ghost')?.getAttribute('data-island-state')).toBe('failed')
+  })
+})
+
+describe('_demo island through the real glob registry', () => {
+  it('mounts and renders the React style guide', async () => {
+    setBody('<div id="demo" data-island="_demo"></div>')
+    const registry = registryFromGlob(import.meta.glob<IslandModule>('../islands/*/index.tsx'))
+    const consoleError = vi.spyOn(console, 'error')
+
+    const report = await mountIslands({ registry })
+
+    expect(report.mounted).toEqual(['_demo'])
+    await vi.waitFor(() => expect(document.querySelector('#demo .tt-ticket')).not.toBeNull())
+    expect(document.querySelectorAll('#demo .tt-stamp')).toHaveLength(3)
+    expect(consoleError).not.toHaveBeenCalled()
   })
 })
 

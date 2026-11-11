@@ -1,0 +1,148 @@
+/*
+ * Nền trang và chất liệu giấy (phase-05-ui-contract.md §3, cuối bảng): .tt-paper, .tt-worn, .tt-tape,
+ * .tt-typed, .tt-pen, .tt-sign. Không mã màu: chỉ biến của tokens.css (màu trong suốt qua color-mix).
+ * Kết cấu giấy là SVG nhỏ tự vẽ trong frontend/public/img/ (paper-grain.svg, paper-stain.svg).
+ */
+
+@layer base {
+  html {
+    color-scheme: light;
+    -webkit-text-size-adjust: 100%;
+    text-size-adjust: 100%;
+  }
+
+  body {
+    min-height: 100vh;
+    background-color: var(--color-paper);
+    color: var(--color-ink);
+    font-family: var(--font-body);
+    font-size: 1rem;
+    /* Chữ Việt chồng dấu (ố, ẫ, ặ) cần dòng đủ cao để dấu không bị cắt: Fuzzy Bubbles có ascent 0.9em
+       nhưng đỉnh dấu chồng ở 1.147em, nên dòng ≥ 1.744 (0.9 + (1.75 − 1.25) / 2 = 1.15em) */
+    line-height: 1.75;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  h1,
+  h2,
+  h3 {
+    font-family: var(--font-sign);
+    /* Momo Trust Display chỉ có 400: đậm hơn sẽ là đậm giả của trình duyệt */
+    font-weight: 400;
+    /* Đỉnh dấu chồng 1.165em, ascent 1.025em: dòng ≥ 1.58 để "Ổ", "Ự" không chạm dòng trên */
+    line-height: 1.6;
+    color: var(--color-ink);
+  }
+
+  h1 {
+    font-size: 2rem;
+  }
+
+  h2 {
+    font-size: 1.5rem;
+  }
+
+  h3 {
+    font-size: 1.25rem;
+  }
+
+  a {
+    color: var(--color-pen-blue);
+    text-decoration-line: underline;
+    text-decoration-thickness: 1px;
+    text-underline-offset: 3px;
+  }
+
+  a:hover {
+    text-decoration-thickness: 2px;
+  }
+
+  /* Vòng focus rõ trên mọi nền giấy (pen-blue ≥ 6.3:1 trên ba nền) */
+  :focus-visible {
+    outline: 2px solid var(--color-pen-blue);
+    outline-offset: 2px;
+  }
+
+  ::selection {
+    background-color: var(--color-tape);
+    color: var(--color-ink);
+  }
+}
+
+@layer components {
+  /* Khung nội dung của layout.tag */
+  .tt-main {
+    width: 100%;
+    max-width: 72rem;
+    margin-inline: auto;
+    padding: var(--s-5) var(--s-4) var(--s-8);
+  }
+
+  @media (min-width: 48rem) {
+    .tt-main {
+      padding-inline: var(--s-6);
+    }
+  }
+
+  /* Nền giấy ố: hạt giấy lặp + một vệt ố lớn ở góc */
+  .tt-paper {
+    background-color: var(--color-paper);
+    background-image: url("/img/paper-stain.svg"), url("/img/paper-grain.svg");
+    background-repeat: no-repeat, repeat;
+    background-position: right -6rem bottom -6rem, 0 0;
+    background-size: 32rem auto, 180px 180px;
+    color: var(--color-ink);
+  }
+
+  /* Mép sờn: viền ố sẫm dần ra mép, vẽ bằng lớp phủ không bắt chuột */
+  .tt-worn {
+    position: relative;
+  }
+
+  .tt-worn::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    box-shadow:
+      inset 0 0 0 1px color-mix(in srgb, var(--color-ink-soft) 22%, transparent),
+      inset 0 0 18px color-mix(in srgb, var(--color-paper-deep) 85%, transparent);
+  }
+
+  /* Băng dính giấy: dải vàng nhạt hơi trong, xoay lệch, hai đầu xé răng cưa */
+  .tt-tape {
+    display: inline-block;
+    min-width: var(--s-8);
+    padding: var(--s-1) var(--s-3);
+    background-color: color-mix(in srgb, var(--color-tape) 88%, transparent);
+    color: var(--color-ink);
+    box-shadow: 0 1px 0 color-mix(in srgb, var(--color-ink) 12%, transparent);
+    transform: rotate(-2deg);
+    clip-path: polygon(
+      0 8%, 3% 0, 6% 10%, 9% 0, 91% 0, 94% 10%, 97% 0, 100% 8%,
+      100% 92%, 97% 100%, 94% 90%, 91% 100%, 9% 100%, 6% 90%, 3% 100%, 0 92%
+    );
+  }
+
+  /* Chữ đánh máy */
+  .tt-typed {
+    font-family: var(--font-type);
+    font-variant-numeric: tabular-nums;
+    letter-spacing: 0.02em;
+  }
+
+  /* Nét bút bi xanh (Momo Signature nét mảnh, nghiêng như chữ kí, nên phóng nhẹ cho dễ đọc) */
+  .tt-pen {
+    font-family: var(--font-pen);
+    font-size: 1.125em;
+    color: var(--color-pen-blue);
+  }
+
+  /* Bảng hiệu: Momo Trust Display (chỉ có 400) */
+  .tt-sign {
+    font-family: var(--font-sign);
+    font-weight: 400;
+    letter-spacing: 0.01em;
+    color: var(--color-ink);
+  }
+}

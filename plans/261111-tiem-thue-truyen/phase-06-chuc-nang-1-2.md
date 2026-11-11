@@ -66,6 +66,8 @@ Accept (một lệnh): `node scripts/accept/phase-06.mjs` chạy tiêu chí 1–
 | Trang tự tính và lưu tổng tiền (thuộc tính dẫn xuất) | medium | high | Tổng chỉ tính lúc hiển thị; ArchitectureTest và SchemaConformanceTest không cho cột mới |
 | Ngày giờ hẹn đã qua làm hỏng kịch bản ch.2 | high | medium | Ngày tương đối theo Deferred #15 trong smoke và trong kiểm MCP |
 | Chặn đăng nhập sai làm hỏng E2E | medium | low | Ngưỡng cấu hình qua biến; `compose.e2e.yaml` đặt ngưỡng cao hơn số lần sai của kịch bản |
+| Kệ 3D trên điện thoại: ảnh tĩnh chụp cả căn phòng, cảnh 3D phóng vào kệ (để nhãn gáy đọc được), nên khung hình đổi trong 300 ms chuyển mờ (chủ dự án chọn làm ở phase 6, 11/11/2026; `plans/reports/phase-05-ke-3d-sua-261111-0847.md`) | high | low | Lane 6B thêm ảnh tĩnh thứ hai cho khung hẹp (chỉ kệ, khớp góc máy 3D) và trường ảnh tương ứng trong props `ShelfScene` (`docs/contracts.md` §11.4, orchestrator sửa trước khi chia lane); xem lại đề xuất `posterAvifSrcSet` của lane 5C cùng lúc |
+| Việc phase 5 để lại cho trang thật | medium | low | Bảng `tt-ledger-table` chưa có khung cuộn ngang trên điện thoại: trang có nhiều cột bọc bảng trong khung cuộn; dialog shadcn chưa có hoạt cảnh (`tw-animate-css` không nằm trong entry CSS) (`plans/reports/phase-05-token-tag-261111-0812.md` §6) |
 
 ## Rollback
 

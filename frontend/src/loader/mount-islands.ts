@@ -1,5 +1,4 @@
-import type { ComponentType, createElement } from 'react'
-import type { createRoot } from 'react-dom/client'
+import type { ComponentType } from 'react'
 
 /** Props an island receives: the JSON object from its `<script type="application/json">`. */
 export type IslandProps = Record<string, unknown>
@@ -14,17 +13,26 @@ export type IslandLoader = () => Promise<IslandModule>
 /** Island name (the `data-island` value) mapped to its lazy chunk. */
 export type IslandRegistry = ReadonlyMap<string, IslandLoader>
 
-/** The two React functions the loader needs; injectable so tests can observe loading. */
+/** The React half of the loader (island-runtime.tsx); injectable so tests can observe loading. */
 export interface ReactRuntime {
-  createElement: typeof createElement
-  createRoot: typeof createRoot
+  /**
+   * Renders `component` into `element` behind an error boundary. If the island throws while
+   * rendering, the runtime puts the original server HTML back into `element` and calls
+   * `onError` exactly once.
+   */
+  mount(
+    element: HTMLElement,
+    component: ComponentType<IslandProps>,
+    props: IslandProps,
+    onError: (cause: unknown) => void,
+  ): void
 }
 
 export interface MountOptions {
   registry: IslandRegistry
   /** Where to look for islands. Defaults to `document`. */
   root?: ParentNode
-  /** Loads React on demand. Defaults to dynamic `import('react')` + `import('react-dom/client')`. */
+  /** Loads React on demand. Defaults to a dynamic import of ./island-runtime.tsx. */
   loadRuntime?: () => Promise<ReactRuntime>
   /** Receives one message per failed island. Defaults to `console.error`. */
   reportError?: (message: string, cause?: unknown) => void
@@ -36,6 +44,10 @@ export interface IslandFailure {
   message: string
 }
 
+/**
+ * `mounted` lists islands whose first render was scheduled. A render crash happens after
+ * `mountIslands` resolves, so it is reported through `reportError` and appended to `failed` then.
+ */
 export interface MountReport {
   mounted: string[]
   failed: IslandFailure[]
@@ -43,6 +55,12 @@ export interface MountReport {
 
 export const ISLAND_ATTRIBUTE = 'data-island'
 export const PROPS_ATTRIBUTE = 'data-props'
+/**
+ * Set on every `[data-island]` once the loader is done with it, so E2E tests can wait for it:
+ * `mounted` after the first render was scheduled, `failed` when the island was rejected, did not
+ * load or crashed (a crash may land after `mounted` and overrides it; `mounted` never overrides `failed`).
+ */
+export const STATE_ATTRIBUTE = 'data-island-state'
 
 const LOG_PREFIX = '[island-loader]'
 const GLOB_KEY_PATTERN = /\/islands\/([^/]+)\/index\.tsx$/
@@ -64,8 +82,7 @@ export function registryFromGlob(modules: Record<string, IslandLoader>): IslandR
 }
 
 export async function loadReactRuntime(): Promise<ReactRuntime> {
-  const [react, reactDomClient] = await Promise.all([import('react'), import('react-dom/client')])
-  return { createElement: react.createElement, createRoot: reactDomClient.createRoot }
+  return (await import('./island-runtime')).runtime
 }
 
 interface PreparedIsland {
@@ -79,9 +96,9 @@ interface PreparedIsland {
 class IslandError extends Error {}
 
 /**
- * Mounts every `[data-island]` under `root`. Each island fails on its own: a bad name, bad props
- * or a chunk that will not load is reported and the remaining islands still mount. React is only
- * imported when at least one island passed the synchronous checks.
+ * Mounts every `[data-island]` under `root`. Each island fails on its own: a bad name, bad props,
+ * a chunk that will not load or a render crash is reported once and the remaining islands still
+ * mount. React is only imported when at least one island passed the synchronous checks.
  */
 export async function mountIslands(options: MountOptions): Promise<MountReport> {
   const root = options.root ?? document
@@ -90,6 +107,7 @@ export async function mountIslands(options: MountOptions): Promise<MountReport> 
 
   const fail = (name: string, element: HTMLElement, message: string, cause?: unknown): void => {
     report.failed.push({ name, element, message })
+    element.setAttribute(STATE_ATTRIBUTE, 'failed')
     reportError(`${LOG_PREFIX} ${message}`, cause)
   }
 
@@ -106,12 +124,17 @@ export async function mountIslands(options: MountOptions): Promise<MountReport> 
   if (prepared.length === 0) return report
 
   const runtimePromise = (options.loadRuntime ?? loadReactRuntime)()
-  const outcomes = await Promise.allSettled(prepared.map((island) => renderIsland(island, runtimePromise)))
+  const onCrash = (island: PreparedIsland) => (cause: unknown) =>
+    fail(island.name, island.element, `Island "${island.name}" crashed while rendering; the server HTML is kept.`, cause)
+  const outcomes = await Promise.allSettled(
+    prepared.map((island) => renderIsland(island, runtimePromise, onCrash(island))),
+  )
   outcomes.forEach((outcome, index) => {
     const island = prepared[index]
     if (!island) return
     if (outcome.status === 'fulfilled') {
       report.mounted.push(island.name)
+      if (island.element.getAttribute(STATE_ATTRIBUTE) !== 'failed') island.element.setAttribute(STATE_ATTRIBUTE, 'mounted')
       return
     }
     fail(island.name, island.element, `Island "${island.name}" failed to mount.`, outcome.reason)
@@ -156,12 +179,16 @@ function readProps(name: string, element: HTMLElement): IslandProps {
   return parsed as IslandProps
 }
 
-async function renderIsland(island: PreparedIsland, runtimePromise: Promise<ReactRuntime>): Promise<void> {
+async function renderIsland(
+  island: PreparedIsland,
+  runtimePromise: Promise<ReactRuntime>,
+  onError: (cause: unknown) => void,
+): Promise<void> {
   const [module, runtime] = await Promise.all([island.loader(), runtimePromise])
   if (module.default == null) {
     throw new Error(`frontend/src/islands/${island.name}/index.tsx has no default export.`)
   }
-  runtime.createRoot(island.element).render(runtime.createElement(module.default, island.props))
+  runtime.mount(island.element, module.default, island.props, onError)
 }
 
 function defaultReportError(message: string, cause?: unknown): void {
