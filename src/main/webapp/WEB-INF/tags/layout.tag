@@ -4,10 +4,10 @@
   - title (bắt buộc, tiếng Việt): thẻ <title> = "title · Tiệm thuê truyện tuổi thơ".
   - bodyClass (không bắt buộc): lớp thêm vào <body>, sau "tt-paper".
   - In <!doctype html>, <html lang="vi">, <t:assets/> (CSS và loader island của Vite), thân trang trong <main>.
-  - Preload Be Vietnam Pro 400 và Xanh Mono 400 (subset latin + vietnamese). URL cố định vì fonts.css nạp
-    các file chép nguyên byte từ Fontsource vào frontend/public/fonts/ (Vite phát ra /static/fonts/ không
-    đổi tên); check-font-subsets.mjs kiểm từng href dưới đây có file thật. Patrick Hand, Fraunces và
-    Be Vietnam Pro 500/600 nạp lười theo font-display: swap.
+  - Preload Fuzzy Bubbles 400 và Momo Trust Sans (variable) (subset latin + vietnamese). URL cố định vì
+    fonts.css nạp các file chép nguyên byte từ Fontsource vào frontend/public/fonts/ (Vite phát ra
+    /static/fonts/ không đổi tên); check-font-subsets.mjs kiểm từng href dưới đây có file thật.
+    Fuzzy Bubbles 700, Momo Signature và Momo Trust Display nạp lười theo font-display: swap.
   - CSP style-src 'self': không <style>, không style=.
   Trang dùng khung phải tự khai <%@ page contentType="text/html; charset=UTF-8" %>.
 --%>
@@ -23,10 +23,10 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>${fn:escapeXml(title)} · Tiệm thuê truyện tuổi thơ</title>
   <link rel="icon" href="${pageContext.request.contextPath}/static/img/favicon.svg" type="image/svg+xml">
-  <link rel="preload" href="${pageContext.request.contextPath}/static/fonts/be-vietnam-pro-vietnamese-400-normal.woff2" as="font" type="font/woff2" crossorigin>
-  <link rel="preload" href="${pageContext.request.contextPath}/static/fonts/be-vietnam-pro-latin-400-normal.woff2" as="font" type="font/woff2" crossorigin>
-  <link rel="preload" href="${pageContext.request.contextPath}/static/fonts/xanh-mono-vietnamese-400-normal.woff2" as="font" type="font/woff2" crossorigin>
-  <link rel="preload" href="${pageContext.request.contextPath}/static/fonts/xanh-mono-latin-400-normal.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="preload" href="${pageContext.request.contextPath}/static/fonts/fuzzy-bubbles-vietnamese-400-normal.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="preload" href="${pageContext.request.contextPath}/static/fonts/fuzzy-bubbles-latin-400-normal.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="preload" href="${pageContext.request.contextPath}/static/fonts/momo-trust-sans-vietnamese-wght-normal.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="preload" href="${pageContext.request.contextPath}/static/fonts/momo-trust-sans-latin-wght-normal.woff2" as="font" type="font/woff2" crossorigin>
   <t:assets/>
 </head>
 <body class="tt-paper${empty bodyClass ? '' : ' '}${fn:escapeXml(bodyClass)}">

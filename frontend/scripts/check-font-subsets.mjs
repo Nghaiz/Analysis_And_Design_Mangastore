@@ -13,8 +13,10 @@
 //      (fonts.googleapis.com, fonts.gstatic.com, CDN).
 //   4. Bản chép trong frontend/public/fonts/ (woff2 và giấy phép OFL của từng họ) giống từng byte file
 //      của gói Fontsource đang cài; không có file lạ.
-//   5. layout.tag preload đúng các file của họ preload (Be Vietnam Pro, Xanh Mono), không preload họ
-//      nạp lười, và mọi href preload có file thật trong build.
+//   5. layout.tag preload đúng các file của họ preload (Fuzzy Bubbles 400, Momo Trust Sans), không preload
+//      họ nạp lười, và mọi href preload có file thật trong build.
+//   6. Mọi tên họ font trong font-family và biến --font-* của CSS đã build là một trong bốn họ tự host,
+//      một font hệ thống dự phòng (SYSTEM_FALLBACKS) hay từ khoá CSS: họ font đã bỏ còn sót là vi phạm.
 // Exit 0: đạt. Exit 1: vi phạm (liệt kê từng dòng). Exit 2: thiếu đầu vào (chưa build, chưa npm ci).
 import { copyFileSync, existsSync, mkdirSync, readdirSync, readFileSync } from 'node:fs';
 import { dirname, join, relative } from 'node:path';
@@ -33,36 +35,52 @@ const SUBSETS = {
   latin: { probe: [0x0000, 0x00ff], label: 'U+0000-00FF' },
 };
 
-// Data: họ font → gói Fontsource, độ đậm, tên file trong gói, có preload hay không.
+// Data: họ font → gói Fontsource, độ đậm, tên file trong gói, có preload hay không (docs/design-tokens.md §2).
 const FAMILIES = [
   {
-    family: 'Be Vietnam Pro',
-    pkg: '@fontsource/be-vietnam-pro',
-    weights: ['400', '500', '600'],
+    family: 'Fuzzy Bubbles',
+    pkg: '@fontsource/fuzzy-bubbles',
+    weights: ['400', '700'],
     preloadWeights: ['400'],
-    file: (subset, weight) => `be-vietnam-pro-${subset}-${weight}-normal.woff2`,
+    file: (subset, weight) => `fuzzy-bubbles-${subset}-${weight}-normal.woff2`,
   },
   {
-    family: 'Xanh Mono',
-    pkg: '@fontsource/xanh-mono',
-    weights: ['400'],
-    preloadWeights: ['400'],
-    file: (subset, weight) => `xanh-mono-${subset}-${weight}-normal.woff2`,
+    family: 'Momo Trust Sans',
+    pkg: '@fontsource-variable/momo-trust-sans',
+    weights: ['200 800'],
+    preloadWeights: ['200 800'],
+    file: (subset) => `momo-trust-sans-${subset}-wght-normal.woff2`,
   },
   {
-    family: 'Patrick Hand',
-    pkg: '@fontsource/patrick-hand',
+    family: 'Momo Signature',
+    pkg: '@fontsource/momo-signature',
     weights: ['400'],
     preloadWeights: [],
-    file: (subset, weight) => `patrick-hand-${subset}-${weight}-normal.woff2`,
+    file: (subset, weight) => `momo-signature-${subset}-${weight}-normal.woff2`,
   },
   {
-    family: 'Fraunces',
-    pkg: '@fontsource-variable/fraunces',
-    weights: ['100 900'],
+    family: 'Momo Trust Display',
+    pkg: '@fontsource/momo-trust-display',
+    weights: ['400'],
     preloadWeights: [],
-    file: (subset) => `fraunces-${subset}-soft-normal.woff2`,
+    file: (subset, weight) => `momo-trust-display-${subset}-${weight}-normal.woff2`,
   },
+];
+
+// Tên được phép trong font-family và biến --font-* của CSS đã build, ngoài bốn họ tự host: font hệ thống
+// dự phòng của tokens.css, stack mặc định của Tailwind, từ khoá chung của CSS. Họ nào khác (ví dụ một họ
+// font đã bỏ còn sót trong stack hay @font-face) là vi phạm.
+const SYSTEM_FALLBACKS = [
+  'system-ui', 'Segoe UI', 'Roboto', 'Segoe Script', 'Segoe Print',
+  'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji',
+  'SFMono-Regular', 'Menlo', 'Monaco', 'Consolas', 'Liberation Mono', 'Courier New',
+  // stack dự phòng của preflight Tailwind: font-family: var(--default-font-family, …)
+  '-apple-system', 'BlinkMacSystemFont', 'Helvetica Neue', 'Noto Sans', 'Arial',
+];
+const CSS_KEYWORDS = [
+  'serif', 'sans-serif', 'monospace', 'cursive', 'fantasy', 'math', 'emoji', 'fangsong',
+  'ui-serif', 'ui-sans-serif', 'ui-monospace', 'ui-rounded',
+  'inherit', 'initial', 'unset', 'revert', 'revert-layer',
 ];
 
 const TAG = '[check-font-subsets]';
@@ -138,6 +156,23 @@ function parseFontFaces(css, file) {
   return faces;
 }
 
+/** Mọi tên họ font trong font-family, --*-font-family và --font-<tên> (bỏ qua --font-weight-*, --font-<tên>--*) */
+function familyNames(css) {
+  const out = [];
+  for (const m of css.matchAll(/(?<![\w-])(font-family|--[\w-]*font-family|--font-(?!weight-)[\w-]+)\s*:\s*([^;}]+)/g)) {
+    const prop = m[1];
+    if (/^--font-[\w-]*--/.test(prop)) continue; // --font-x--font-feature-settings…: không phải họ font
+    // var(--x, a, b) → a, b: tên trong phần dự phòng của var() cũng phải hợp lệ
+    const value = m[2].replace(/!important\s*$/i, '').replace(/var\(\s*--[\w-]+\s*,?/g, '').replace(/\)/g, '');
+    for (const raw of value.split(',')) {
+      const name = raw.trim().replace(/^["']|["']$/g, '');
+      if (name === '') continue;
+      out.push({ prop, name });
+    }
+  }
+  return out;
+}
+
 function main() {
   if (args.includes('--sync')) return sync();
 
@@ -177,6 +212,16 @@ function main() {
       const onDisk = join(STATIC_DIR, url.slice(PUBLIC_BASE.length));
       if (!existsSync(onDisk)) {
         violations.push(`${face.file}: "${face.family}" trỏ tới ${url} nhưng không có ${relative(ROOT, onDisk)} → chạy --sync rồi build lại`);
+      }
+    }
+  }
+
+  // 6. Không còn họ font lạ (họ đã bỏ) trong @font-face, font-family hay biến --font-*
+  const allowed = new Set([...FAMILIES.map((f) => f.family), ...SYSTEM_FALLBACKS, ...CSS_KEYWORDS].map((n) => n.toLowerCase()));
+  for (const f of cssFiles) {
+    for (const { prop, name } of familyNames(readFileSync(join(cssDir, f), 'utf8'))) {
+      if (!allowed.has(name.toLowerCase())) {
+        violations.push(`${f}: ${prop} có họ font "${name}" không thuộc bốn họ tự host hay font hệ thống dự phòng → bỏ khỏi frontend/src/styles/ (tokens.css, fonts.css…)`);
       }
     }
   }
@@ -246,10 +291,10 @@ function main() {
   const families = FAMILIES.length;
   if (violations.length) {
     for (const v of violations) console.error(`${TAG} FAIL ${v}`);
-    console.error(`${TAG} FAIL ${violations.length} vi phạm (ngưỡng: ${families} họ font đều có subset vietnamese + latin, không subset khác, không URL ngoài)`);
+    console.error(`${TAG} FAIL ${violations.length} vi phạm (ngưỡng: ${families} họ font đều có subset vietnamese + latin, không subset khác, không URL ngoài, không họ font lạ)`);
     process.exit(1);
   }
-  console.log(`${TAG} PASS ${families} họ font có subset vietnamese (U+1EA0-1EF9) và latin; ${faces.length} @font-face trong ${cssFiles.length} file CSS; ${copies.length} file (woff2 + OFL) khớp Fontsource; ${preloads.length} preload đúng`);
+  console.log(`${TAG} PASS ${families} họ font có subset vietnamese (U+1EA0-1EF9) và latin; ${faces.length} @font-face trong ${cssFiles.length} file CSS; ${copies.length} file (woff2 + OFL) khớp Fontsource; ${preloads.length} preload đúng; không họ font lạ`);
 }
 
 main();

@@ -17,8 +17,9 @@
     color: var(--color-ink);
     font-family: var(--font-body);
     font-size: 1rem;
-    /* Chữ Việt chồng dấu (ố, ẫ, ặ) cần dòng đủ cao để dấu không bị cắt */
-    line-height: 1.6;
+    /* Chữ Việt chồng dấu (ố, ẫ, ặ) cần dòng đủ cao để dấu không bị cắt: Fuzzy Bubbles có ascent 0.9em
+       nhưng đỉnh dấu chồng ở 1.147em, nên dòng ≥ 1.744 (0.9 + (1.75 − 1.25) / 2 = 1.15em) */
+    line-height: 1.75;
     -webkit-font-smoothing: antialiased;
   }
 
@@ -26,9 +27,10 @@
   h2,
   h3 {
     font-family: var(--font-sign);
-    font-variation-settings: "SOFT" 100;
-    font-weight: 600;
-    line-height: 1.3;
+    /* Momo Trust Display chỉ có 400: đậm hơn sẽ là đậm giả của trình duyệt */
+    font-weight: 400;
+    /* Đỉnh dấu chồng 1.165em, ascent 1.025em: dòng ≥ 1.58 để "Ổ", "Ự" không chạm dòng trên */
+    line-height: 1.6;
     color: var(--color-ink);
   }
 
@@ -125,21 +127,21 @@
   /* Chữ đánh máy */
   .tt-typed {
     font-family: var(--font-type);
+    font-variant-numeric: tabular-nums;
     letter-spacing: 0.02em;
   }
 
-  /* Nét bút bi xanh (Patrick Hand nhỏ hơn cùng cỡ chữ thân, nên phóng nhẹ) */
+  /* Nét bút bi xanh (Momo Signature nét mảnh, nghiêng như chữ kí, nên phóng nhẹ cho dễ đọc) */
   .tt-pen {
     font-family: var(--font-pen);
     font-size: 1.125em;
     color: var(--color-pen-blue);
   }
 
-  /* Bảng hiệu: Fraunces trục SOFT */
+  /* Bảng hiệu: Momo Trust Display (chỉ có 400) */
   .tt-sign {
     font-family: var(--font-sign);
-    font-variation-settings: "SOFT" 100;
-    font-weight: 700;
+    font-weight: 400;
     letter-spacing: 0.01em;
     color: var(--color-ink);
   }

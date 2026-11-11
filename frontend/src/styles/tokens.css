@@ -22,15 +22,26 @@
   --color-lamp: #F6C453;
 
   /* Font (docs/design-tokens.md §2; @font-face ở fonts.css) */
-  --font-body: "Be Vietnam Pro", system-ui, "Segoe UI", Roboto, sans-serif;
-  --font-type: "Xanh Mono", ui-monospace, "Cascadia Mono", Consolas, monospace;
-  --font-pen: "Patrick Hand", "Segoe Print", cursive;
-  --font-sign: "Fraunces", Georgia, "Times New Roman", serif;
-  /* Tiện ích font-sign bật trục SOFT của Fraunces (giống lớp .tt-sign) */
-  --font-sign--font-variation-settings: "SOFT" 100;
+  --font-body: "Fuzzy Bubbles", system-ui, "Segoe UI", Roboto, sans-serif;
+  --font-type: "Momo Trust Sans", system-ui, "Segoe UI", Roboto, sans-serif;
+  --font-pen: "Momo Signature", "Segoe Script", "Segoe Print", cursive;
+  --font-sign: "Momo Trust Display", system-ui, "Segoe UI", Roboto, sans-serif;
   /* Font mặc định của preflight (html, code) trỏ về hai font chính */
   --font-sans: var(--font-body);
   --font-mono: var(--font-type);
+
+  /* Dòng cao cho chữ Việt chồng dấu: dòng mặc định của tiện ích text-* (1.33–1.5) thấp hơn tầm cao
+     của dấu chồng trên Fuzzy Bubbles (đỉnh 1.147em, đáy 0.362em), nên hai dòng bẻ của "Ố", "Ẫ" chạm
+     nhau. 1.75 = 0.9em (ascent) + nửa phần dư ≥ 1.147em. Cỡ 3xl, 4xl dùng cho tiêu đề Momo Trust Display
+     (đỉnh dấu 1.165em, ascent 1.025em) nên 1.6 là đủ. */
+  --text-xs--line-height: 1.75;
+  --text-sm--line-height: 1.75;
+  --text-base--line-height: 1.75;
+  --text-lg--line-height: 1.75;
+  --text-xl--line-height: 1.75;
+  --text-2xl--line-height: 1.75;
+  --text-3xl--line-height: 1.6;
+  --text-4xl--line-height: 1.6;
 
   /* Khoảng cách bậc 4px (docs/design-tokens.md §3); --spacing để p-4 = 16px */
   --spacing: 4px;

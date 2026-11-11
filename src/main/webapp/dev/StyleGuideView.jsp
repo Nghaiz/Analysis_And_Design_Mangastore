@@ -86,30 +86,26 @@
   <%-- ===================== Font ===================== --%>
   <section id="font" class="mb-16" aria-labelledby="font-h">
     <h2 id="font-h">Font</h2>
-    <p class="text-ink-soft">Tự host, chỉ subset latin và vietnamese. Be Vietnam Pro và Xanh Mono được preload; Patrick Hand và Fraunces nạp lười.</p>
+    <p class="text-ink-soft">Tự host, chỉ subset latin và vietnamese, cả bốn họ giấy phép SIL OFL 1.1. Fuzzy Bubbles 400 và Momo Trust Sans được preload; Fuzzy Bubbles 700, Momo Signature và Momo Trust Display nạp lười.</p>
     <dl class="grid gap-4">
       <div class="border-b border-ink-soft pb-3">
-        <dt class="tt-typed text-sm text-ink-soft">--font-body · Be Vietnam Pro 400</dt>
+        <dt class="tt-typed text-sm text-ink-soft">--font-body · Fuzzy Bubbles 400</dt>
         <dd class="m-0 font-body text-2xl font-normal">Đã huỷ · Ố vàng · Nguyễn Thu Hà · Thám tử lừng danh Conan</dd>
       </div>
       <div class="border-b border-ink-soft pb-3">
-        <dt class="tt-typed text-sm text-ink-soft">--font-body · Be Vietnam Pro 500</dt>
-        <dd class="m-0 font-body text-2xl font-medium">Đã huỷ · Ố vàng · Nguyễn Thu Hà · Thám tử lừng danh Conan</dd>
+        <dt class="tt-typed text-sm text-ink-soft">--font-body · Fuzzy Bubbles 700</dt>
+        <dd class="m-0 font-body text-2xl font-bold">Đã huỷ · Ố vàng · Nguyễn Thu Hà · Thám tử lừng danh Conan</dd>
       </div>
       <div class="border-b border-ink-soft pb-3">
-        <dt class="tt-typed text-sm text-ink-soft">--font-body · Be Vietnam Pro 600</dt>
-        <dd class="m-0 font-body text-2xl font-semibold">Đã huỷ · Ố vàng · Nguyễn Thu Hà · Thám tử lừng danh Conan</dd>
+        <dt class="tt-typed text-sm text-ink-soft">--font-type · Momo Trust Sans (variable, wght 200–800) 400</dt>
+        <dd class="m-0 font-type text-2xl font-normal">Đã huỷ · Ố vàng · Nguyễn Thu Hà · Thám tử lừng danh Conan</dd>
       </div>
       <div class="border-b border-ink-soft pb-3">
-        <dt class="tt-typed text-sm text-ink-soft">--font-type · Xanh Mono 400</dt>
-        <dd class="m-0 font-type text-2xl">Đã huỷ · Ố vàng · Nguyễn Thu Hà · Thám tử lừng danh Conan</dd>
-      </div>
-      <div class="border-b border-ink-soft pb-3">
-        <dt class="tt-typed text-sm text-ink-soft">--font-pen · Patrick Hand 400</dt>
+        <dt class="tt-typed text-sm text-ink-soft">--font-pen · Momo Signature 400</dt>
         <dd class="m-0 font-pen text-2xl">Đã huỷ · Ố vàng · Nguyễn Thu Hà · Thám tử lừng danh Conan</dd>
       </div>
       <div class="border-b border-ink-soft pb-3">
-        <dt class="tt-typed text-sm text-ink-soft">--font-sign · Fraunces (trục SOFT)</dt>
+        <dt class="tt-typed text-sm text-ink-soft">--font-sign · Momo Trust Display 400</dt>
         <dd class="tt-sign m-0 text-2xl">Đã huỷ · Ố vàng · Nguyễn Thu Hà · Thám tử lừng danh Conan</dd>
       </div>
     </dl>
@@ -208,9 +204,9 @@
         <tr><th scope="col">Mã</th><th scope="col">Tên đầu truyện</th><th scope="col">Mã vạch</th><th scope="col">Giá thuê/ngày</th><th scope="col">Tình trạng khi giao</th></tr>
       </thead>
       <tbody>
-        <tr><td>DT001</td><td>Thám tử lừng danh Conan - Tập 1</td><td class="font-type">DT001-03</td><td>3.000đ</td><td><ui:condition-tag text="Không có lỗi"/></td></tr>
-        <tr><td>DT002</td><td>Doraemon - Tập 5</td><td class="font-type">DT002-01</td><td>2.000đ</td><td><ui:condition-tag text="Rách bìa, Vết bẩn, viết vẽ"/></td></tr>
-        <tr><td>DT003</td><td>Thần đồng đất Việt - Tập 12</td><td class="font-type">DT003-02</td><td>2.500đ</td><td><ui:condition-tag text=""/></td></tr>
+        <tr><td>DT001</td><td>Thám tử lừng danh Conan - Tập 1</td><td class="font-type tabular-nums">DT001-03</td><td>3.000đ</td><td><ui:condition-tag text="Không có lỗi"/></td></tr>
+        <tr><td>DT002</td><td>Doraemon - Tập 5</td><td class="font-type tabular-nums">DT002-01</td><td>2.000đ</td><td><ui:condition-tag text="Rách bìa, Vết bẩn, viết vẽ"/></td></tr>
+        <tr><td>DT003</td><td>Thần đồng đất Việt - Tập 12</td><td class="font-type tabular-nums">DT003-02</td><td>2.500đ</td><td><ui:condition-tag text=""/></td></tr>
       </tbody>
     </ui:ledger-table>
 
@@ -279,10 +275,10 @@
           </div>
 
           <ul class="grid gap-2">
-            <li class="font-body">Be Vietnam Pro: Đã huỷ · Ố vàng · Nguyễn Thu Hà · Thám tử lừng danh Conan</li>
-            <li class="font-type">Xanh Mono: Đã huỷ · Ố vàng · Nguyễn Thu Hà · Thám tử lừng danh Conan</li>
-            <li class="font-pen">Patrick Hand: Đã huỷ · Ố vàng · Nguyễn Thu Hà · Thám tử lừng danh Conan</li>
-            <li class="font-sign">Fraunces: Đã huỷ · Ố vàng · Nguyễn Thu Hà · Thám tử lừng danh Conan</li>
+            <li class="font-body">Fuzzy Bubbles: Đã huỷ · Ố vàng · Nguyễn Thu Hà · Thám tử lừng danh Conan</li>
+            <li class="font-type">Momo Trust Sans: Đã huỷ · Ố vàng · Nguyễn Thu Hà · Thám tử lừng danh Conan</li>
+            <li class="font-pen">Momo Signature: Đã huỷ · Ố vàng · Nguyễn Thu Hà · Thám tử lừng danh Conan</li>
+            <li class="font-sign">Momo Trust Display: Đã huỷ · Ố vàng · Nguyễn Thu Hà · Thám tử lừng danh Conan</li>
           </ul>
         </div>
       </div>
