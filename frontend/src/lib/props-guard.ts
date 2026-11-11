@@ -1,6 +1,6 @@
 // Kiểm props JSON từ JSP (docs/contracts.md §11): sai thì ném lỗi nêu đúng đường dẫn trường, để
-// loader báo một lần ra console và giữ nguyên HTML của trang. Dùng chung cho ProcessBillDesk và
-// CollateralDrawer (đề xuất chuyển sang frontend/src/lib/ ghi trong báo cáo lane 7C).
+// loader báo một lần ra console và giữ nguyên HTML của trang. Dùng chung cho SelectedStack,
+// ProcessBillDesk và CollateralDrawer.
 
 export type RawProps = Record<string, unknown>
 
