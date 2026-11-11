@@ -68,6 +68,7 @@ Quy ước chung của chín trang:
 | Hai khoản cọc cùng loại | cho phép (`AddRentalCollateralView`, nhánh `lnkChooseCollateral`) | Kiểm |
 | Loại lỗi đã ghi bị chọn lại → `DAMAGE_ALREADY_RECORDED` | `AddConditionView.jsp:136` | HTTP (bản đầu) |
 | Lỗi mới tạo rồi "Quay lại" không lưu tình trạng | loại lỗi ở DB; chỉ bản sao `rentedBook` có lỗi đó, ProcessRentalBillView bỏ bản sao (C6) | Kiểm |
+| Lưu danh sách quyển chỉ ghi danh sách (orchestrator chốt 11/11/2026, theo §2 và §9.2 AddConditionView): ngày, giảm giá, ghi chú, nhân viên, cọc, tình trạng đang sửa không xuống DB trước khi xác nhận | `doUpdateRentedBookList.jsp:28` (`listOnlyCopy`), `:90` (gọi `updateRentalBill` với bản sao); `true` thì chép id và quyển thực giao K1 về dòng trong session, `rentalBill` trong session giữ ngày, cọc, tình trạng đang sửa | Kiểm (đọc `RentalBillDAO.saveBill`: ghi theo bản truyền vào, xoá con không có trong bản, K1 cho dòng `id = 0`); JspC 0 lỗi |
 
 ## 4. Chạy thật trên stack riêng (`-p tiemtruyen-7b`, cổng 8085)
 
@@ -81,7 +82,7 @@ Lượt đầu (trước edge case, filter khung cho qua): dựng stack xong; JS
 
 ## 6. Điểm cần orchestrator xem (DONE_WITH_CONCERNS)
 
-1. `doUpdateRentedBookList` gọi `updateRentalBill` với cả phiếu trong session (đúng §9.2), nên lần "Lưu" danh sách cũng ghi xuống DB `borrowDate`, `dueDate` (mặc định C7 do SearchRentalBillView đặt), giảm giá, ghi chú, tình trạng và khoản cọc đang có trong session, khi phiếu vẫn "Chờ nhận". §2 nói `borrowDate`, `dueDate` NULL tới khi giao và §9.2 AddConditionView nói tình trạng ghi khi xác nhận. Hợp đồng không nói cách tránh; tôi theo đúng chữ §9.2. Nếu cần giữ DB sạch tới lúc giao thì phải chốt lại (ví dụ trang gửi một bản phiếu chỉ đổi danh sách).
+1. (Đã giải quyết) Trước đây lần "Lưu" danh sách ghi cả trạng thái bàn quầy xuống DB. Orchestrator chốt 11/11/2026: chỉ ghi danh sách quyển qua bản sao `listOnlyCopy` (mục 3.3, dòng cuối).
 2. `AddConditionView` "Lưu tình trạng" khi quyển của bản sao không còn trong `rentalBill` (danh sách vừa lưu ở thẻ khác): tôi forward ProcessRentalBillView kèm `RENTAL_BILL_CHANGED` thay vì 500 (`AddConditionView.jsp`, nhánh `index < 0`). Hợp đồng không có dòng cho trường hợp này.
 3. `AddRentedBookView` luôn hiện `listBook` đang có trong session (kể cả kết quả tìm lần trước); ch.2 bước 11.6 nói bảng ban đầu rỗng, nhưng §7 không cho trang này bỏ `listBook`.
 4. Mọi lần gửi về AddConditionView ghi `txtConditionNote` vào bản sao (theo lời nhắn orchestrator); bản sao chỉ vào `rentalBill` khi "Lưu tình trạng", nên "Quay lại" vẫn không lưu.
