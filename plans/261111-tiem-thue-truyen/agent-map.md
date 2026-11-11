@@ -19,16 +19,13 @@ Nhánh phase: `phase/06-chuc-nang-1-2` (worktree `D:/Coding/mangastore-wt/06-orc
 
 | Lane | Agent | Bắt đầu | Worktree / nhánh | Báo cáo |
 |---|---|---|---|---|
-| 6A `filter-chung` | `t1k-web-core-developer` | 2026-11-11 | `06-filter-chung` / `lane/06-chuc-nang-1-2/filter-chung` | |
-| 6D `island-selected-stack` | `t1k-web-core-developer` | 2026-11-11 | `06-island-selected-stack` / `lane/06-chuc-nang-1-2/island-selected-stack` | |
-| 6C `trang-m2` | `t1k-web-core-developer` | 2026-11-11 | `06-trang-m2` / `lane/06-chuc-nang-1-2/trang-m2` | |
+| 6F `xac-minh-m2` | `t1k-web-testing-tester` | 2026-11-11 | 06-orch (chỉ ghi `plans/reports/`), stack `tiemtruyen-m2` 8083 | |
 
 ## Hàng đợi
 
 | Thứ tự | Lane | Chờ gì |
 |---|---|---|
-| 2 | 6E `xac-minh-m1` | 6A, 6B đã merge |
-| 3 | 6F `xac-minh-m2` | 6C, 6D đã merge |
+| 1 | 6E phần khổ 390 còn lại | 6F xong (trình duyệt Playwright MCP dùng chung, mỗi lúc một lane) |
 
 ## Bảng lane
 
@@ -62,12 +59,13 @@ Nhánh phase: `phase/06-chuc-nang-1-2` (worktree `D:/Coding/mangastore-wt/06-orc
 | 5 | 5C `ke-3d` | ShelfScene, quạt trần, ảnh tĩnh, HomePreview | `t1k-web-core-developer` | xem `phase-05` | 5.0 | xong (b5de396) | `plans/reports/phase-05-ke-3d-261111-0801.md` |
 | 5 | 5D `xac-minh` | Playwright MCP và đo Lighthouse | `t1k-web-testing-tester` | `plans/reports/` | 5A, 5B, 5C | xong | `plans/reports/phase-05-xac-minh-261111-0828.md` |
 | 6 | 6.0 orchestrator | web.xml filter, compose e2e, smoke M1–M2, Accept | phiên chính | xem `phase-06` | phase 4, 5 | đang chạy (hợp đồng a96abb6) | `phase-06-integration.md` |
-| 6 | 6A `filter-chung` | 5 filter, csrf tag, trang lỗi | `t1k-web-core-developer` | xem `phase-06` | 6.0 | đang chạy | |
-| 6 | 6B `trang-m1` | 5 trang M1 | `t1k-web-core-developer` | xem `phase-06` | 6.0 | xong, merge (48c0823); chưa chạy trên Tomcat (Docker hỏng 10:56–11:20), smoke kiểm sau khi 6A merge | `plans/reports/phase-06-trang-m1-261111-1110.md` |
-| 6 | 6C `trang-m2` | 9 trang M2 | `t1k-web-core-developer` | xem `phase-06` | 6.0 | đang chạy | |
-| 6 | 6D `island-selected-stack` | island SelectedStack | `t1k-web-core-developer` | `frontend/src/islands/SelectedStack/**` | 6.0, chỗ trống | đang chạy (thêm loader submit-on-change, nút OK hộp báo) | |
-| 6 | 6E `xac-minh-m1` | Playwright MCP chức năng 1 | `t1k-web-testing-tester` | `plans/reports/` | 6A, 6B | chờ | |
-| 6 | 6F `xac-minh-m2` | Playwright MCP chức năng 2 | `t1k-web-testing-tester` | `plans/reports/` | 6C, 6D | chờ | |
+| 6 | 6A `filter-chung` | 5 filter, csrf tag, trang lỗi | `t1k-web-core-developer` | xem `phase-06` | 6.0 | xong 3 vòng, merge (038d316, 3481296): Redisson, error.jsp, header, 400 khi %-hỏng, trang 400/413/414 nginx | |
+| 6 | 6B `trang-m1` | 5 trang M1 | `t1k-web-core-developer` | xem `phase-06` | 6.0 | xong, merge (48c0823); ClientHomeView thêm hộp thông báo (71165d9) | `plans/reports/phase-06-trang-m1-261111-1110.md` |
+| 6 | 6C `trang-m2` | 9 trang M2 | `t1k-web-core-developer` | xem `phase-06` | 6.0 | xong, merge (d5de2df) | |
+| 6 | 6D `island-selected-stack` | island SelectedStack | `t1k-web-core-developer` | `frontend/src/islands/SelectedStack/**` | 6.0, chỗ trống | xong, merge (799d807); nút OK về ô nhập đầu (258c6f5) | |
+| 6 | 6E `xac-minh-m1` | Playwright MCP chức năng 1 | `t1k-web-testing-tester` | `plans/reports/` | 6A, 6B | DONE_WITH_CONCERNS: 1440 PASS, 390 tới ngoại lệ 6.2 (`phase-06-xac-minh-m1-261111-1158.md`) | |
+| 6 | 6G `dao-dong-gio` | C21 dòng giỏ trong K1, updateCart khoá giỏ, nút Tạo phiếu mượn không trùng | `t1k-web-core-developer` | RentalBillDAO, CartDAO, test DAO, doAddRentalBill.jsp, SearchBookView.jsp | 6C | xong, merge (28d08c5, 1784105); làm đỏ 34/41, 1/41 | |
+| 6 | 6F `xac-minh-m2` | Playwright MCP chức năng 2 | `t1k-web-testing-tester` | `plans/reports/` | 6C, 6D | đang chạy (stack 8083) | |
 | 7 | 7.0 orchestrator | smoke M3, Accept | phiên chính | xem `phase-07` | phase 6 | chờ | |
 | 7 | 7A `quay-xu-li` | đăng nhập NV, tìm, xử lí, xác nhận, in | `t1k-web-core-developer` | xem `phase-07` | 7.0 | chờ | |
 | 7 | 7B `tinh-trang-coc` | sửa danh sách, tình trạng, lỗi, cọc | `t1k-web-core-developer` | xem `phase-07` | 7.0 | chờ | |
@@ -115,3 +113,4 @@ Nhánh phase: `phase/06-chuc-nang-1-2` (worktree `D:/Coding/mangastore-wt/06-orc
 | 2026-11-11 | Docker Desktop hỏng ~10:56 (API 500), chủ dự án khởi động lại ~11:20. 6B xong (DONE_WITH_CONCERNS: chưa chạy Tomcat), merge; sửa LoginView sang session mới. 6A DONE_WITH_CONCERNS (thiếu Redisson trong pom) → orchestrator thêm Redisson provided, error.jsp mặc định (a0bc269), nhắn 6A làm tiếp. Mở 6D |
 | 2026-11-11 | Docker treo lần hai (hai phiên cùng chạy nhiều stack và Testcontainers). Thoả thuận với phiên phase 7: tối đa 2 stack compose trên máy (phase 6 giữ 1: 6c, rồi e2e của orchestrator), `mvnw verify` đủ chỉ orchestrator chạy và báo phiên kia "verify bắt đầu/xong", stack thường `tiemtruyen` tắt khi không ai dùng (down, không -v). 6A, 6D không dùng Docker; 6C chỉ dựng stack khi `docker info` trả lời; chủ dự án tự khởi động lại Docker. C20 `uncheckedBarcodes` (5216e6e) |
 | 2026-11-11 | 6C DONE_WITH_CONCERNS (chưa chạy stack vì Docker), merge (d5de2df); 6A DONE vòng 2 (Redisson, error.jsp, header, token mới sau đăng nhập), merge (038d316), SHA gửi phiên phase 7; verify đủ 358 test xanh. Đề xuất 4 của 6C (dòng giỏ bị xoá hoặc đã thuộc phiếu khác khi khách dùng hai thiết bị → 500 hoặc phiếu trùng) → câu §10.3 thứ 9 `SELECTED_BOOKS_CHANGED` + C21 (3e5d5fd), mở lane 6G `dao-dong-gio` (worktree `06-dao-dong-gio`, Owns RentalBillDAO, test DAO, doAddRentalBill.jsp, SearchBookView.jsp). 6D DONE_WITH_CONCERNS, merge (799d807); nút "Tạo phiếu mượn" trùng khi có JS giao 6G. Stack thường down (không -v), dựng tiemtruyen-e2e |
+| 2026-11-11 | Docker treo lần 3, 4 (VM 3 GB / 3 CPU). Chủ dự án duyệt nâng: `.wslconfig` memory=12GB, processors=8, swap=4GB (bản cũ `.wslconfig.bak-261111`), VM giờ 12,5 GB / 8 CPU; mỗi phiên một stack lại. Codec Redisson Kryo tràn stack với vòng Book↔BookCopy → SerializationCodec + test codec runtime (phiên phase 7, cherry-pick 585c504). 6G merge, §6.1 ghi khoá dòng giỏ (ab66866). verify đủ 400 xanh; smoke 49 bước ALL PASS; rate limit Redis 11/11 (stack tạm 8082); tiem-contract-guard 0 vi phạm, 4 cảnh báo (sửa 2: §9.1 trang lỗi, "(chưa ghi nhận)"). 6E: nút OK về BODY khi không có ô sai → sửa (258c6f5); hai lane Playwright dùng chung một trình duyệt MCP → mỗi lúc một lane |
