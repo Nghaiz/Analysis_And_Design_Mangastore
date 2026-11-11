@@ -65,6 +65,7 @@ public boolean addDamage(Damage damage) throws SQLException {
 - Cấm mọi hàm đọc một đối tượng theo id, kể cả `private` dùng làm "tiện": D9 đọc lại bằng `searchRentalBill("PM" + id)` hoặc `getRentalBillList(client)` ở **trang**, không ở DAO.
 - Không tin `book.listBookCopy` trong session để giữ quyển; K1 luôn đọc lại trong transaction.
 - Tiền là `float` như ch.9 (C13); không đổi sang `BigDecimal`. Kiểu mảng `T[]` là `List<T>`.
+- Checkstyle `MagicNumber` bắt chỉ số tham số `PreparedStatement` từ 3 trở lên (`ps.setString(3, …)`). Dùng biến đếm: `int p = 1; ps.setString(p++, …); ps.setInt(p++, …);` thay cho hằng số hay `@SuppressWarnings`.
 - Collation `utf8mb4_0900_ai_ci`: "doraemon" khớp "Doraemon", "huỷ" khớp "huy". UNIQUE cũng không phân biệt dấu: "Rách bìa" và "Rach bia" là trùng.
 - Test Testcontainers cần Docker đang chạy; thiếu Docker là thiếu công cụ (Accept exit 2), không phải test đỏ.
 

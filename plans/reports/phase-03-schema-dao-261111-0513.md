@@ -36,8 +36,8 @@ Ngày 11/11/2026. Nhánh `phase/03-schema-dao`. Orchestrator: phiên cook thứ 
 
 | Lane | Báo cáo | Trạng thái |
 |---|---|---|
-| 3A `model-util` | `phase-03-model-util-261111-0426.md` | DONE |
-| 3B `dao-user-book` | `phase-03-dao-user-book-261111-0438.md` | DONE |
+| 3A `model-util` | `phase-03-model-util-261111-0426.md` | DONE_WITH_CONCERNS (sửa ghi 11/11/2026: đề xuất trường `con` xử lí ở mục 5; getter `flywayDataLocation` xử lí ở phase 4b) |
+| 3B `dao-user-book` | `phase-03-dao-user-book-261111-0438.md` | DONE_WITH_CONCERNS (sửa ghi 11/11/2026: hằng 1062, `LIKE` xử lí ở mục 5; đánh số quyển của `updateBook` và mẹo `MagicNumber` xử lí ở phase 4b) |
 | 3C `dao-cart-bill` | `phase-03-dao-cart-bill-261111-0450.md` | DONE_WITH_CONCERNS, đã xử lí ở mục 5 |
 | 3D `kiem-kien-truc` | `phase-03-kiem-kien-truc-261111-0442.md` | DONE_WITH_CONCERNS, đã xử lí ở mục 5 |
 | 3.6 Workbench | `phase-03-workbench-261111-0506.md` | Khớp ERD thiết kế |
@@ -60,4 +60,4 @@ Ngày 11/11/2026. Nhánh `phase/03-schema-dao`. Orchestrator: phiên cook thứ 
 
 ## 7. Nợ còn lại
 
-Không có cho phase 3. Ghi cho phase sau: trang (phase 6, 7) đọc trạng thái phiếu bằng `getRentalBillList` khi `updateRentalBill` trả `false` (D9), đúng `docs/contracts.md` §6.3.
+Không có cho phase 3. Ghi cho phase sau: trang (phase 6, 7) đọc lại trạng thái phiếu bằng hàm danh sách đã có khi `updateRentalBill` trả `false` (D9): nhân viên `searchRentalBill("PM" + id)`, khách `getRentalBillList(client)`, đúng `docs/contracts.md` §6.3.
