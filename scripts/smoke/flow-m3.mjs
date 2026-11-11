@@ -45,6 +45,8 @@ const M = {
   BOOK_NOT_CHOSEN: 'Vui lòng chọn đầu truyện.',
   INPUT_TOO_LONG: 'Nội dung nhập quá dài, vui lòng rút gọn.',
   RENTAL_BILL_CHANGED: 'Phiếu mượn đang mở đã thay đổi, vui lòng chọn lại phiếu.',
+  SESSION_EXPIRED: 'Phiên làm việc đã hết hạn, vui lòng đăng nhập lại.',
+  CANCEL_REASON_REQUIRED: 'Vui lòng nhập lí do huỷ.',
 };
 const LONG_255 = 'x'.repeat(256);
 const LONG_100 = 'x'.repeat(101);
@@ -252,6 +254,11 @@ async function main() {
   page = await deskUpdate(a, page, { received: both, dueDate: '2026-02-30' });
   expectMessage('EC', 'ngày hẹn trả không có thật', page, PAGE.process, M.DUE_DATE_INVALID);
   assertEq(stepOf('EC', 'giữ ngày hẹn trả cũ'), PAGE.process, due, deskState(page).dueDate);
+  page = await deskUpdate(a, page, { received: both, dueDate: isoDate(addDays(vnToday(), 45)) });
+  if (messageOf(page.html)) throw new StepError(stepOf('EC', 'ngày hẹn trả quá 30 ngày được nhận ở quầy (C15)'), PAGE.process, 'không có câu báo', messageOf(page.html));
+  assertEq(stepOf('EC', 'ngày hẹn trả 45 ngày'), PAGE.process, isoDate(addDays(vnToday(), 45)), deskState(page).dueDate);
+  page = await deskUpdate(a, page, { received: both, dueDate: due });
+  expectText('EC', 'trả lại 7 ngày', page, PAGE.process, /Tổng tiền thuê:? 42\.000đ/);
   page = await deskUpdate(a, page, { received: both, dueDate: due, note: LONG_255 });
   expectMessage('EC', 'ghi chú quá 255 kí tự', page, PAGE.process, M.INPUT_TOO_LONG);
   page = await deskUpdate(a, page, { received: [...both, 'DT999-99'], dueDate: due });
@@ -265,7 +272,19 @@ async function main() {
   expectRedirect('EC', 'mở Thêm tình trạng khi session chưa có phiếu', await d.get(PAGE.condition, { follow: false }), PAGE.condition, [PAGE.search, PAGE.process]);
   expectRedirect('EC', 'mở trang in khi session chưa có phiếu', await d.get(PAGE.print, { follow: false }), PAGE.print, [PAGE.search]);
   const dHome = await d.get(PAGE.home);
+  if (!hasId(dHome.html, 'btnLogout')) throw new StepError(stepOf('C14', 'nút Đăng xuất'), PAGE.home, 'id btnLogout', 'không có');
   expectRedirect('EC', 'POST doUpdateRentalBill khi session chưa có phiếu', await send(d, dHome, PAGE.doConfirm, { btnConfirm: '' }, { follow: false }), PAGE.doConfirm, [PAGE.search]);
+  const out = await send(d, dHome, '/doLogout.jsp', { btnLogout: '' }, { follow: false });
+  expectRedirect('C14', 'đăng xuất nhân viên', out, '/doLogout.jsp', [PAGE.login]);
+  const afterOut = await d.get(PAGE.home, { follow: false });
+  expectRedirect('C14', 'sau khi đăng xuất mở trang nhân viên', afterOut, PAGE.home, [PAGE.login, `${PAGE.login}?expired=1`]);
+  const e = new Session(BASE);
+  await login(e, 'hant', 'hant@123', 'C16');
+  const eHome = await e.get(PAGE.home);
+  e.cookies.set('JSESSIONID', 'het-han-0000');
+  const expired = await send(e, eHome, PAGE.search, { txtKeyword: 'PM0125', btnSearch: '' }, { follow: false });
+  expectRedirect('C16', 'POST khi session đã hết hạn', expired, PAGE.search, [`${PAGE.login}?expired=1`]);
+  expectMessage('C16', 'câu phiên hết hạn', await e.get(`${PAGE.login}?expired=1`), PAGE.login, M.SESSION_EXPIRED);
 
   // Điều kiện 1: bỏ tích mọi quyển rồi xác nhận
   page = await deskUpdate(a, page, { received: [], dueDate: due });
@@ -446,6 +465,9 @@ async function main() {
   page = await send(a, page, PAGE.process, { btnCancel: '', chkReceived: ['DT002-01'] });
   expectText('12.2', 'hộp xác nhận huỷ', page, PAGE.process, M.CANCEL_CONFIRM);
   assertEq(stepOf('12.2', 'input from=staff (C8)'), PAGE.process, 'staff', valueOf(page.html, 'from'));
+  const noReason = await send(a, page, PAGE.doCancel, { txtCancelReason: '   ', from: 'staff', btnConfirmCancel: '' });
+  expectMessage('C17', 'huỷ tại quầy không nhập lí do', noReason, PAGE.doCancel, M.CANCEL_REASON_REQUIRED);
+  assertEq(stepOf('C17', 'DB: PM0126 vẫn Chờ nhận'), 'tblRentalBill', 'Chờ nhận', sql('SELECT status FROM tblRentalBill WHERE id = 126;')[0]?.[0]);
   page = await send(a, page, PAGE.doCancel, { txtCancelReason: 'Khách không đồng ý với tình trạng quyển DT001-03', from: 'staff', btnConfirmCancel: '' });
   expectMessage('12.4', 'huỷ tại quầy', page, PAGE.doCancel, M.CANCEL_SUCCESS);
   expectText('12.5', 'quay về Tìm phiếu mượn', page, PAGE.search, 'Tìm phiếu mượn');

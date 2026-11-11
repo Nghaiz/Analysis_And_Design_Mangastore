@@ -17,7 +17,9 @@ Owner: orchestrator phase 7 (phiên 93), lập 11/11/2026 theo yêu cầu của 
 | `RENTAL_BILL_CHANGED` | Phiếu mượn đang mở đã thay đổi, vui lòng chọn lại phiếu. |
 
   C10 đổi: lỗi nhập có câu riêng thì hiện câu đó và đặt `aria-invalid="true"` trên ô, giữ giá trị cũ trong session.
-- Phiếu "Chờ nhận" đã quá giờ hẹn: **không** xử lí riêng (không nhãn, không tự huỷ); nhân viên xử lí hoặc huỷ như phiếu thường.
+- Phiếu "Chờ nhận" đã quá giờ hẹn: **không** xử lí riêng (không nhãn, không tự huỷ); nhân viên xử lí hoặc huỷ như phiếu thường (`docs/contracts.md` C18).
+- Giới hạn 30 ngày (C15, `RentalBill.MAX_EXPECTED_DAYS`) chỉ áp cho số ngày khách đặt; ở quầy **không** giới hạn: ngày hẹn trả chỉ cần sau ngày mượn (chủ dự án chọn 11/11/2026).
+- Câu ngoài báo cáo đã vào `docs/contracts.md` §10.3 và `Messages` (phiên phase 6, 612cdd3). Phase 7 dùng thêm: `SESSION_EXPIRED` (C16, LoginView nhân viên khi `?expired=1`), `CANCEL_REASON_REQUIRED` (C17, huỷ tại quầy). Nút "Đăng xuất" `btnLogout` ở StaffHomeView gửi tới `/doLogout.jsp` (C14).
 
 ## 2. Ngoại lệ của ch.2 mục 2.3 (đủ, smoke `scripts/smoke/flow-m3.mjs`)
 
