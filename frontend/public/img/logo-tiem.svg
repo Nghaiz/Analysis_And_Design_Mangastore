@@ -1,0 +1,30 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="96" height="96" viewBox="0 0 96 96">
+  <!-- Biểu trưng tiệm tự vẽ: mái hiên sọc, chồng truyện tự vẽ (gáy trơn, không bìa thật, không nhân vật, không logo NXB),
+       con dấu đỏ. Không chứa chữ: tên tiệm in bằng HTML (font Momo Trust Display) cạnh ảnh này, nên ảnh dùng alt="". -->
+  <rect x="4" y="4" width="88" height="88" fill="#F3E6C8" stroke="#6B4226" stroke-width="3"/>
+  <!-- mái hiên sọc -->
+  <path d="M10 14h76v14H10z" fill="#E9DDB0"/>
+  <path d="M10 14h11v14H10zM32 14h11v14H32zM54 14h11v14H54zM76 14h10v14H76z" fill="#A3221B"/>
+  <path d="M10 28q5.5 6 11 0q5.5 6 11 0q5.5 6 11 0q5.5 6 11 0q5.5 6 11 0q5.5 6 11 0q5 6 10 0" fill="#E9DDB0" stroke="#6B4226" stroke-width="1.5"/>
+  <!-- kệ gỗ -->
+  <path d="M14 80h68v5H14z" fill="#6B4226"/>
+  <!-- chồng truyện tự vẽ -->
+  <g stroke="#2B2118" stroke-width="1.2">
+    <path d="M22 50h8v30h-8z" fill="#1F3F8F"/>
+    <path d="M30 46h7v34h-7z" fill="#2A6334"/>
+    <path d="M37 52h9v28h-9z" fill="#7F4B00"/>
+    <path d="M46 48h7v32h-7z" fill="#A3221B"/>
+    <path d="M54.5 55l7.5-2.6 9.6 27.4-7.5 2.6z" fill="#E4CF9F"/>
+  </g>
+  <g stroke="#F3E6C8" stroke-width="1" opacity="0.8">
+    <path d="M24 56h4M24 74h4M32 52h3M32 74h3M39 58h5M39 74h5M48 54h3M48 74h3"/>
+  </g>
+  <!-- con dấu đỏ góc phải -->
+  <g transform="rotate(-10 76 56)">
+    <rect x="66" y="44" width="20" height="20" fill="none" stroke="#A3221B" stroke-width="2.5"/>
+    <path d="M70 49h12v3h-4.5v9h-3v-9H70z" fill="#A3221B"/>
+  </g>
+  <!-- bóng đèn vàng -->
+  <path d="M48 32v4" stroke="#2B2118" stroke-width="1.2"/>
+  <circle cx="48" cy="39" r="3" fill="#F6C453" stroke="#6B4226" stroke-width="1"/>
+</svg>

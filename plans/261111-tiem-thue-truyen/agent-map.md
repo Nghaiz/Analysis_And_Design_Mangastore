@@ -2,9 +2,9 @@
 
 Nguồn sự thật cho việc giao lane của mọi phiên cook. Đọc lại đầu phiên và sau mỗi lần compact (cùng `CLAUDE.md` và file phase đang làm). Giao hay nhận việc xong là cập nhật file này ngay, trước khi làm việc khác.
 
-Phase 1–4 xong: phase 1, 2, 3 đã vào `main` (PR #1, #2, #3), phase 4 vào `main` qua PR của `phase/04-pipeline`. Phase tiếp theo: 5
-Cập nhật lần cuối: 2026-11-11 (phiên cook phase 3–4)
-Nhánh phase: chưa có (phase 5 tạo `phase/05-...` từ `origin/main`)
+Phase 1–4 xong: phase 1, 2, 3 đã vào `main` (PR #1, #2, #3), phase 4 vào `main` qua PR của `phase/04-pipeline`. Phase 1–5 xong; phase tiếp theo: 6
+Cập nhật lần cuối: 2026-11-11 (phiên cook phase 5)
+Nhánh phase: `phase/05-he-thiet-ke-giao-dien`, worktree orchestrator `D:/Coding/mangastore-wt/05-orch`
 
 ## Luật (tóm tắt, bản đủ ở `plan.md` và `contract.md` §1)
 
@@ -48,11 +48,11 @@ Nhánh phase: chưa có (phase 5 tạo `phase/05-...` từ `origin/main`)
 | 4 | 4B `xu-li` | clean, images, copies, price, validate, export, publish | `t1k-web-core-developer` | xem `phase-04` | 4.0 | xong | `plans/reports/phase-04-xu-li-261111-0401.md` |
 | 4 | 4C `xac-minh` | Playwright MCP trang ảnh chạy thử | `t1k-web-testing-tester` | `plans/reports/` | 4.3 | xong | `plans/reports/phase-04-trial-261111-0423.md` |
 | 4 | 4.5 HARD STOP | chủ dự án duyệt chạy thử 10 đầu truyện | orchestrator thay (chủ dự án giao toàn quyền 11/11/2026) | | 4C | xong: 10/10 đạt, crawl hết | `plans/reports/phase-04-trial-261111-0423.md` |
-| 5 | 5.0 orchestrator | gói npm, shadcn add, khoá vite.config | phiên chính | xem `phase-05` | phase 3 | chờ | |
-| 5 | 5A `token-tag` | token, font, CSS, tag JSP, StyleGuide, kiểm tương phản và font | `t1k-web-ui-developer` | xem `phase-05` | 5.0 | chờ | |
-| 5 | 5B `loader-react` | loader cách B, component React, ESLint chặn fetch, ngân sách | `t1k-web-core-developer` | xem `phase-05` | 5.0 | chờ | |
-| 5 | 5C `ke-3d` | ShelfScene, quạt trần, ảnh tĩnh, HomePreview | `t1k-web-core-developer` | xem `phase-05` | 5.0 | chờ | |
-| 5 | 5D `xac-minh` | Playwright MCP và đo Lighthouse | `t1k-web-testing-tester` | `plans/reports/` | 5A, 5B, 5C | chờ | |
+| 5 | 5.0 orchestrator | gói npm, shadcn add, khoá vite.config, hợp đồng giao diện, Accept | phiên chính | xem `phase-05` | phase 3 | xong | `phase-05-ui-contract.md` |
+| 5 | 5A `token-tag` | token, font, CSS, tag JSP, StyleGuide, kiểm tương phản và font | `t1k-web-ui-developer` | xem `phase-05` | 5.0 | xong (5660371) | `plans/reports/phase-05-token-tag-261111-0812.md` |
+| 5 | 5B `loader-react` | loader cách B, component React, ESLint chặn fetch, ngân sách | `t1k-web-core-developer` | xem `phase-05` | 5.0 | xong (6349b00) | `plans/reports/phase-05-loader-react-261111-0756.md` |
+| 5 | 5C `ke-3d` | ShelfScene, quạt trần, ảnh tĩnh, HomePreview | `t1k-web-core-developer` | xem `phase-05` | 5.0 | xong (b5de396) | `plans/reports/phase-05-ke-3d-261111-0801.md` |
+| 5 | 5D `xac-minh` | Playwright MCP và đo Lighthouse | `t1k-web-testing-tester` | `plans/reports/` | 5A, 5B, 5C | xong | `plans/reports/phase-05-xac-minh-261111-0828.md` |
 | 6 | 6.0 orchestrator | web.xml filter, compose e2e, smoke M1–M2, Accept | phiên chính | xem `phase-06` | phase 4, 5 | chờ | |
 | 6 | 6A `filter-chung` | 5 filter, csrf tag, trang lỗi | `t1k-web-core-developer` | xem `phase-06` | 6.0 | chờ | |
 | 6 | 6B `trang-m1` | 5 trang M1 | `t1k-web-core-developer` | xem `phase-06` | 6.0 | chờ | |
@@ -96,3 +96,9 @@ Nhánh phase: chưa có (phase 5 tạo `phase/05-...` từ `origin/main`)
 | 2026-11-11 | 2D xong, merge (d8104fc); chạy thử tiem-contract-guard báo đúng 2 vi phạm cố ý (c124d06), worktree thử không merge |
 | 2026-11-11 | 2B xong, merge (875c7fb); UNIQUE vào ô khoá `tblCart.clientId`, thêm `schema-doc-sync.test.mjs` (2257b72) |
 | 2026-11-11 | Theo phiên phase 3 (lane 3A): skill `tiem-add-dao-duplicate-check` đổi khuôn sang `con()` + `inWriteTransaction` (Checkstyle cấm trường protected); Accept phase 2 ALL PASS (`plans/reports/accept-phase-02-261111-0430.log`) |
+| 2026-11-11 | Phase 5: 5.0 xong (gói npm ghim, shadcn 7 component sửa import `cn`, vite phát `data/categories.json`, `phase-05-ui-contract.md`, Accept phase 5 bước 2 đỏ có chủ đích); phiên 9b báo phase 5 đụng cây chính → chuyển sang worktree `05-orch`, cây chính về `main` |
+| 2026-11-11 | Spawn 5A, 5B, 5C song song (phase 4 xong nên đủ 3 chỗ) |
+| 2026-11-11 | Merge PR #5, #6 của main vào nhánh phase. 5B xong (DONE_WITH_CONCERNS: thẻ HTML chưa ghim), merge (eab90f0); hợp đồng giao diện thêm §3a, nhắn 5A khớp theo; 5B đề xuất 3 gotcha, đã thêm vào skill `tiem-create-react-island`; loader 2,25 kB gzip |
+| 2026-11-11 | 5C xong (DONE_WITH_CONCERNS: chưa soi trình duyệt, HomePreview cần layout.tag của 5A), merge (289a89e); đổi import sang `@/hooks/useReducedMotion`, xoá hook tạm (a46b254); 88 test xanh, check:budget PASS (loader 2,36 kB, ShelfCanvas 247 kB gzip chỉ ShelfScene); đề xuất `posterAvifSrcSet` trong contracts §11.4 để sau số Lighthouse |
+| 2026-11-11 | 5A dừng ở giới hạn 75 lượt, nhắn làm tiếp, xong (5660371), merge (c419293); áp đề xuất tài liệu, Accept thêm bước 4b chặn hex; loader thêm `data-island-state` (mục phiên 9b mang từ phase 1); Accept lần 1 FAIL bước 6 (HomePreviewView 500: `<%= %>` trong thân scriptless), sửa (c3af339), lần 2 ALL PASS; spawn 5D. Stack compose do phase 5 giữ tới khi xong 5.5 (đã hẹn phiên 9b) |
+| 2026-11-11 | 5D lần 1: L1 (CSS ảnh thiếu lớp JSP) sửa ở Dockerfile + Accept bước 6; chủ dự án đổi font (Fuzzy Bubbles + Momo), lane 5E và lane tài liệu làm; 5C sửa ánh sáng, chuyển mờ, nhãn 390, lọc warning THREE.Clock; 5D đo lại PASS; chủ dự án giao chọn font số → Nunito (`--font-num`); Accept ALL PASS (0908); Lighthouse HomePreview 96, StyleGuide 98; ảnh tĩnh kệ cho điện thoại ghi sang phase 6 |
